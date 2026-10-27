@@ -80,14 +80,32 @@ export class StudentAuthUi {
     }
 
     showForcedPasswordChange() {
+        const ownerUserId = this.sm.currentUser?.uid;
+        this.passwordIntent?.dispose();
+        if (!ownerUserId) throw new DOMException('The account changed.', 'AbortError');
+        const intent = this.passwordIntent = supabaseService.capturePasswordChangeIntent({ ownerUserId });
+        this.passwordOwner = ownerUserId;
+        this.passwordChangePending = false;
         const modal = $('#force-password-modal');
         const status = $('#change-password-status');
+        for (const id of ['#change-password-new', '#change-password-confirm']) { const field = $(id); if (field) field.value = ''; }
+        intent.signal.addEventListener('abort', () => {
+            for (const id of ['#change-password-new', '#change-password-confirm']) { const field = $(id); if (field) field.value = ''; }
+            if (this.passwordIntent === intent) {
+                this.passwordIntent = null;
+                this.passwordChangePending = false;
+                closeDialog('#force-password-modal', { restoreFocus: false });
+            }
+        }, { once: true });
         if (status) status.textContent = '';
         if (modal) openModal(modal, { dismissible: false, initialFocus: '#change-password-new' });
     }
 
     async handleForcedPasswordChange(event) {
         event.preventDefault();
+        const intent = this.passwordIntent, owner = this.passwordOwner;
+        const current = () => this.passwordIntent === intent && intent?.isCurrent() && this.sm.currentUser?.uid === owner;
+        if (this.passwordChangePending || !current()) return;
         const password = $('#change-password-new')?.value || '';
         const confirmPassword = $('#change-password-confirm')?.value || '';
         const status = $('#change-password-status');
@@ -103,15 +121,22 @@ export class StudentAuthUi {
         }
 
         try {
+            this.passwordChangePending = true;
             if (status) status.textContent = 'Updating password...';
-            await supabaseService.updatePasswordAndClearFlag(password);
+            await supabaseService.updatePasswordAndClearFlag(password, { intent });
+            if (!current()) return;
             this.sm.mustChangePassword = false;
             closeDialog('#force-password-modal', { restoreFocus: false });
-            await this.auth.finishSignedInSession();
-            notifications.success('Password updated.');
+            const finished = await this.auth.finishSignedInSession(owner, { isCurrent: current, signal: intent.signal });
+            if (current() && finished) {
+                this.sm.authInitialized = true;
+                notifications.success('Password updated.');
+                intent.dispose();
+            }
         } catch (error) {
-            console.error('Password change failed:', error);
-            if (status) status.textContent = error.message || 'Could not update password.';
+            if (current() && status) status.textContent = error.message || 'Could not update password.';
+        } finally {
+            if (this.passwordIntent === intent) this.passwordChangePending = false;
         }
     }
 

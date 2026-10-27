@@ -1,10 +1,9 @@
-import { openDB } from 'idb';
 import { createUniqueId } from './randomUtils.js';
 import {
-    MAX_SYNC_ATTEMPTS,
     MAX_SYNC_QUEUE_RECORDS,
     getSyncActionDedupeKey,
-    getSyncRetryDelayMs
+    getSyncRetryDelayMs,
+    isRecoverableLegacySyncFailure
 } from './services/syncQueuePolicy.js';
 import {
     getActiveStudentStorageOwner,
@@ -13,6 +12,13 @@ import {
 
 function createStorageId(type) {
     return createUniqueId(`${type}-`);
+}
+
+function compareSyncOrder(a, b) {
+    const left = Number(a.queueOrder) || 0, right = Number(b.queueOrder) || 0;
+    // Legacy timestamp ties have no recoverable chronology; keep a stable fallback.
+    return left - right || String(a.createdAt).localeCompare(String(b.createdAt))
+        || String(a.id).localeCompare(String(b.id));
 }
 
 export class ImageDB {
@@ -25,7 +31,7 @@ export class ImageDB {
 
     async open() {
         if (!this.dbPromise) {
-            this.dbPromise = openDB(this.dbName, 6, {
+            this.dbPromise = import('idb').then(({ openDB }) => openDB(this.dbName, 6, {
                 upgrade: (db, _oldVersion, _newVersion, transaction) => {
                     const drawingStore = db.objectStoreNames.contains(this.storeName)
                         ? transaction.objectStore(this.storeName)
@@ -80,7 +86,7 @@ export class ImageDB {
                     console.warn('Browser storage connection ended unexpectedly; it will reopen when needed.');
                     this.dbPromise = null;
                 }
-            }).catch(error => {
+            })).catch(error => {
                 this.dbPromise = null;
                 throw error;
             });
@@ -126,7 +132,10 @@ export class ImageDB {
     }
 
     async saveDrawing(vocabName, word, blob, options = {}) {
+        options.signal?.throwIfAborted();
         const db = await this.open();
+        options.signal?.throwIfAborted();
+        if (options.isCurrent && !options.isCurrent()) throw new DOMException('Drawing owner changed.', 'AbortError');
         const ownerUserId = this.resolveOwnerFromOptions(options);
         await db.put(this.storeName, {
             id: this.drawingId(vocabName, word, ownerUserId),
@@ -172,6 +181,10 @@ export class ImageDB {
         const dedupeKey = getSyncActionDedupeKey(type, payload);
         const tx = db.transaction(this.syncStoreName, 'readwrite');
         const store = tx.objectStore(this.syncStoreName);
+        // A single readwrite transaction allocates order across tabs/connections.
+        // Once no receipts remain the counter may restart; no causal work remains.
+        const ownerRecords = (await store.getAll()).filter(record => record.ownerUserId === ownerUserId);
+        const nextOrder = () => Math.max(0, ...ownerRecords.map(record => Number(record.queueOrder) || 0)) + 1;
         if (dedupeKey) {
             let existing = await store.index('ownerDedupeKey').get([ownerUserId, dedupeKey]);
             if (type === 'student-unit-work') {
@@ -194,6 +207,7 @@ export class ImageDB {
                     ...existing,
                     payload,
                     dedupeKey,
+                    queueOrder: payload.eventId !== existing.payload?.eventId ? nextOrder() : existing.queueOrder,
                     ...(type === 'student-unit-work' && payload.eventId !== existing.payload?.eventId
                         ? { attempts: 0, lastError: '', failureReason: '' } : {}),
                     revision: (Number(existing.revision) || 0) + 1,
@@ -207,17 +221,7 @@ export class ImageDB {
             }
         }
 
-        const allRecords = (await store.getAll())
-            .filter(record => record.ownerUserId === ownerUserId);
-        const terminalRecords = allRecords
-            .filter(record => record.status === 'failed' || record.status === 'quarantined')
-            .sort((a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt)));
-        while (allRecords.length >= MAX_SYNC_QUEUE_RECORDS && terminalRecords.length > 0) {
-            const discarded = terminalRecords.shift();
-            await store.delete(discarded.id);
-            allRecords.splice(allRecords.findIndex(record => record.id === discarded.id), 1);
-        }
-        if (allRecords.length >= MAX_SYNC_QUEUE_RECORDS) {
+        if (ownerRecords.length >= MAX_SYNC_QUEUE_RECORDS) {
             const error = new Error('Offline sync storage is full. Reconnect before saving more work.');
             error.code = 'SYNC_QUEUE_FULL';
             await tx.done;
@@ -226,6 +230,7 @@ export class ImageDB {
 
         const record = {
             id: createStorageId(type),
+            queueOrder: nextOrder(),
             ownerUserId,
             type,
             payload,
@@ -270,7 +275,27 @@ export class ImageDB {
         const now = Number(options.now) || Date.now();
         return records
             .filter(record => options.includeDeferred || !record.nextAttemptAt || Date.parse(record.nextAttemptAt) <= now)
-            .sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+            .sort(compareSyncOrder);
+    }
+
+    async getNewerUnitSyncAction(record, options = {}) {
+        const pending = await this.getPendingSyncActions({ ...options, includeDeferred: true });
+        return pending.filter(candidate => candidate.type === 'student-unit-work'
+            && candidate.payload?.unitKey === record.payload?.unitKey
+            && compareSyncOrder(candidate, record) > 0).at(-1) || null;
+    }
+
+    async reviveRetryableSyncActions(options = {}) {
+        const db = await this.open();
+        const ownerUserId = this.resolveOwnerFromOptions(options);
+        const tx = db.transaction(this.syncStoreName, 'readwrite');
+        const store = tx.objectStore(this.syncStoreName);
+        for (const record of await store.index('ownerStatus').getAll([ownerUserId, 'failed'])) {
+            if (!isRecoverableLegacySyncFailure(record)) continue;
+            await store.put({ ...record, status: 'pending', nextAttemptAt: null,
+                revision: (Number(record.revision) || 0) + 1, updatedAt: new Date().toISOString() });
+        }
+        await tx.done;
     }
 
     async completeSyncAction(id, options = {}) {
@@ -302,8 +327,8 @@ export class ImageDB {
             await tx.done;
             return { ...(current || record), skipped: true };
         }
-        const attempts = (Number(current.attempts) || 0) + 1;
-        const terminal = options.terminal === true || attempts >= MAX_SYNC_ATTEMPTS;
+        const attempts = Math.min(Number.MAX_SAFE_INTEGER, (Number(current.attempts) || 0) + 1);
+        const terminal = options.terminal === true;
         const now = Date.now();
         const updated = {
             ...current,

@@ -1,6 +1,6 @@
+import { showLibraryLoading, renderLibraryEmpty } from './teacherLibraryControls.js';
 import { $ } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
-import { showLoadingState } from './ui/loadingState.js';
 import { validateQuizBuilderDraft } from './quizMakerStateValidation.js';
 
 const QUIZ_BUILDER_DRAFT_KEY = 'teacher_quiz_builder_active_draft';
@@ -111,6 +111,18 @@ class TeacherQuizCoreMethods {
 
         let nextQuizMaker;
         try {
+            // Both makers use the same editor elements. Retire the previous
+            // handlers and preview before the replacement claims those elements.
+            const previousQuizMaker = this.quizMaker;
+            this.quizMaker = null;
+            this.quizMakerVocabKey = null;
+            previousQuizMaker?.destroy?.();
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || openGeneration !== this.quizBuilderOpenGeneration
+                || !this.quizEditorOpen
+                || vocabKey !== this.getQuizBuilderVocabKey(this.getActiveVocabulary())) return false;
+
             nextQuizMaker = new QuizMaker(this.getActiveVocabulary(), () => {
                 if (this.destroyed || lifecycleGeneration !== this.lifecycleGeneration) return;
                 if (this.quizReturnView === 'editor') {
@@ -127,6 +139,11 @@ class TeacherQuizCoreMethods {
                 }
             });
         } catch (error) {
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || openGeneration !== this.quizBuilderOpenGeneration
+                || !this.quizEditorOpen
+                || vocabKey !== this.getQuizBuilderVocabKey(this.getActiveVocabulary())) return false;
             console.error('Failed to start Quiz Maker:', error);
             this.quizEditorOpen = false;
             this.feedback.error('Could not start the quiz builder. Please try again.');
@@ -135,11 +152,12 @@ class TeacherQuizCoreMethods {
         }
         if (this.destroyed
             || lifecycleGeneration !== this.lifecycleGeneration
-            || openGeneration !== this.quizBuilderOpenGeneration) {
+            || openGeneration !== this.quizBuilderOpenGeneration
+            || !this.quizEditorOpen
+            || vocabKey !== this.getQuizBuilderVocabKey(this.getActiveVocabulary())) {
             nextQuizMaker?.destroy?.();
             return false;
         }
-        this.quizMaker?.destroy?.();
         this.quizMakerVocabKey = vocabKey;
         this.quizMaker = nextQuizMaker;
         return true;
@@ -169,8 +187,8 @@ class TeacherQuizCoreMethods {
     updateQuizHubSummary() {
         const title = $('#quiz-active-vocab-name');
         const meta = $('#quiz-active-vocab-meta');
-        if (title) title.textContent = 'Choose a vocabulary set';
-        if (meta) meta.textContent = 'Open the builder from a specific unit card below.';
+        if (title) title.textContent = 'Build a quiz';
+        if (meta) meta.textContent = 'Choose a vocabulary set below to start a new quiz.';
     }
 
     async loadQuizPicker() {
@@ -178,17 +196,14 @@ class TeacherQuizCoreMethods {
         if (!container) return false;
         const pickerGeneration = ++this.quizPickerLoadGeneration;
         const lifecycleGeneration = this.lifecycleGeneration;
-        showLoadingState(container, 'Loading vocabulary choices...');
+        showLibraryLoading(container, 'Loading vocabulary sets for quiz creation...');
         try {
             const { items } = await this.getTeacherLibrary();
             if (this.destroyed
                 || lifecycleGeneration !== this.lifecycleGeneration
                 || pickerGeneration !== this.quizPickerLoadGeneration) return false;
-            if (!items || items.length === 0) {
-                container.innerHTML = '<p class="teacher-empty-state">No vocabulary sets are available yet.</p>';
-                return true;
-            }
-            this.quizLibraryItems = items;
+            container.removeAttribute('aria-busy');
+            this.quizLibraryItems = items || [];
             this.renderQuizVocabularyBrowser(container);
             this.refreshIcons();
             return true;
@@ -197,7 +212,7 @@ class TeacherQuizCoreMethods {
                 || lifecycleGeneration !== this.lifecycleGeneration
                 || pickerGeneration !== this.quizPickerLoadGeneration) return false;
             console.error('Failed to load quiz vocabulary picker:', error);
-            container.innerHTML = '<p class="teacher-empty-state">Could not load vocabulary choices.</p>';
+            renderLibraryEmpty(container, 'Could not load vocabulary choices. Try again.', () => this.loadQuizPicker());
             return false;
         }
     }
@@ -223,9 +238,13 @@ class TeacherQuizCoreMethods {
         this.quizEditorOpen = false;
         this.quizReturnView = 'quizzes';
         this.quizLibraryItems = [];
+        this.quizSearchState = null;
         this.quizDrilldown = { subject: null, grade: null, trimester: null, month: null };
         this.quizVocabularyViewModes = {};
         $('#quiz-vocab-picker')?.replaceChildren();
+        $('#quiz-library-filters')?.replaceChildren();
+        $('#quiz-vocab-breadcrumb')?.replaceChildren();
+        $('#quiz-library-result-count')?.replaceChildren();
         $('#quiz-vocab-view-toggle')?.replaceChildren();
         const title = $('#quiz-active-vocab-name');
         const meta = $('#quiz-active-vocab-meta');

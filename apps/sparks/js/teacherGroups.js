@@ -24,6 +24,7 @@ class TeacherGroupsFeature {
     constructor({
         ensureAuthenticated,
         showView,
+        onClassChange,
         classesRepository = classroomRepository,
         getSession,
         refreshIcons,
@@ -36,6 +37,7 @@ class TeacherGroupsFeature {
     }) {
         this.ensureAuthenticated = ensureAuthenticated;
         this.showView = showView;
+        this.onClassChange = onClassChange;
         this.classesRepository = classesRepository;
         this.classes = [];
         this.rosterGeneration = 0;
@@ -103,7 +105,8 @@ class TeacherGroupsFeature {
         this.listenersBound = true;
 
         this.addListener('#group-class-select', 'change', event => {
-            this.handleGroupClassChange(event.currentTarget.value);
+            if (this.onClassChange) this.onClassChange(event.currentTarget.value);
+            else this.handleGroupClassChange(event.currentTarget.value);
         });
         this.addListener('#group-student-list', 'change', event => {
             const checkbox = event.target.closest('input[data-student-id]');

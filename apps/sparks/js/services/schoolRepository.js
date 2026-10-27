@@ -1,6 +1,19 @@
 import { readSectionQuery } from './sectionRead.js';
 // Every operation is authorized by the server. UI roles are never credentials.
-export function createSchoolRepository(getClient) {
+import { requestWithTimeout } from './requestReliability.js';
+export function createSchoolRepository(getClient, getSession = () => null) {
+    function ownedSettingRpc(name, args, options = {}) {
+        const snapshot = JSON.parse(JSON.stringify(args));
+        const session = getSession();
+        return requestWithTimeout(async signal => {
+            if (!options.ownerUserId || (options.isCurrent && !options.isCurrent())) {
+                throw new DOMException('The school settings account changed.', 'AbortError');
+            }
+            const { ownedSchoolSettingWrite } = await import('./schoolSettingWrites.js');
+            signal.throwIfAborted();
+            return ownedSchoolSettingWrite(getClient, name, snapshot, { ...options, signal, session, getSession });
+        }, { signal: options.signal, timeoutMs: options.timeoutMs || 30000, label: 'Saving school settings' });
+    }
     async function rpc(name, args = {}, { signal } = {}) {
         const client = await getClient();
         if (signal?.aborted) throw new DOMException('Request cancelled', 'AbortError');
@@ -16,9 +29,10 @@ export function createSchoolRepository(getClient) {
     }
     return Object.freeze({
         listYears: (schoolId, options) => rpc('list_school_years_v1', { p_school_id: schoolId }, options),
-        setYear: (schoolId, year, label, archived = false) => rpc('set_school_year_v1', { p_school_id: schoolId, p_year: Number(year), p_label: label.trim(), p_archived: archived }),
+        setYear: (schoolId, year, label, archived = false, options) => ownedSettingRpc('set_school_year_owned_v1', { p_school_id: schoolId, p_year: Number(year), p_label: label.trim(), p_archived: archived }, options),
         getAccess: options => rpc('my_school_access_v1', {}, options),
         getSettings: (schoolId, options) => rpc('get_school_settings_v1', { p_school_id: schoolId }, options),
+        setSetting: (schoolId, key, value, options) => ownedSettingRpc('set_school_setting_owned_v1', { p_school_id: schoolId, p_key: key, p_value: value }, options),
         setSettings: (schoolId, settings) => rpc('set_school_settings_v1', { p_school_id: schoolId, p_settings: settings }),
         createSchool: ({ name, timezone, adminEmail, requestId }) => rpc('create_school_with_admin_invitation_v1', { p_name: name.trim(), p_timezone: timezone, p_admin_email: adminEmail.trim().toLowerCase(), p_request_id: requestId }),
         setSchoolActive: (schoolId, active) => rpc('set_school_active_v1', { p_school_id: schoolId, p_active: active }),
@@ -36,8 +50,10 @@ export function createSchoolRepository(getClient) {
         listPlatformAdmins: options => rpc('list_platform_admins_v1', {}, options)
     });
 }
+let schoolService;
 export const schoolRepository = createSchoolRepository(async () => {
     const { supabaseService } = await import('../supabaseService.js');
+    schoolService = supabaseService;
     await supabaseService.init();
     return supabaseService.getClient();
-});
+}, () => schoolService?.currentSession);

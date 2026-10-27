@@ -17,6 +17,9 @@ export class StudentActivityWorkTimer {
         this.intervalId = null;
         this.windowFocused = true;
         this.lastReportedSeconds = 0;
+        this.reportInFlight = false;
+        this.reportGeneration = 0;
+        this.nextReportAt = 0;
         this.boundVisibilityChange = () => this.handleVisibilityChange();
         this.boundFocus = () => this.handleFocus();
         this.boundBlur = () => this.handleBlur();
@@ -112,9 +115,36 @@ export class StudentActivityWorkTimer {
         const snapshot = this.getSnapshot();
         this.persist(snapshot.activeSeconds);
         this.render(snapshot);
-        if (snapshot.activeSeconds - this.lastReportedSeconds >= REPORT_INTERVAL_SECONDS) {
-            this.lastReportedSeconds = snapshot.activeSeconds;
-            void this.onReport?.(snapshot);
+        if (this.onReport && snapshot.attemptId && !this.reportInFlight
+            && this.now() >= this.nextReportAt
+            && snapshot.activeSeconds - this.lastReportedSeconds >= REPORT_INTERVAL_SECONDS) {
+            void this.reportTime(snapshot);
+        }
+    }
+
+    async reportTime(snapshot) {
+        const generation = this.reportGeneration;
+        const isCurrent = () => generation === this.reportGeneration && snapshot.attemptId === this.attemptId;
+        this.reportInFlight = true;
+        try {
+            const result = await this.onReport(snapshot);
+            if (isCurrent()) {
+                if (result == null) {
+                    // Persistence returns null when reporting fails or is skipped.
+                    this.nextReportAt = this.now() + REPORT_INTERVAL_SECONDS * 1000;
+                    return;
+                }
+                this.lastReportedSeconds = snapshot.activeSeconds;
+                this.nextReportAt = 0;
+            }
+        } catch (error) {
+            if (isCurrent()) {
+                // Local cumulative seconds remain available for the next report.
+                this.nextReportAt = this.now() + REPORT_INTERVAL_SECONDS * 1000;
+                console.warn('Could not report activity time; saved locally for retry:', error);
+            }
+        } finally {
+            if (isCurrent()) this.reportInFlight = false;
         }
     }
 
@@ -175,6 +205,9 @@ export class StudentActivityWorkTimer {
     }
 
     destroy() {
+        this.reportGeneration += 1;
+        this.reportInFlight = false;
+        this.nextReportAt = 0;
         this.pause();
         this.unbindListeners();
         this.attemptId = '';

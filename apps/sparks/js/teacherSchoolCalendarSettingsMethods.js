@@ -93,7 +93,8 @@ export const teacherSchoolCalendarSettingsMethods = {
     },
 
     readSchoolCalendarFromUI() {
-        return normalizeSchoolCalendar({
+        const calendar = normalizeSchoolCalendar({
+            ...this.schoolCalendar,
             schoolYear: $('#school-calendar-year')?.value,
             classSchedules: this.readClassSchedulesFromUI(),
             trimesters: {
@@ -102,6 +103,11 @@ export const teacherSchoolCalendarSettingsMethods = {
                 IIIT: this.readSchoolCalendarTrimesterFromUI('iiit')
             }
         });
+        if (calendar.academicYears) calendar.academicYears = {
+            ...calendar.academicYears,
+            [calendar.schoolYear]: { schoolYear: calendar.schoolYear, trimesters: calendar.trimesters }
+        };
+        return calendar;
     },
 
     readClassSchedulesFromUI() {
@@ -287,6 +293,7 @@ export const teacherSchoolCalendarSettingsMethods = {
     },
 
     async saveSchoolCalendarSettings(options = {}) {
+        const ownerUserId = this.currentUser?.uid;
         const isCurrent = createTeacherSettingsOperationGuard(this, options);
         if (!isCurrent()) return false;
         const scheduleError = this.validateClassScheduleRows();
@@ -329,7 +336,7 @@ export const teacherSchoolCalendarSettingsMethods = {
                 ...calendar,
                 updatedAt: new Date().toISOString(),
                 updatedBy: this.currentUser?.email || 'unknown'
-            });
+            }, { ownerUserId, isCurrent, signal: options.signal });
             if (!isCurrent()) return false;
             this.schoolCalendarSettingsLoaded = true;
 

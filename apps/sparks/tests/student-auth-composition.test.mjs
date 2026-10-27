@@ -48,6 +48,48 @@ const { StudentAuth } = await import('../js/student/studentAuth.js');
 const { StudentAuthUi } = await import('../js/studentAuthUiMethods.js');
 const { SessionInitializationCoordinator } = await import('../js/services/sessionInitialization.js');
 const { supabaseService } = await import('../js/supabaseService.js');
+const { StudentActivityMenu } = await import('../js/student/studentActivityMenuMethods.js');
+const { getActiveStudentStorageOwner, setActiveStudentStorageOwner } = await import('../js/student/persistence/studentStorage.js');
+
+test('actual auth deduped focus preserves Menu, while forced same-UID initialization cancels held Menu', async () => {
+    const previousOwner = getActiveStudentStorageOwner();
+    try {
+        for (const force of [false, true]) {
+            setActiveStudentStorageOwner('menu-owner');
+            let releaseImport, importEntered, releaseRole, roleEntered, created = 0;
+            const held = new Promise(resolve => { releaseImport = resolve; });
+            const entered = new Promise(resolve => { importEntered = resolve; });
+            const heldRole = new Promise(resolve => { releaseRole = resolve; });
+            const enteredRole = new Promise(resolve => { roleEntered = resolve; });
+            const owner = { uid: 'menu-owner' };
+            const sm = { ...createManager(), authDisabled: false, currentUser: owner, currentRole: 'student',
+                currentVocab: { id: 'unit' }, progress: { cloud: { cloudGeneration: 1 } },
+                routing: { arcadeReadController: new AbortController() } };
+            const activities = sm.activities = { sm, getUnitProgressKey: value => value.id, session: { vocabularyLoadId: 1 } };
+            const menu = activities.menu = new StudentActivityMenu(activities, {
+                load: async () => { importEntered(); await held; return { createStudentUnitWorkspace() { created++; return { dispose() {} }; } }; },
+                loadStyles: async () => {}
+            });
+            activities.progressPersistence = { resetForSession: () => menu.resetForSession() };
+            const auth = new StudentAuth(sm);
+            auth.setAuthStatus = auth.updateGuestStatus = () => {};
+            auth.fetchAndSetRole = async () => { roleEntered(); await heldRole; return 'student'; };
+            auth.finishSignedInSession = async () => true;
+            await auth.sessionCoordinator.run('menu-owner', async () => true);
+            const pending = menu.prepare(menu.capture());
+            const outcome = pending.then(() => 'ready', error => error.name);
+            await entered;
+            const updated = auth.handleBackendSignIn({ uid: 'menu-owner', displayName: 'updated' }, { force });
+            if (force) await enteredRole;
+            else await updated;
+            releaseImport();
+            assert.equal(await outcome, force ? 'AbortError' : 'ready');
+            assert.equal(created, force ? 0 : 1);
+            if (!force) assert.equal(sm.currentUser, owner, 'Actual focus deduplication preserves the owner incarnation');
+            releaseRole(); await updated;
+        }
+    } finally { setActiveStudentStorageOwner(previousOwner); }
+});
 
 function createManager() {
     return {
@@ -70,6 +112,18 @@ test('StudentAuth owns the explicit authentication UI component', () => {
     assert.ok(auth.ui instanceof StudentAuthUi);
     assert.equal(auth.ui.auth, auth);
     assert.equal(auth.ui.sm, manager);
+});
+
+test('a delayed A auth view cannot open a password form bound to service account B', () => {
+    const saved = { client: supabaseService.client, currentUser: supabaseService.currentUser, currentSession: supabaseService.currentSession };
+    try {
+        supabaseService.currentUser = { uid: 'service-b' };
+        supabaseService.currentSession = { user: { id: 'service-b' }, access_token: 'fixture-b', refresh_token: 'fixture-refresh' };
+        supabaseService.client = { auth: { onAuthStateChange() { return { data: { subscription: { unsubscribe() {} } } }; } } };
+        const auth = new StudentAuth({ ...createManager(), currentUser: { uid: 'view-a' } });
+        assert.throws(() => auth.ui.showForcedPasswordChange(), { name: 'AbortError' });
+        assert.equal(auth.ui.passwordIntent, undefined);
+    } finally { Object.assign(supabaseService, saved); }
 });
 
 test('StudentManager declares only the cross-component auth interface directly', () => {

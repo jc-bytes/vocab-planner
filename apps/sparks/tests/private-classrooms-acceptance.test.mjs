@@ -313,11 +313,18 @@ test('private classes enforce ownership and verified enrollment through real aut
             const { ensureViteServer } = await import('../scripts/lib/local-vite-server.mjs');
             const port = Number(process.env.PRIVATE_CLASSROOM_UI_PORT || 8016);
             const baseUrl = `http://127.0.0.1:${port}`;
-            const server = await ensureViteServer({ cwd: fileURLToPath(new URL('..', import.meta.url)), baseUrl, probePath: '/', host: '127.0.0.1', port });
+            const server = await ensureViteServer({ cwd: fileURLToPath(new URL('..', import.meta.url)), baseUrl, probePath: '/', host: '127.0.0.1', port,
+                ...(process.env.PRIVATE_CLASSROOM_UI_DIST === '1' ? {
+                    args: ['vite', 'preview', '--outDir', 'dist-desktop', '--host', '127.0.0.1', '--port', String(port), '--strictPort']
+                } : {}) });
             const browser = await chromium.launch();
             try {
                 async function localPage() {
                     const page = await browser.newPage();
+                    // Returning-student enrollment flow; guide interactions have
+                    // separate real-modal acceptance checks.
+                    const { seedReturningStudentGuidePreferences } = await import('../scripts/lib/student-guide-fixture.mjs');
+                    await seedReturningStudentGuidePreferences(page, neither.id);
                     if (new URL(config.url).port !== '54321') {
                         await page.context().grantPermissions(['local-network-access'], { origin: baseUrl });
                         // The disposable stack uses a different loopback port. Keep CSP,
@@ -343,24 +350,29 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await teacherPage.locator('#tab-classes').waitFor({ state: 'visible', timeout: 10000 }).catch(async error => {
                     console.error(await teacherPage.locator('body').innerText()); throw error;
                 });
-                await teacherPage.locator('#tab-classes').click();
+                await teacherPage.locator('#tab-overview').click();
+                const homeView = teacherPage.locator('#teacher-overview-view');
+                await homeView.getByRole('heading', { name: 'My classes', exact: true }).waitFor();
                 const teacherView = teacherPage.locator('#teacher-classes-view');
-                await teacherView.getByRole('heading', { name: 'Classes', exact: true }).waitFor();
-                const classCard = teacherView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: '6A', exact: true }) });
+                const classCard = homeView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: '6A', exact: true }) });
                 await classCard.waitFor({ state: 'visible' });
                 assert.equal(await classCard.count(), 1, 'Only this teacher’s matching class is listed');
                 await classCard.getByText('Technology · 2026', { exact: true }).waitFor();
-                await classCard.getByRole('button', { name: 'Open class', exact: true }).click();
+                await classCard.getByRole('button', { name: 'Open class 6A', exact: true }).click();
+                await teacherView.getByRole('tab', { name: 'Students', exact: true }).click();
                 await teacherView.getByRole('button', { name: 'Invite students', exact: true }).click();
                 const inviteDialog = teacherPage.getByRole('dialog', { name: 'Invite students', exact: true });
                 await inviteDialog.getByLabel('Student emails', { exact: true }).fill(neither.email);
                 await inviteDialog.getByRole('button', { name: 'Invite students', exact: true }).click();
                 await inviteDialog.waitFor({ state: 'detached' });
+                await teacherView.locator('.class-pending-invitations summary').click();
                 await teacherView.getByText(neither.email + ' · Invited', { exact: false }).waitFor();
-                await teacherView.getByRole('button', { name: 'Work', exact: true }).click();
+                await teacherView.getByRole('tab', { name: 'Classwork', exact: true }).click();
                 const baseline = await a.repo.listAssignments(ca.id);
-                async function publishSavedMaterial(label, source) {
-                    await source.getByRole('button', { name: 'Assign material', exact: true }).click();
+                async function publishSavedMaterial(label) {
+                    await teacherPage.locator('#tab-classes').click();
+                    await teacherView.getByRole('tab', { name: 'Classwork', exact: true }).click();
+                    await teacherView.getByRole('button', { name: 'Assign material', exact: true }).click();
                     const dialog = teacherPage.getByRole('dialog', { name: 'Assign material', exact: true });
                     await dialog.locator('select[name=material]').selectOption({ label });
                     await dialog.locator(`input[name=classIds][value="${ca.id}"]`).check();
@@ -369,10 +381,10 @@ test('private classes enforce ownership and verified enrollment through real aut
                     await dialog.waitFor({ state: 'detached' });
                     await teacherPage.locator('#teacher-assignments-view:not(.hidden)').waitFor();
                 }
-                await publishSavedMaterial('Vocabulary · Cell practice', teacherView);
+                await publishSavedMaterial('Vocabulary · Cell practice');
                 const assignmentView = teacherPage.locator('#teacher-assignments-view');
                 await assignmentView.getByRole('heading', { name: 'Cell practice', exact: true }).first().waitFor();
-                await publishSavedMaterial('Spark · Private reflection', assignmentView);
+                await publishSavedMaterial('Spark · Private reflection');
                 const afterPublication = await a.repo.listAssignments(ca.id);
                 assert.equal(afterPublication.filter(row => row.title === 'Cell practice').length,
                     baseline.filter(row => row.title === 'Cell practice').length + 1);
@@ -400,11 +412,10 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await sparkView.getByLabel('Your answer', { exact: true }).fill('My class response is private.');
                 await sparkView.getByRole('button', { name: 'Save answer', exact: true }).click();
                 await sparkView.getByText('Answer saved. Your teacher will review it.', { exact: true }).waitFor();
-                await teacherPage.locator('#tab-review').click();
-                const reviewView = teacherPage.locator('#teacher-review-view');
-                await reviewView.locator('select[name=class]').selectOption(ca.id);
-                const activeSpark = reviewView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: 'Private reflection', exact: true }) }).filter({ has: teacherPage.getByText('Available', { exact: true }) });
-                await activeSpark.getByRole('button', { name: 'Review work', exact: true }).click();
+                await teacherPage.locator('#tab-assignments').click();
+                const reviewView = teacherPage.locator('#teacher-assignments-view');
+                await teacherPage.getByLabel('Current class', { exact: true }).selectOption(ca.id);
+                await reviewView.getByRole('button', { name: `Open Private reflection · ${ca.name}`, exact: true }).click();
                 await reviewView.getByText('My class response is private.', { exact: true }).waitFor();
                 const [checkedSpark] = await a.repo.publishMaterial({ classIds: [ca.id], kind: 'spark', materialId: sparkCheckMaterialId,
                     releaseAt: new Date(Date.now() - 60000).toISOString(), publicationKey: crypto.randomUUID() });
@@ -423,10 +434,14 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await studentPage.locator('#activity-menu-view [data-activity="flashcards"]').click();
                 assert.equal((await attemptResponse).status(), 200);
                 await studentPage.locator('#activity-view').waitFor({ state: 'visible' });
-                await studentPage.waitForFunction(() => studentApp.activityInstance?.constructor.name === 'FlashcardsActivity');
+                await studentPage.waitForFunction(() => studentApp.currentActivityType === 'flashcards' && studentApp.activityInstance?.container?.querySelector('.flashcard'));
+                await studentPage.waitForFunction(() => !studentApp.routing.isApplyingRoute && !studentApp.routing.pendingRoute
+                    && location.hash.endsWith('/activity/flashcards'));
                 const activityLink = studentPage.url();
                 await studentPage.reload();
-                await studentPage.waitForFunction(() => studentApp.activityInstance?.constructor.name === 'FlashcardsActivity');
+                await studentPage.waitForFunction(() => studentApp.authInitialized
+                    && !studentApp.routing.isApplyingRoute && !studentApp.routing.pendingRoute
+                    && studentApp.currentActivityType === 'flashcards' && studentApp.activityInstance?.container?.querySelector('.flashcard'));
                 assert.equal(studentPage.url(), activityLink, 'Reload retains the selected assignment/activity');
                 const unfinished = await admin.from('student_activity_progress').select('is_complete').eq('user_id', neither.id);
                 assert.ifError(unfinished.error);

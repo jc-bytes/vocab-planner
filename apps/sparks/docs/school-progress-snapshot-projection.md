@@ -1,0 +1,11 @@
+# School progress snapshot projection
+
+Migration `20261025153155_omit_discarded_school_progress_rewards.sql` replaces only `private.student_progress_snapshot_school_v2(uuid,uuid)`. The previous function constructed account rewards and up to 100 ledger entries per student, then deleted those fields from the resulting JSON. The new projection builds only the existing `userId`, `studentProfile`, `units`, and `createdAt` fields.
+
+The educational CTEs, assignment authorization, membership placement, summary-row requirement, function signature, owner, execution permissions, and account-self snapshot stay unchanged. Both school progress RPCs benefit, covering teacher detail, roster progress, batch detail loading, and exports. The client’s defensive export filtering remains in place. No new endpoint, index, or permission is introduced.
+
+Run `npm run test:school-progress-snapshot:database` with the local Supabase stack available. The rehearsal clones definitions into a disposable database and uses synthetic data: three schools, six classes, 180 students, ten vocabulary units and eight activity types per student, rich attempt/state data, and 125 ledger entries for each of the selected 30 students. It restores the historical baseline only inside that clone so it also works after the migration is installed locally or in CI.
+
+The test compares complete SQL results/errors and real SDK/PostgREST bodies/statuses across 13 role contexts, including inactive membership, inactive school, cross-school, student, anonymous, and missing identity cases. It checks nested arrays/nulls, missing summaries, empty and mixed requests, private execution denial, and exact metadata for the changed function. Every other public/private function definition and ACL must remain identical. The migration is applied twice to check repeatability.
+
+An actual expanded-body `EXPLAIN (ANALYZE, BUFFERS)` must show the discarded ledger read executing in the baseline and disappearing in the candidate. Evidence JSON is written to the reported temporary directory. This establishes eliminated work, not a measured latency or throughput improvement; schedule quiet alternating measurements separately. All disposable database, gateway, role, and secret-environment resources are removed automatically. The default local database and hosted systems are not modified by the rehearsal.

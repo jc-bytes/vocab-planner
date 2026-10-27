@@ -61,10 +61,10 @@ test('academic years retain explicit school scope and numeric year across create
     const calls = [];
     const repository = createSchoolRepository(async () => ({ rpc(name, args) { calls.push({ name, args }); return Promise.resolve({ data: [], error: null }); } }));
     await repository.listYears('school-a');
-    await repository.setYear('school-a', '2027', ' Next school year ', true);
+    await repository.setYear('school-a', '2027', ' Next school year ', true, { ownerUserId: 'admin-a' });
     assert.deepEqual(calls, [
         { name: 'list_school_years_v1', args: { p_school_id: 'school-a' } },
-        { name: 'set_school_year_v1', args: { p_school_id: 'school-a', p_year: 2027, p_label: 'Next school year', p_archived: true } }
+        { name: 'set_school_year_owned_v1', args: { p_school_id: 'school-a', p_year: 2027, p_label: 'Next school year', p_archived: true, p_expected_user_id: 'admin-a' } }
     ]);
 });
 

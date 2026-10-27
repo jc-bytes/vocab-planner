@@ -1,4 +1,8 @@
 import process from 'node:process';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { firefox, webkit } from 'playwright';
 
 import {
@@ -9,6 +13,7 @@ import {
     seedLocalAuditData
 } from './lib/local-supabase-audit.mjs';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
+import { login } from './lib/browser-login.mjs';
 
 const host = process.env.UI_CROSS_BROWSER_HOST || '127.0.0.1';
 const port = Number(process.env.UI_CROSS_BROWSER_PORT || 8125);
@@ -55,21 +60,6 @@ async function addLocalSupabaseOverride(context, browserConfig) {
     }, browserConfig);
 }
 
-async function login(page, { pagePath, form, email, password, ready, error }) {
-    await page.goto(`${baseUrl}${pagePath}`, { waitUntil: 'domcontentloaded' });
-    if (await page.locator(form.selector).isVisible().catch(() => false)) {
-        await page.fill(form.email, email);
-        await page.fill(form.password, password);
-        await page.locator(`${form.selector} button[type="submit"]`).click();
-    }
-    await page.waitForFunction(({ readySelector, errorSelector }) => (
-        document.querySelector(readySelector)
-        || document.querySelector(errorSelector)?.textContent.trim()
-    ), { readySelector: ready, errorSelector: error }, { timeout: 30000 });
-
-    const errorText = await page.locator(error).textContent().catch(() => '');
-    if (errorText?.trim()) throw new Error(`${pagePath} login failed: ${errorText.trim()}`);
-}
 
 async function verifyIndexedDb(page) {
     const result = await page.evaluate(async () => {
@@ -139,9 +129,16 @@ async function verifySandboxGame(page) {
 
 async function runEngine(name, browserType, browserConfig) {
     console.log(`${name}: launching...`);
-    const browser = await browserType.launch({ timeout: 20000 });
+    // macOS 27 protects Firefox's shared app-data root even with a fresh profile.
+    // Keep this test's CoreFoundation app data separate from personal browser data.
+    // https://github.com/microsoft/playwright/issues/42768
+    const taskFirefoxData = name === 'Firefox' && process.platform === 'darwin'
+        ? await mkdtemp(join(tmpdir(), 'sparks-firefox-data-')) : null;
+    let browser;
     const problems = [];
     try {
+        browser = await browserType.launch({ timeout: 20000, ...(taskFirefoxData
+            ? { env: { ...process.env, CFFIXED_USER_HOME: taskFirefoxData } } : {}) });
         const teacherContext = await browser.newContext();
         const studentContext = await browser.newContext();
         await addLocalSupabaseOverride(teacherContext, browserConfig);
@@ -156,6 +153,7 @@ async function runEngine(name, browserType, browserConfig) {
 
         console.log(`${name}: checking teacher authentication and navigation...`);
         await login(teacherPage, {
+            baseUrl,
             pagePath: '/teacher.html',
             form: { selector: '#teacher-login-form', email: '#teacher-email', password: '#teacher-password' },
             email: AUDIT_TEACHER_EMAIL,
@@ -176,6 +174,7 @@ async function runEngine(name, browserType, browserConfig) {
 
         console.log(`${name}: checking student authentication and activity routing...`);
         await login(studentPage, {
+            baseUrl,
             pagePath: '/student.html',
             form: { selector: '#student-login-form', email: '#login-email', password: '#login-password' },
             email: AUDIT_STUDENT_EMAIL,
@@ -215,7 +214,13 @@ async function runEngine(name, browserType, browserConfig) {
         }
         throw error;
     } finally {
-        await browser.close().catch(() => {});
+        await browser?.close().catch(() => {});
+        if (taskFirefoxData) {
+            // macOS adds deny-delete ACLs to this temporary home’s standard folders.
+            // Remove those ACLs only inside the directory created by this run.
+            execFileSync('/bin/chmod', ['-RN', taskFirefoxData]);
+            await rm(taskFirefoxData, { recursive: true, force: true });
+        }
     }
 }
 

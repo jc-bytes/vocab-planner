@@ -1,8 +1,8 @@
-import { readSectionQuery } from './sectionRead.js';
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
 import { cleanUndefined, normalizeTextArray, timestampToIso, toClientTimestamp } from './supabaseValues.js';
 import { normalizeSparkCheckMode, normalizeSparkQuestions } from '../sparkCheckModel.js';
+import { readCollection } from './readCollection.js';
 
 export function mapSparkRow(row) {
     if (!row) return null;
@@ -44,11 +44,12 @@ export function sparkPayload(spark = {}, id = null) {
 export const sparksRepository = {
     async list(options = {}) {
         const schoolId = requireSchoolId();
-        await supabaseService.init();
-        let query = supabaseService.getClient().from('weekly_sparks').select('*').eq('school_id', schoolId);
-        const { data, error } = await readSectionQuery(query, options);
-        if (error) throw error;
-        return (data || []).map(mapSparkRow);
+        const rows = await readCollection(async () => {
+            await supabaseService.init();
+            return supabaseService.getClient();
+        }, (client, count) => client.from('weekly_sparks').select('*', count)
+            .eq('school_id', schoolId).order('id'), options.signal);
+        return rows.map(mapSparkRow);
     },
     async listScheduledForStudent({ subjectSlug, onOrAfter = '', onOrBefore, targetGrade = '', limit = 20 }) {
         const schoolId = requireSchoolId();

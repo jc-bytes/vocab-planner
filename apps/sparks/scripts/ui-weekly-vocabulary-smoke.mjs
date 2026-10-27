@@ -16,7 +16,7 @@ try {
   const flow=app.activities.getActivityFlowConfig();
   const pendingBefore=app.activities.getUnitRequiredCompletion(v);
   for(const type of flow.required)app.unitScores[type]={score:100,isComplete:true};
-  app.activities.showActivityMenu();
+  await app.activities.showActivityMenu();
   document.querySelector('#app')?.classList.remove('hidden');
   const cards=[...document.querySelectorAll('.activity-card')].filter(el=>!el.hidden&&getComputedStyle(el).display!=='none');
   const descriptor=await import('/js/student/studentActivityRegistry.js');
@@ -33,19 +33,19 @@ try {
  }
  const review=await page.evaluate(async()=>{
  const app=window.studentApp;app.studentProfile={grade:'6',group:'C'};
- const v=await(await fetch('/vocabularies/grade6/grade6_t3_2026_w08_weekly_v1.json')).json();app.activities.vocabularyData.applyVocabularyData(v);app.activities.showActivityMenu();
+ const v=await(await fetch('/vocabularies/grade6/grade6_t3_2026_w08_weekly_v1.json')).json();app.activities.vocabularyData.applyVocabularyData(v);await app.activities.showActivityMenu();
  return {required:app.activities.getActivityFlowConfig().required,unlocked:app.activities.isActivityUnlocked('matching'),available:app.activities.isStudentVocabularyAvailable(v,new Date('2026-11-06T12:00:00'))};
  });assert.deepEqual(review,{required:[],unlocked:true,available:true});
  console.log('Optional review opens without new requirements on its group release date.');
  const archive=await page.evaluate(async()=>{
   const app=window.studentApp;app.studentProfile={grade:'6',group:'A'};
   app.activities.manifest=await(await fetch('/vocabularies/manifest.json')).json();
-  app.activities.availableVocabs=[];
-  const old=app.routing.findVocabByRouteId('grade6_t3_2026_w02_part1');
-  const otherGrade=app.routing.findVocabByRouteId('grade9_t3_2026_w02_part1');
+  const old=await app.routing.findVocabByRouteId('grade6_t3_2026_w02_part1');
+  const otherGrade=await app.routing.findVocabByRouteId('grade9_t3_2026_w02_part1');
+  if(!old?.id||!old.path)throw new Error('Prepared own-grade archived vocabulary route was not found.');
   app.progressData.units['technology:'+old.id]={scores:{flashcards:{score:100,isComplete:true,verified:true}}};
   const oldData=await(await fetch('/'+old.path)).json();
-  app.activities.vocabularyData.applyVocabularyData(oldData);app.activities.showActivityMenu();
+  app.activities.vocabularyData.applyVocabularyData(oldData);await app.activities.showActivityMenu();
   const saved=app.unitScores.flashcards.score;
   const notice=document.getElementById('weekly-retirement-notice')?.textContent;
   const v=await(await fetch('/vocabularies/grade6/grade6_t3_2026_w02_weekly_v1.json')).json();

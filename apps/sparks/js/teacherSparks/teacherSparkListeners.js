@@ -57,7 +57,12 @@ export function bindTeacherSparksListeners(context) {
         const spark = context.findSparkById(id);
         if (!spark) return;
 
-        if (action === 'edit') {
+        if (action === 'preview') {
+            const lifecycle = context.weeklySparkLifecycleGeneration;
+            void import('../teacherStudentPreview.js').then(({ previewTeacherSpark }) => {
+                if (lifecycle === context.weeklySparkLifecycleGeneration) previewTeacherSpark(spark, { isCurrent: () => lifecycle === context.weeklySparkLifecycleGeneration });
+            });
+        } else if (action === 'edit') {
             context.openSparkModal(spark);
         } else if (action === 'assign' && schoolContext.hasRole('teacher') && context.publishMaterial && !context.isAuthenticationDisabled()) {
             Promise.resolve(context.publishMaterial({ kind: 'spark', materialId: spark.id })).catch(error => {

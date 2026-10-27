@@ -44,8 +44,8 @@ export class StudentSubjects {
         if (routeView === 'units') {
             this.sm.setRoute({ view: 'units' }, { replace: true });
         }
-        this.sm.activities.renderDashboard();
-        this.sm.activities.renderStudentHome();
+        if (routeView === 'units') this.sm.activities.renderDashboard();
+        if (routeView === 'menu') this.sm.activities.renderStudentHome();
         if (routeView === 'sparks') this.sm.activities.renderSparkLibrary();
     }
 

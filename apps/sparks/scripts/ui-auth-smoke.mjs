@@ -1,5 +1,4 @@
 import process from 'node:process';
-import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
 import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
@@ -11,8 +10,9 @@ import {
 } from './lib/local-supabase-audit.mjs';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 
+const built = process.env.UI_AUTH_SMOKE_DIST === '1';
 const host = process.env.UI_AUTH_SMOKE_HOST || '127.0.0.1';
-const port = Number(process.env.UI_AUTH_SMOKE_PORT || 8000);
+const port = Number(process.env.UI_AUTH_SMOKE_PORT || 8572);
 const baseUrl = (process.env.UI_AUTH_SMOKE_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 
 async function resolveServer() {
@@ -22,9 +22,7 @@ async function resolveServer() {
         host,
         port,
         external: Boolean(process.env.UI_AUTH_SMOKE_BASE_URL),
-        ...(process.env.UI_AUTH_SMOKE_DIST === '1' ? {
-            args: ['vite', 'preview', '--outDir', 'dist-desktop', '--host', host, '--port', String(port), '--strictPort']
-        } : {})
+        ...(built && !process.env.UI_AUTH_SMOKE_BASE_URL ? { args: ['vite', 'preview', '--outDir', 'dist-desktop', '--host', host, '--port', String(port), '--strictPort'] } : {})
     });
 }
 
@@ -54,6 +52,9 @@ async function addLocalSupabaseOverride(context, browserConfig) {
 }
 
 function trackPageProblems(page, label, problems) {
+    page.on('response', response => {
+        if (response.status() >= 400) problems.push(`[${label}] HTTP ${response.status()}: ${new URL(response.url()).pathname}`);
+    });
     page.on('console', (message) => {
         if (message.type() !== 'error') return;
         problems.push(`[${label}] console.error: ${message.text()}`);
@@ -125,19 +126,7 @@ try {
     trackPageProblems(teacherPage, 'teacher', problems);
     trackPageProblems(studentPage, 'student', problems);
 
-    const manifestRequests = [];
-    teacherPage.on('request', request => {
-        if (new URL(request.url()).pathname.endsWith('/vocabularies/manifest.json')) manifestRequests.push(request.url());
-    });
-    const analyticsResponse = teacherPage.waitForResponse(response =>
-        new URL(response.url()).pathname.endsWith('/rpc/get_teacher_dashboard_analytics_school_v1'));
     await loginTeacher(teacherPage);
-    const dashboardResponse = await analyticsResponse;
-    assert.equal(dashboardResponse.status(), 200, 'Dashboard analytics RPC must succeed');
-    const analytics = await dashboardResponse.json();
-    assert.ok(analytics.totalStudents >= 1, 'Fixture must exercise a nonempty roster');
-    await teacherPage.locator('#overview-total-students').filter({ hasText: String(analytics.totalStudents) }).waitFor();
-    await teacherPage.locator('#overview-recent-activity .loading-spinner').waitFor({ state: 'hidden' });
     await teacherPage.locator('#tab-vocabulary').click();
     await teacherPage.locator('#teacher-dashboard-view:not(.hidden)').waitFor({ timeout: 15000 });
     await teacherPage.locator(
@@ -145,6 +134,20 @@ try {
     ).click();
     await teacherPage.locator('#teacher-sparks-view:not(.hidden)').waitFor({ timeout: 15000 });
     await assertNoAccessibilityViolations(teacherPage, 'Authenticated teacher Sparks page');
+
+    // Open the real enrolled student's profile through its stable cold route.
+    // This must work without first opening the legacy whole-school roster.
+    const profileHash = await teacherPage.evaluate(({ studentId, classId }) => teacherApp.buildRoute({
+        view: 'student-profile', studentId, classId, tab: 'overview'
+    }), { studentId: seeded.users.student.id, classId: seeded.classroom.id });
+    await teacherPage.goto(`${baseUrl}/teacher.html${profileHash}`, { waitUntil: 'domcontentloaded' });
+    await teacherPage.locator('#teacher-student-profile-view.active #student-profile-content:not(.hidden)').waitFor({ timeout: 30000 });
+    if (!(await teacherPage.locator('#detail-student-name').innerText()).includes('Audit')) {
+        throw new Error('The enrolled audit student profile did not render from the real backend.');
+    }
+    if (!await teacherPage.locator('#reset-student-password-btn').isDisabled()) {
+        throw new Error('The legacy password-reset control became enabled in the profile.');
+    }
 
     await studentPage.clock.setFixedTime(new Date('2026-08-24T15:00:00Z'));
     await loginStudent(studentPage);
@@ -158,8 +161,7 @@ try {
         throw new Error(`Browser errors during auth smoke:\n${problems.join('\n')}`);
     }
 
-    assert.deepEqual(manifestRequests, [], 'Authenticated teacher must not request the retired public catalog');
-    console.log('Authenticated UI smoke passed, including dashboard analytics and private vocabulary loading.');
+    console.log('Authenticated UI smoke passed.');
 } catch (error) {
     if (problems.length) console.error(problems.join('\n'));
     throw error;

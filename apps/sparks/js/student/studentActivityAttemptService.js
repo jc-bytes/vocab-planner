@@ -1,5 +1,6 @@
 import { studentApi } from '../services/studentApi.js';
-import { createRequestError, requestWithTimeout } from '../services/requestReliability.js';
+import { createRequestError } from '../services/requestReliability.js';
+import { runActivityStartupStage } from './studentActivityStartupRecovery.js';
 import { createUniqueId } from '../randomUtils.js';
 
 export class StudentActivityAttemptService {
@@ -20,18 +21,23 @@ export class StudentActivityAttemptService {
         }
 
         const vocab = this.sm.currentVocab;
-        const attempt = await requestWithTimeout(signal => (
-            studentApi.startStudentActivityAttempt({
-                unitKey: this.activities.getUnitProgressKey(vocab),
-                vocabularyId: vocab?.id || '',
+        const unitKey = this.activities.getUnitProgressKey(vocab);
+        const vocabularyId = vocab?.id || '';
+        const launchId = this.activities.session.activityLaunchId;
+        const userId = this.sm.currentUser?.uid;
+        const isCurrent = () => !options.signal?.aborted && this.sm.currentVocab === vocab
+            && this.activities.session.activityLaunchId === launchId
+            && this.sm.currentUser?.uid === userId;
+        const attempt = await runActivityStartupStage('verification', signal => {
+            if (!isCurrent()) throw createRequestError('Activity launch changed.', 'REQUEST_ABORTED');
+            return studentApi.startStudentActivityAttempt({
+                unitKey,
+                vocabularyId,
                 activityType,
                 signal
-            })
-        ), {
-            signal: options.signal,
-            timeoutMs: options.timeoutMs || 10000,
-            label: 'Starting the verified activity'
-        });
+            }, { ownerUserId: userId });
+        }, options);
+        if (!isCurrent()) return null;
         if (!attempt?.attemptId) throw new Error('The server did not create a verified activity attempt.');
         this.activities.session.activityAttempt = attempt;
         return attempt;

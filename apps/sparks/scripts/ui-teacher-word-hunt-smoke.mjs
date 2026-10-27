@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_TEACHER_WORD_HUNT_HOST || '127.0.0.1';
-const port = Number(process.env.UI_TEACHER_WORD_HUNT_PORT || 8000);
+const port = Number(process.env.UI_TEACHER_WORD_HUNT_PORT || 8566);
 const baseUrl = (process.env.UI_TEACHER_WORD_HUNT_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 
 let server;
@@ -41,7 +41,7 @@ try {
                 email: 'student@example.test',
                 studentProfile: { firstName: 'Ada', lastName: 'Lovelace', grade: '6', group: 'A' },
                 units: {
-                    'technology:unit_one': {
+                    'assignment:work-a': {
                         wordHunt: {
                             Algorithm: {
                                 definition: 'A precise sequence of steps used to solve a problem.',
@@ -72,12 +72,17 @@ try {
                 this.vocabularyMode = 'assign';
                 this.currentView = '';
                 this.workflowCalls = [];
+                this.classroomRepository = {
+                    getRoster: async () => [{studentId:'student-one'}],
+                    listAssignments: async () => [{id:'work-a'}]
+                };
             }
 
             ensureAuthenticated() { return true; }
             switchView(viewId) { this.currentView = viewId; }
             setVocabularyWorkflowTab(tab, options) { this.workflowCalls.push({ tab, options }); }
             getSubjects() { return []; }
+            getSelectedTeacherClassId() { return 'class-a'; }
             refreshIcons() {}
         }
 

@@ -79,7 +79,7 @@ try {
  await fullPage.waitForFunction(()=>window.studentApp?.currentActivityType==='matching' && window.studentApp.activityInstance?.container?.querySelector('.matching-shell'),null,{timeout:30000});
  const fullState=await fullPage.evaluate(()=>({id:studentApp.currentVocab.assignmentId,type:studentApp.currentActivityType,authDisabled:studentApp.authDisabled}));
  assert.deepEqual(fullState,{id:fullFixture.ids.assignment,type:'matching',authDisabled:false});
- assert.ok(fullFixture.calls.some(call=>call.name==='start_student_activity_attempt'));
+ assert.ok(fullFixture.calls.some(call=>call.name==='start_student_activity_attempt_owned_v1'));
  assert.equal(fullFixture.calls.filter(call=>/^submit_/.test(call.name)).length,0,'No student activity submitted');
  assert.deepEqual(fullFixture.errors,[]);
  console.log('Actual signed-in StudentManager Classes → vocabulary → activity menu → MatchingActivity passed with network-only fixture.');

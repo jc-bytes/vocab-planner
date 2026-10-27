@@ -154,9 +154,9 @@ test('teacher CSV placement is derived from bounded grade-section filenames', ()
     assert.equal(manager.getGradeSectionFromStudentCsvName('students.csv'), null);
 });
 
-test('teacher CSV parsing handles quoted fields and normalized bilingual headers', () => {
+test('teacher CSV parsing handles quoted fields and normalized bilingual headers', async () => {
     const manager = new TestTeacherManager();
-    const records = manager.parseStudentCsvText(
+    const records = await manager.parseStudentCsvText(
         'Primer Nombre,Primer Apellido,Correo,Contraseña\n"Ana María",Ríos,ana@aid.edu.pa,school1234',
         '6A.csv',
         { grade: '6', section: 'A' }
@@ -522,7 +522,7 @@ test('a late password reset cannot restore sensitive output after session cleanu
         assert.equal(output.textContent, '');
         assert.equal(output.style.display, 'none');
         assert.equal(status.textContent, '');
-        assert.equal(button.disabled, false);
+        assert.equal(button.disabled, true, 'disabled legacy account policy survives session cleanup');
         assert.equal(manager.activeStudentId, 'new');
     } finally {
         supabaseService.resetStudentPassword = originalReset;
@@ -762,7 +762,7 @@ test('a late account-creation continuation cannot load or notify in the next ses
         await creating;
         assert.equal(filterCalls, 0);
         assert.equal(status.textContent, '');
-        assert.equal(button.disabled, false);
+        assert.equal(button.disabled, true, 'disabled legacy account policy survives session cleanup');
     } finally {
         supabaseService.createStudentAccount = originalCreate;
         document.querySelector = originalQuerySelector;

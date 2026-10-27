@@ -83,16 +83,9 @@ test('generator returns no groups when restrictions make a valid arrangement imp
     assert.equal(randomizeStudentsWithRestrictions(students, 2, restrictions), null);
 });
 
-test('teacher overview exposes direct group-generator shortcuts', async () => {
-    const [html, listeners] = await Promise.all([
-        readFile(new URL('../teacher.html', import.meta.url), 'utf8'),
-        readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8')
-    ]);
-
-    assert.match(html, /id="overview-groups-btn"[\s\S]*?Randomize Groups/);
-    assert.match(html, /id="overview-groups-action-btn"[\s\S]*?Randomize groups/);
-    assert.match(listeners, /overview-groups-btn[\s\S]*?showTeacherSection\(GROUPS_PAGE\.id\)/);
-    assert.match(listeners, /overview-groups-action-btn[\s\S]*?showTeacherSection\(GROUPS_PAGE\.id\)/);
+test('class students expose a group generator with the class preselected', async () => {
+    const workspace = await readFile(new URL('../js/teacherClassWorkspace.js', import.meta.url), 'utf8');
+    assert.match(workspace, /button\('Make groups', \(\) => onGroups\(\{ classId: active\.id \}\)\)/);
 });
 
 test('pairing restrictions have a private device fallback when cloud storage is unavailable', async () => {

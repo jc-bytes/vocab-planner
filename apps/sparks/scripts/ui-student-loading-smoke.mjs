@@ -87,10 +87,11 @@ try {
   const {StudentActivityBrowser}=await import('/js/student/studentActivityBrowserMethods.js');
   const view=document.querySelector('#vocab-selection-view'),container=document.querySelector('#vocab-list');
   document.querySelector('main').classList.remove('hidden');view.classList.remove('hidden');view.classList.add('active');container.className='vocab-grid';
-  let release;const gate=new Promise(resolve=>release=resolve);
-  const owner={sm:{authDisabled:false,studentVocabularyDrilldown:{trimester:'IIIT',month:'october'}},vocabularyData:{classSelection:{loadedAt:0},loadClassSelection:async()=>{await gate;return false;}},getStudentVocabularyViewMode:()=> 'cards'};
+  let release,prepareEntered=false;const gate=new Promise(resolve=>release=resolve);
+  const owner={sm:{authDisabled:false,studentVocabularyDrilldown:{trimester:'IIIT',month:'october'}},vocabularyData:{classSelection:{loadedAt:0},prepareClassData:async()=>{prepareEntered=true;await gate;return null;}},getStudentVocabularyViewMode:()=> 'cards'};
   const rendering=StudentActivityBrowser.prototype.renderDashboard.call(owner);
   await new Promise(resolve=>requestAnimationFrame(resolve));
+  if(!prepareEntered)throw new Error('Units width fixture never reached class preparation.');
   const expected=container.getBoundingClientRect().width,actual=container.querySelector('.student-page-skeleton').getBoundingClientRect().width;
   release();await rendering;return {expected,actual};
  });assert.ok(unitWidth.expected>0,'Units width check uses a visible list');assert.ok(Math.abs(unitWidth.expected-unitWidth.actual)<2,'Units skeleton keeps the full list width while waiting');
@@ -98,10 +99,11 @@ try {
   const {StudentActivityHome}=await import('/js/student/studentActivityHomeMethods.js');
   const view=document.querySelector('#main-menu-view'),root=document.querySelector('#student-home-dashboard');
   const saved=root.innerHTML,classes=view.className;
-  const home=new StudentActivityHome({sm:{currentUser:{uid:'loading-test'},authDisabled:false},vocabularyData:{loadClassSelection:async()=>{throw new Error('Fixture unavailable');}}});
+  let prepareEntered=false;
+  const home=new StudentActivityHome({sm:{currentUser:{uid:'loading-test'},authDisabled:false},vocabularyData:{prepareClassData:async()=>{prepareEntered=true;throw new Error('Fixture unavailable');}}});
   await home.renderStudentHome();
   const cleared=view.getAttribute('aria-busy')==='false'&&!view.classList.contains('student-home-loading')&&root.textContent.includes('Could not load');
-  root.innerHTML=saved;view.className=classes;return cleared;
+  root.innerHTML=saved;view.className=classes;return cleared&&prepareEntered;
  });assert.equal(dashboardError,true,'Dashboard error replaces the skeleton and clears busy state');
  const gameContext=await browser.newContext();const gamePage=await gameContext.newPage();gamePage.on('pageerror',error=>errors.push(error.message));
  await gamePage.goto(`${baseUrl}/student.html`);

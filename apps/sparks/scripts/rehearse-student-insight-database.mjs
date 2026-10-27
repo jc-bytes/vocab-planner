@@ -24,14 +24,14 @@ try {
         ['20260917131020_school_platform_foundation.sql', "select to_regclass('public.schools') is not null"],
         ['20260917131024_school_classroom_ownership.sql', "select exists(select 1 from information_schema.columns where table_schema='public' and table_name='teaching_classes' and column_name='school_id')"],
         ['20261006022529_student_insight_teacher_reads.sql', "select to_regprocedure('public.teacher_student_attempts_v1(uuid,uuid,uuid,text,integer,integer)') is not null"],
-        ['20261006025409_student_feedback_teacher_review.sql', "select to_regclass('private.student_assignment_feedback') is not null"],
-        ['20261015191054_optimize_teacher_dashboard_analytics.sql', "select pg_get_functiondef('private.get_teacher_dashboard_analytics_school_v1(uuid,integer)'::regprocedure) like '%authorized_classes as materialized%'"]
+        ['20261006025409_student_feedback_teacher_review.sql', "select to_regclass('private.student_assignment_feedback') is not null"]
     ];
     for (const [name, present] of migrations) {
         if (sql(database, present) === 't') continue;
         sql(database, readFileSync(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8'), migrationOwner);
         console.log(`Applied ${name} in isolated rehearsal.`);
     }
+    sql(database, readFileSync(new URL('../supabase/migrations/20261015191054_optimize_teacher_dashboard_analytics.sql', import.meta.url), 'utf8'), migrationOwner);
     console.log('Testing disposable schema with original owners/ACL and explicit fixtures.');
     execFileSync(process.execPath, ['--test', '--test-concurrency=1', 'tests/teacher-student-insight-database.test.mjs', 'tests/teacher-student-feedback-database.test.mjs', 'tests/teacher-dashboard-database.test.mjs'], {
         stdio: 'inherit', env: { ...process.env, SPARKS_SCHOOL_TEST_DATABASE: database, SPARKS_SCHOOL_TEST_CONTAINER: source.container }

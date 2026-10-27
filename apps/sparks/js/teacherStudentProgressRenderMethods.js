@@ -127,7 +127,7 @@ class TeacherStudentProgressRenderMethods {
                 const id = e.currentTarget.dataset.id;
                 const student = this.allStudentData.find(s => s.id === id);
                 if (student) this.showStudentDetails(student);
-            });
+            }, { signal: this.progressListenersController?.signal });
         });
         $$('.add-coins-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -136,12 +136,12 @@ class TeacherStudentProgressRenderMethods {
                 if (student) {
                     this.showStudentDetails(student, { tab: 'account' });
                 }
-            });
+            }, { signal: this.progressListenersController?.signal });
         });
         $$('.student-select-control').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
                 this.setStudentSelected(e.currentTarget.dataset.id, e.currentTarget.checked);
-            });
+            }, { signal: this.progressListenersController?.signal });
         });
     }
 
@@ -180,6 +180,8 @@ class TeacherStudentProgressRenderMethods {
 
     async showStudentProfileById(studentId, { tab = 'overview' } = {}) {
         if (!this.ensureAuthenticated(false) || !studentId) return false;
+        const classId = this.getSelectedTeacherClassId?.();
+        const navigation = this.captureTeacherNavigation?.();
         const generation = this.studentProgressSessionGeneration || 0;
         const request = (this.studentProfileRequest || 0) + 1;
         this.studentProfileRequest = request;
@@ -196,6 +198,13 @@ class TeacherStudentProgressRenderMethods {
         $('#student-profile-error')?.classList.add('hidden');
 
         try {
+            if (classId) {
+                const repository = this.classroomRepository || (await import('./services/classroomRepository.js')).classroomRepository;
+                const roster = await repository.getRoster(classId);
+                if (navigation && !this.isTeacherNavigationCurrent(navigation)) return false;
+                if (!roster.some(student => student.studentId === studentId)) throw new Error('Student is not enrolled in this class.');
+                this.studentProfileClassRoster = roster.map(student => ({ ...student, id: student.studentId }));
+            }
             const rosterStudent = this.allStudentData.find(student => student.id === studentId);
             const seed = rosterStudent || { id: studentId, userId: studentId, studentProfile: {} };
             const [progressStudent, identity] = await Promise.all([
@@ -203,7 +212,7 @@ class TeacherStudentProgressRenderMethods {
                 supabaseService.getProfile(studentId)
             ]);
             if (request !== this.studentProfileRequest || generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId) return false;
+                || this.activeStudentId !== studentId || (navigation && !this.isTeacherNavigationCurrent(navigation))) return false;
             if (!identity && !rosterStudent && !progressStudent?.progressDetailLoaded) {
                 throw new Error('Student progress was not found.');
             }
@@ -227,12 +236,12 @@ class TeacherStudentProgressRenderMethods {
             this.activeStudentProfile = student;
             this.renderStudentProfile(student, { tab });
             const { loadStudentInsight } = await import('./teacherStudentInsightView.js');
-            if (request !== this.studentProfileRequest || generation !== (this.studentProgressSessionGeneration || 0) || this.activeStudentId !== studentId) return false;
+            if (request !== this.studentProfileRequest || generation !== (this.studentProgressSessionGeneration || 0) || this.activeStudentId !== studentId || (navigation && !this.isTeacherNavigationCurrent(navigation))) return false;
             await loadStudentInsight(this, studentId);
             return true;
         } catch (error) {
             if (request !== this.studentProfileRequest || generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId) return false;
+                || this.activeStudentId !== studentId || (navigation && !this.isTeacherNavigationCurrent(navigation))) return false;
             console.error('Failed to load student profile:', error);
             $('#student-profile-loading')?.classList.add('hidden');
             const errorElement = $('#student-profile-error');
@@ -373,7 +382,7 @@ class TeacherStudentProgressRenderMethods {
                 </table>
             </div>`;
         $$('.activity-late-override-btn').forEach(button => {
-            button.addEventListener('click', () => this.handleActivityLateOverride(student, button));
+            button.addEventListener('click', () => this.handleActivityLateOverride(student, button), { signal: this.progressListenersController?.signal });
         });
     }
 
@@ -396,7 +405,11 @@ class TeacherStudentProgressRenderMethods {
     }
 
     setStudentProfileTab(tab, { updateRoute = true } = {}) {
-        const activeTab = ['overview', 'assigned', 'activity', 'account'].includes(tab) ? tab : 'overview';
+        const scoped = Boolean(this.getSelectedTeacherClassId?.());
+        const requestedTab = scoped && tab === 'activity' ? 'assigned' : tab;
+        const activityTab = document.querySelector('[data-student-profile-tab="activity"]');
+        if (activityTab) activityTab.hidden = scoped;
+        const activeTab = ['overview', 'assigned', 'activity', 'account'].includes(requestedTab) ? requestedTab : 'overview';
         this.activeStudentProfileTab = activeTab;
         $$('[data-student-profile-tab]').forEach(button => {
             const active = button.dataset.studentProfileTab === activeTab;
@@ -409,12 +422,13 @@ class TeacherStudentProgressRenderMethods {
             $(`#student-profile-${name}-panel`)?.classList.toggle('hidden', name !== activeTab);
         });
         if (updateRoute && this.activeStudentId) {
-            this.setRoute({ view: 'student-profile', studentId: this.activeStudentId, tab: activeTab });
+            this.setRoute({ view: 'student-profile', studentId: this.activeStudentId, tab: activeTab, classId: this.getSelectedTeacherClassId?.() });
         }
     }
 
     updateStudentProfileNavigation(studentId) {
-        const roster = this.filteredStudentData.length ? this.filteredStudentData : this.allStudentData;
+        const roster = this.getSelectedTeacherClassId?.() ? this.studentProfileClassRoster || []
+            : this.filteredStudentData.length ? this.filteredStudentData : this.allStudentData;
         const index = roster.findIndex(student => student.id === studentId);
         const previous = $('#student-profile-previous-btn');
         const next = $('#student-profile-next-btn');

@@ -1,28 +1,10 @@
+import { createLibraryChoiceCard, createLibraryRowList, createLibraryRow } from '../learningLibraryView.js';
+import { renderStudentMonthNavigation } from '../student/studentMonthNavigation.js';
 import { createElement } from '../main.js';
 import { getSubjectBySlug } from '../services/vocabularyApi.js';
 
 export function createVocabularyChoiceCard({ title, count, meta, icon, color = '' }) {
-    const card = createElement('button', 'teacher-library-choice-card');
-    card.type = 'button';
-
-    const text = createElement('span', 'teacher-library-choice-text');
-    const titleEl = createElement('strong', 'card-title', title);
-    const countEl = createElement('span', 'teacher-library-choice-count card-secondary', count);
-    if (color) {
-        const dot = createElement('span', 'subject-color-dot');
-        dot.style.background = color;
-        text.appendChild(dot);
-    }
-    text.append(titleEl, countEl);
-    if (meta) text.appendChild(createElement('small', 'card-caption', meta));
-    card.appendChild(text);
-
-    if (icon) {
-        const iconEl = createElement('i');
-        iconEl.setAttribute('data-lucide', icon);
-        card.appendChild(iconEl);
-    }
-    return card;
+    return createLibraryChoiceCard({ title, count, meta, icon });
 }
 
 export function createVocabularyBreadcrumbButton(label, onClick) {
@@ -35,6 +17,7 @@ export function createVocabularyBreadcrumbButton(label, onClick) {
 function appendBreadcrumbPart(nav, name, value, isCurrent, onClick) {
     const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
     separator.dataset.beforeCrumb = name;
+    separator.setAttribute('aria-hidden', 'true');
     nav.appendChild(separator);
     const node = isCurrent
         ? createElement('span', 'teacher-library-breadcrumb-current breadcrumb__current', value)
@@ -52,10 +35,12 @@ export function renderVocabularyBreadcrumb(host, {
 }) {
     const { subject, grade, trimester, month } = drilldown;
     breadcrumbHost.innerHTML = '';
-    const nav = createElement('div', 'teacher-library-breadcrumb breadcrumb');
+    breadcrumbHost.hidden = !subject;
+    const nav = createElement('nav', 'teacher-library-breadcrumb breadcrumb');
+    nav.setAttribute('aria-label', 'Vocabulary location');
     nav.dataset.breadcrumbDepth = month ? 'month' : trimester ? 'trimester' : grade ? 'grade' : subject ? 'subject' : 'root';
 
-    const rootButton = createVocabularyBreadcrumbButton('Subjects', () => onNavigate({
+    const rootButton = createVocabularyBreadcrumbButton('Vocabulary', () => onNavigate({
         subject: null, grade: null, trimester: null, month: null
     }));
     rootButton.dataset.crumb = 'root';
@@ -82,12 +67,23 @@ export function renderVocabularyBreadcrumb(host, {
         appendBreadcrumbPart(nav, 'month', host.getTeacherMonthLabel(month), true, () => {});
     }
 
+    if (month && host.getTeacherMonthLabel(month).toLowerCase() === new Date().toLocaleString('en-US', {month:'long',timeZone:'America/Panama'}).toLowerCase()) {
+        nav.appendChild(createElement('span', 'student-current-month-badge context-badge', 'Current Month'));
+    }
     breadcrumbHost.appendChild(nav);
+}
+
+function hierarchyList(options, headers) {
+    const rows = options.getViewMode(options.drilldown) === 'rows';
+    const list = rows ? createLibraryRowList(headers) : createElement('div', 'teacher-library-choice-grid');
+    return { list, choice: config => rows
+        ? createLibraryRow({ primary: config.title, cells: [config.meta || '', config.count], icon: config.icon })
+        : createVocabularyChoiceCard(config) };
 }
 
 export function renderVocabularySubjectPicker(host, options, subjectGroups) {
     renderVocabularyBreadcrumb(host, { ...options, drilldown: {} });
-    const grid = createElement('div', 'teacher-library-choice-grid');
+    const { list: grid, choice } = hierarchyList(options, ['Subject', 'Grades', 'Units']);
     Array.from(subjectGroups.entries())
         .sort(([subjectA], [subjectB]) => {
             const metaA = getSubjectBySlug(host.getSubjects(), subjectA);
@@ -103,7 +99,7 @@ export function renderVocabularySubjectPicker(host, options, subjectGroups) {
                 .sort((gradeA, gradeB) => host.compareGradeLabels(gradeA, gradeB))
                 .map(grade => host.formatGradeLabel(grade))
                 .join(' · ');
-            const card = createVocabularyChoiceCard({
+            const card = choice({
                 title: subject.name,
                 count: host.formatUnitCount(totalUnits),
                 meta: gradeSummary,
@@ -120,7 +116,7 @@ export function renderVocabularySubjectPicker(host, options, subjectGroups) {
 
 export function renderVocabularyGradePicker(host, options, selectedSubject, gradeGroups) {
     renderVocabularyBreadcrumb(host, { ...options, drilldown: { subject: selectedSubject } });
-    const grid = createElement('div', 'teacher-library-choice-grid');
+    const { list: grid, choice } = hierarchyList(options, ['Grade', 'Trimesters', 'Units']);
     Array.from(gradeGroups.entries())
         .sort(([gradeA], [gradeB]) => host.compareGradeLabels(gradeA, gradeB))
         .forEach(([grade, trimesterGroups]) => {
@@ -129,7 +125,7 @@ export function renderVocabularyGradePicker(host, options, selectedSubject, grad
                 .sort(([trimesterA], [trimesterB]) => host.getTeacherTrimesterOrder(trimesterA) - host.getTeacherTrimesterOrder(trimesterB))
                 .map(([trimesterKey, vocabItems]) => `${host.getTeacherTrimesterShortLabel(trimesterKey)}: ${vocabItems.length}`)
                 .join(' · ');
-            const card = createVocabularyChoiceCard({
+            const card = choice({
                 title: host.formatGradeLabel(grade),
                 count: host.formatUnitCount(totalUnits),
                 meta: trimesterSummary,
@@ -148,12 +144,12 @@ export function renderVocabularyTrimesterPicker(host, options, selectedSubject, 
         ...options,
         drilldown: { subject: selectedSubject, grade: selectedGrade }
     });
-    const grid = createElement('div', 'teacher-library-choice-grid');
+    const { list: grid, choice } = hierarchyList(options, ['Trimester', 'Months', 'Units']);
     Array.from(trimesterGroups.entries())
         .sort(([trimesterA], [trimesterB]) => host.getTeacherTrimesterOrder(trimesterA) - host.getTeacherTrimesterOrder(trimesterB))
         .forEach(([trimesterKey, vocabItems]) => {
             const monthSummary = host.formatMonthSummary(host.buildMonthGroups(vocabItems));
-            const card = createVocabularyChoiceCard({
+            const card = choice({
                 title: host.getTeacherTrimesterLabel(trimesterKey),
                 count: host.formatUnitCount(vocabItems.length),
                 meta: monthSummary || host.formatGradeLabel(selectedGrade),
@@ -172,11 +168,11 @@ export function renderVocabularyMonthPicker(host, options, selectedSubject, sele
         ...options,
         drilldown: { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester }
     });
-    const grid = createElement('div', 'teacher-library-choice-grid');
+    const { list: grid, choice } = hierarchyList(options, ['Month', 'Grade', 'Units']);
     Array.from(monthGroups.entries())
         .sort(([monthA], [monthB]) => host.getTeacherMonthOrder(monthA) - host.getTeacherMonthOrder(monthB))
         .forEach(([monthKey, vocabItems]) => {
-            const card = createVocabularyChoiceCard({
+            const card = choice({
                 title: host.getTeacherMonthLabel(monthKey),
                 count: host.formatUnitCount(vocabItems.length),
                 meta: host.formatGradeLabel(selectedGrade),
@@ -191,7 +187,7 @@ export function renderVocabularyMonthPicker(host, options, selectedSubject, sele
 }
 
 export function renderTeacherVocabularyHierarchy(host, options) {
-    const { container, items, drilldown, getViewMode, resetDrilldown, filterItems, renderRows, renderAssignments } = options;
+    const { container, items, drilldown, resetDrilldown, renderAssignments } = options;
     const subjectGroups = host.buildLibraryGroups(items);
     const selectedSubject = drilldown.subject;
     const selectedGrade = drilldown.grade;
@@ -200,54 +196,37 @@ export function renderTeacherVocabularyHierarchy(host, options) {
 
     if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
         resetDrilldown();
-        if (getViewMode({}) === 'rows') {
-            renderVocabularyBreadcrumb(host, { ...options, drilldown: {} });
-            renderRows(container, items);
-        } else {
-            renderVocabularySubjectPicker(host, options, subjectGroups);
-        }
+        renderVocabularySubjectPicker(host, options, subjectGroups);
         return;
     }
 
     const gradeGroups = subjectGroups.get(selectedSubject);
     if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
         Object.assign(drilldown, { grade: null, trimester: null, month: null });
-        if (getViewMode({ subject: selectedSubject }) === 'rows') {
-            renderVocabularyBreadcrumb(host, { ...options, drilldown: { subject: selectedSubject } });
-            renderRows(container, filterItems({ subject: selectedSubject }));
-        } else {
-            renderVocabularyGradePicker(host, options, selectedSubject, gradeGroups);
-        }
+        renderVocabularyGradePicker(host, options, selectedSubject, gradeGroups);
         return;
     }
 
     const trimesterGroups = gradeGroups.get(selectedGrade);
     if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
         Object.assign(drilldown, { trimester: null, month: null });
-        if (getViewMode({ subject: selectedSubject, grade: selectedGrade }) === 'rows') {
-            renderVocabularyBreadcrumb(host, { ...options, drilldown: { subject: selectedSubject, grade: selectedGrade } });
-            renderRows(container, filterItems({ subject: selectedSubject, grade: selectedGrade }));
-        } else {
-            renderVocabularyTrimesterPicker(host, options, selectedSubject, selectedGrade, trimesterGroups);
-        }
+        renderVocabularyTrimesterPicker(host, options, selectedSubject, selectedGrade, trimesterGroups);
         return;
     }
 
     const monthGroups = host.buildMonthGroups(trimesterGroups.get(selectedTrimester));
     if (!selectedMonth || !monthGroups.has(selectedMonth)) {
         drilldown.month = null;
-        if (getViewMode({ subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester }) === 'rows') {
-            renderVocabularyBreadcrumb(host, {
-                ...options,
-                drilldown: { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester }
-            });
-            renderRows(container, trimesterGroups.get(selectedTrimester));
-        } else {
-            renderVocabularyMonthPicker(host, options, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
-        }
+        renderVocabularyMonthPicker(host, options, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
         return;
     }
 
     renderVocabularyBreadcrumb(host, { ...options, drilldown });
+    renderStudentMonthNavigation(container, {
+        sortedMonths: [...monthGroups.keys()].sort((a, b) => host.getTeacherMonthOrder(a) - host.getTeacherMonthOrder(b)),
+        selectedMonth, monthLabel: month => host.getTeacherMonthLabel(month),
+        ariaLabel: 'Vocabulary month navigation',
+        navigate: month => options.onNavigate({ ...drilldown, month })
+    });
     renderAssignments(container, monthGroups.get(selectedMonth));
 }

@@ -1,35 +1,12 @@
-import { readSectionQuery } from './services/sectionRead.js';
-import { requireSchoolId } from './services/schoolScope.js';
+import { installLazyTeacherProfileMethods } from './supabaseTeacherProfileMethods.js';
 import { createSupabaseClient, isSupabaseConfigured } from './services/supabaseClient.js';
+import { capturePasswordChangeIntent, invalidatePasswordChangeIntents } from './services/passwordChangeIntent.js';
+import { requestWithTimeout } from './services/requestReliability.js';
 import {
     mapProfileRow,
     normalizeProfile,
-    normalizeUser,
-    toClientTimestamp
+    normalizeUser
 } from './services/supabaseValues.js';
-import { DEFAULT_COIN_DATA } from './studentProgressDefaults.js';
-
-function normalizeTeacherProgressRecord(record, { detailed = false } = {}) {
-    if (!record) return null;
-    const studentProfile = normalizeProfile(record.studentProfile || {});
-    return {
-        ...record,
-        id: record.id || record.userId,
-        userId: record.userId || record.id,
-        email: record.email || studentProfile.email,
-        role: record.role || 'student',
-        mustChangePassword: Boolean(record.mustChangePassword),
-        studentProfile,
-        units: detailed ? (record.units || {}) : undefined,
-        coins: Number(record.coins) || 0,
-        coinData: record.coinData || { ...DEFAULT_COIN_DATA },
-        totalXp: Number(record.totalXp) || 0,
-        version: Number(record.version) || 0,
-        createdAt: toClientTimestamp(record.createdAt),
-        updatedAt: toClientTimestamp(record.updatedAt),
-        progressDetailLoaded: detailed
-    };
-}
 
 function profileWriteGuard(service, userId) {
     const user = service.currentUser;
@@ -41,7 +18,7 @@ function profileWriteGuard(service, userId) {
     };
 }
 
-export function installSupabaseAuthProfileMethods(supabaseService) {
+export function installSupabaseAuthProfileMethods(supabaseService, options = {}) {
     Object.assign(supabaseService, {
     async init() {
         if (this.initPromise) return this.initPromise;
@@ -85,6 +62,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     async signInWithPassword(email, password) {
+        invalidatePasswordChangeIntents(this.client);
         await this.init();
         const { data, error } = await this.client.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -163,171 +141,36 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return mapProfileRow(Array.isArray(data) ? data[0] : data);
     },
 
-    async listStudentProgressSummaries({
-        limit = 100,
-        offset = 0,
-        grade = null,
-        section = null,
-        search = null
-    } = {}) {
-        const schoolId = requireSchoolId();
-        await this.init();
-        const pageLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 100, 1), 200);
-        const pageOffset = Math.max(Number.parseInt(offset, 10) || 0, 0);
-        const { data, error } = await this.client.rpc('list_student_progress_summaries_school_v1', { p_school_id: schoolId,
-            p_limit: pageLimit,
-            p_offset: pageOffset,
-            p_grade: grade === null || grade === '' ? null : Number.parseInt(grade, 10),
-            p_section: section || null,
-            p_search: search || null
-        });
-        if (error) throw error;
-        const page = Array.isArray(data) ? data[0] : data;
-        return {
-            items: (page?.items || []).map(item => normalizeTeacherProgressRecord(item)),
-            total: Number(page?.total) || 0,
-            limit: Number(page?.limit) || pageLimit,
-            offset: Number(page?.offset) || pageOffset
-        };
-    },
-
-    async getWordHuntReviewData() {
-        const schoolId = requireSchoolId();
-        await this.init();
-        const { data, error } = await this.client.rpc('list_word_hunt_reviews_school_v1', { p_school_id: schoolId });
-        if (error) throw error;
-        const rows = Array.isArray(data) ? data : [];
-        return rows.map(row => normalizeTeacherProgressRecord(row, { detailed: true }));
-    },
-
-    async listStudentIdentityRoster() {
-        const schoolId = requireSchoolId();
-        await this.init();
-        const { data, error } = await this.client.rpc('list_student_identity_roster_school_v1', { p_school_id: schoolId });
-        if (error) throw error;
-        const rows = Array.isArray(data) ? data : [];
-        return rows.map(row => normalizeTeacherProgressRecord(row));
-    },
-
-    async getStudentRosterFilters() {
-        const schoolId = requireSchoolId();
-        await this.init();
-        const { data, error } = await this.client.rpc('list_student_roster_filters_school_v1', { p_school_id: schoolId });
-        if (error) throw error;
-        const filters = Array.isArray(data) ? data[0] : data;
-        return {
-            grades: (filters?.grades || []).map(String),
-            classes: (filters?.classes || []).map(item => ({
-                grade: String(item?.grade || ''),
-                section: String(item?.section || '')
-            })).filter(item => item.grade && item.section)
-        };
-    },
-
-    async getTeacherDashboardAnalytics({ grade = null, signal } = {}) {
-        const schoolId = requireSchoolId();
-        await this.init();
-        const { data, error } = await readSectionQuery(this.client.rpc('get_teacher_dashboard_analytics_school_v1', { p_school_id: schoolId,
-            p_grade: grade === null || grade === '' ? null : Number.parseInt(grade, 10)
-        }), { signal });
-        if (error) throw error;
-        const analytics = Array.isArray(data) ? data[0] : data;
-        return {
-            totalStudents: Number(analytics?.totalStudents) || 0,
-            activeStudents: Number(analytics?.activeStudents) || 0,
-            averageCoins: Number(analytics?.averageCoins) || 0,
-            availableGrades: (analytics?.availableGrades || []).map(String),
-            gradeCounts: analytics?.gradeCounts || {},
-            coinDistribution: (analytics?.coinDistribution || []).map(value => Number(value) || 0),
-            activities: analytics?.activities || {},
-            recentActivities: analytics?.recentActivities || []
-        };
-    },
-
-    async getStudentProgressForTeacher(userId, options = {}) {
-        const schoolId = requireSchoolId();
-        await this.init();
-        let query = this.client.rpc('get_student_progress_school_v3', { p_school_id: schoolId, p_user_id: userId });
-        if (options.signal && typeof query.abortSignal === 'function') {
-            query = query.abortSignal(options.signal);
+    capturePasswordChangeIntent({ ownerUserId = this.currentUser?.uid } = {}) {
+        const userId = ownerUserId;
+        if (!userId || this.currentUser?.uid !== userId || this.currentSession?.user?.id !== userId) {
+            throw new DOMException('The account changed. Open the password form again.', 'AbortError');
         }
-        const { data, error } = await query;
-        if (error) throw error;
-        return normalizeTeacherProgressRecord(Array.isArray(data) ? data[0] : data, { detailed: true });
+        return capturePasswordChangeIntent(this.client, { session: this.currentSession,
+            isCurrent: () => this.currentUser?.uid === userId });
     },
 
-    async setStudentActivityLateOverride(attemptId, { excused, reason = '' } = {}) {
-        const schoolId = requireSchoolId();
-        await this.init();
-        const { data, error } = await this.client.rpc('set_student_activity_late_override_v1', {
-            p_attempt_id: attemptId,
-            p_excused: Boolean(excused),
-            p_reason: String(reason || '').trim()
-        });
-        if (error) throw error;
-        return Array.isArray(data) ? data[0] : data;
+    async updatePasswordAndClearFlag(password, settings = {}) {
+        return this.updateAccountPassword(password, { ...settings, clearFlag: true });
     },
 
-    async getStudentsProgressForTeacher(userIds = [], { schoolId = requireSchoolId(), signal } = {}) {
-        await this.init();
-        signal?.throwIfAborted();
-        const ids = Array.from(new Set(userIds.filter(Boolean)));
-        if (ids.length === 0) return [];
-        if (ids.length > 200) throw new Error('A maximum of 200 students can be loaded at once.');
-        let request = this.client.rpc('get_students_progress_by_ids_school_v1', { p_school_id: schoolId,
-            p_user_ids: ids
-        });
-        if (signal && typeof request.abortSignal === 'function') request = request.abortSignal(signal);
-        const { data, error } = await request;
-        signal?.throwIfAborted();
-        if (error) throw error;
-        const rows = Array.isArray(data) ? data : [];
-        return rows.map(row => normalizeTeacherProgressRecord(row, { detailed: true }));
-    },
-
-    async updatePasswordAndClearFlag(password) {
-        await this.init();
-        if (!this.currentUser) throw new Error('You must be signed in to change your password.');
-
-        const { error: passwordError } = await this.client.auth.updateUser({ password });
-        if (passwordError) throw passwordError;
-
-        const { error: profileError } = await this.client
-            .from('profiles')
-            .update({ must_change_password: false })
-            .eq('user_id', this.currentUser.uid);
-        if (profileError) throw profileError;
-    },
-
-    async resetStudentPassword(userId) {
-        await this.init();
-        const { data, error } = await this.client.functions.invoke('reset-student-password', {
-            body: { userId }
-        });
-        if (error) throw error;
-        if (data?.error) throw new Error(data.error);
-        return data;
-    },
-
-    async createStudentAccount(profile, password) {
-        await this.init();
-        const normalized = normalizeProfile(profile);
-        const { data, error } = await this.client.functions.invoke('create-student-account', {
-            body: {
-                firstName: normalized.firstName,
-                lastName: normalized.lastName,
-                email: normalized.email,
-                grade: normalized.grade,
-                section: normalized.group,
-                password
-            }
-        });
-        if (error) throw error;
-        if (data?.error) throw new Error(data.error);
-        return data;
+    async updateAccountPassword(password, settings = {}) {
+        const intent = settings.intent || this.capturePasswordChangeIntent();
+        try {
+            if (!intent.isCurrent()) throw new DOMException('The account changed.', 'AbortError');
+            return await requestWithTimeout(async signal => {
+                await this.init();
+                signal.throwIfAborted();
+                const { updatePasswordForIntent } = await (options.loadPasswordOperation
+                    ? options.loadPasswordOperation() : import('./services/passwordChangeOperation.js'));
+                return updatePasswordForIntent(intent, password, { ...options.passwordChangeDependencies,
+                    signal, clearFlag: settings.clearFlag });
+            }, { signal: intent.signal, timeoutMs: settings.timeoutMs || 30000, label: 'Password update' });
+        } finally { if (!settings.intent) intent.dispose(); }
     },
 
     async signOut() {
+        invalidatePasswordChangeIntents(this.client);
         this.authIdentityGeneration = (this.authIdentityGeneration || 0) + 1;
         await this.init();
         await this.client.auth.signOut({ scope: 'local' });
@@ -356,4 +199,5 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     });
+    installLazyTeacherProfileMethods(supabaseService, options);
 }

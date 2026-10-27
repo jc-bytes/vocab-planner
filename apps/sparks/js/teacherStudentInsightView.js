@@ -11,16 +11,18 @@ const formatDate = value => value ? new Date(value).toLocaleString() : 'No deadl
 const metric = value => value === null || value === undefined ? 'Unavailable' : `${Math.round(Number(value))}%`;
 const pretty = value => text(JSON.stringify(value, null, 2));
 
-export async function loadStudentInsight(manager, studentId, schoolYear = manager.studentInsightYear || new Date().getFullYear()) {
+export async function loadStudentInsight(manager, studentId, schoolYear = manager.teacherClassOptions?.find(c => c.id === manager.getSelectedTeacherClassId?.())?.school_year || manager.studentInsightYear || new Date().getFullYear()) {
     const host = document.querySelector('#student-profile-assigned-work');
     if (!host) return;
+    const classId = manager.getSelectedTeacherClassId?.();
     const session = manager.studentProgressSessionGeneration || 0;
     const request = (manager.studentInsightRequest || 0) + 1;
     manager.studentInsightRequest = request;
     manager.studentDashboardCharts?.dispose();
     manager.studentDashboardCharts = null;
     const current = () => manager.activeStudentId === studentId && manager.studentInsightRequest === request
-        && (manager.studentProgressSessionGeneration || 0) === session;
+        && (manager.studentProgressSessionGeneration || 0) === session
+        && manager.getSelectedTeacherClassId?.() === classId;
     await import('../css/teacher-student-feedback.css');
     await import('../css/teacher-student-dashboard.css');
     if (!current()) return;
@@ -31,8 +33,9 @@ export async function loadStudentInsight(manager, studentId, schoolYear = manage
     const overview = document.querySelector('#student-insight-summary');
     if (overview) overview.textContent = 'Loading assigned-work insight...';
     try {
-        const data = await repository.studentInsight(studentId, year);
+        const result = await repository.studentInsight(studentId, year);
         if (!current()) return;
+        const data = classId ? { ...result, assignments: (result.assignments || []).filter(a => a.classId === classId) } : result;
         let model = buildStudentInsight(data);
         function renderSummary() {
             if (!overview) return;

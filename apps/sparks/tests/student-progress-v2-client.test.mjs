@@ -135,8 +135,8 @@ test('unit RPC timeout aborts transport and keeps its immutable receipt payload'
     };
     const payload = { eventId: 'stable-receipt', snapshotOrder: 456, unitKey: 'unit', workPatch: { states: {} } };
     const saving = service.syncStudentUnitWork(payload, { ownerUserId: 'student-1' });
-    await Promise.resolve();
-    await Promise.resolve();
+    // Wait for the real lazy operation to reach transport before firing its deadline.
+    while (!requestedSignal) await new Promise(resolve => setImmediate(resolve));
     fireTimeout();
     await assert.rejects(saving, error => error.code === 'REQUEST_TIMEOUT');
     assert.equal(requestedSignal.aborted, true);

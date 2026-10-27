@@ -54,7 +54,7 @@ test('school switch during profile initialization prevents the old request dispa
         init: () => initialized.promise,
         getClient() { throw new Error('No request should be dispatched after a switch'); }
     } });
-    const pending = repository.getProfiles(['student']);
+    const pending = repository.getProfiles(['00000000-0000-0000-0000-000000000002']);
     context.select('b'); initialized.resolve();
     await assert.rejects(pending, { name: 'AbortError' });
 });

@@ -1,4 +1,3 @@
-import { $, createElement, escapeHtml, refreshIcons } from '../main.js';
 import { imageDB } from '../db.js';
 import {
     getActiveStudentStorageOwner,
@@ -9,6 +8,7 @@ import { getPanamaDateValue } from '../services/dateUtils.js';
 import { sparkResponsesRepository } from '../services/sparkResponsesRepository.js';
 import { sparksRepository } from '../services/sparksRepository.js';
 import { serverStateQuery } from '../services/serverStateQuery.js';
+import { schoolContext } from '../services/schoolContext.js';
 import { normalizeSchoolCalendar } from '../services/vocabularyApi.js';
 import {
     evaluateSparkAnswers,
@@ -19,23 +19,6 @@ import {
     isAllGradeSpark,
     normalizeSparkRecord
 } from '../sparkModel.js';
-import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
-
-const SPARK_TYPE_LABELS = {
-    cool_fact: 'Cool Fact',
-    trivia: 'Trivia',
-    good_news: 'Good News',
-    reflection: 'Reflection',
-    debate: 'Debate'
-};
-function getSafeExternalUrl(value) {
-    try {
-        const url = new URL(String(value || ''));
-        return ['https:', 'http:'].includes(url.protocol) ? url.href : '';
-    } catch (_error) {
-        return '';
-    }
-}
 
 export class StudentActivityHomeSpark {
     constructor(home) {
@@ -67,58 +50,39 @@ export class StudentActivityHomeSpark {
         };
     }
 
-    async fetchCurrentSpark() {
-        if (this.sm.authDisabled || !this.sm.currentUser) return null;
-        const subjectSlug = this.sm.selectedSubjectSlug || 'technology';
-        const dateValue = getPanamaDateValue();
-        const dateRange = this.getCurrentSparkDateRange(dateValue);
+    captureCurrentSparkScope(isCurrent = () => true) {
+        const user = this.sm.currentUser;
+        const ownerId = user?.uid || user?.id;
+        const authMode = this.sm.authDisabled;
+        const cloud = this.sm.progress?.cloud;
+        const session = cloud?.cloudGeneration;
+        const school = schoolContext.getGeneration();
+        const selection = this.activities.vocabularyData?.classSelection;
+        const generation = selection?.generation;
+        const classId = selection?.selectedId;
+        const subject = this.sm.selectedSubjectSlug;
         const grade = this.getStudentGradeLevel();
-        const accountId = this.sm.currentUser.uid || this.sm.currentUser.id;
-        const currentSpark = await this.queryService.ensure({
-            accountId,
-            key: ['student', 'scheduled-sparks', 'current', subjectSlug, grade || 'all', dateRange],
-            queryFn: async () => {
-                const sparks = (await sparksRepository.listScheduledForStudent({
-                    subjectSlug,
-                    onOrAfter: dateRange.onOrAfter,
-                    onOrBefore: dateRange.onOrBefore,
-                    targetGrade: grade,
-                    limit: 1
-                })).map(spark => this.normalizeSpark(spark));
-                if (grade) {
-                    const gradeMatch = sparks.find(spark => spark.targetGrades.includes(grade));
-                    if (gradeMatch) return gradeMatch;
-                }
-                return sparks.find(isAllGradeSpark) || null;
-            }
-        });
-        this.currentSpark = currentSpark;
-        return currentSpark;
+        return () => isCurrent() && user === this.sm.currentUser
+            && ownerId === (this.sm.currentUser?.uid || this.sm.currentUser?.id)
+            && authMode === this.sm.authDisabled && cloud === this.sm.progress?.cloud
+            && session === cloud?.cloudGeneration && school === schoolContext.getGeneration()
+            && selection === this.activities.vocabularyData?.classSelection
+            && generation === selection?.generation && classId === selection?.selectedId
+            && subject === this.sm.selectedSubjectSlug && grade === this.getStudentGradeLevel();
     }
 
-    async fetchAvailableSparks() {
-        if (this.sm.authDisabled || !this.sm.currentUser) return [];
-        const subjectSlug = this.sm.selectedSubjectSlug || 'technology';
-        const dateValue = getPanamaDateValue();
-        const dateRange = this.getCurrentSparkDateRange(dateValue);
-        const grade = this.getStudentGradeLevel();
-        const accountId = this.sm.currentUser.uid || this.sm.currentUser.id;
-        return this.queryService.ensure({
-            accountId,
-            key: ['student', 'scheduled-sparks', 'library', subjectSlug, grade || 'all', dateRange],
-            queryFn: async () => {
-                const sparks = (await sparksRepository.listScheduledForStudent({
-                    subjectSlug,
-                    onOrAfter: dateRange.onOrAfter,
-                    onOrBefore: dateRange.onOrBefore,
-                    targetGrade: grade,
-                    limit: 20
-                })).map(spark => this.normalizeSpark(spark));
-                return grade
-                    ? sparks.filter(spark => spark.targetGrades.includes(grade) || isAllGradeSpark(spark))
-                    : sparks.filter(isAllGradeSpark);
-            }
-        });
+    async fetchCurrentSpark({ isCurrent = () => true } = {}) {
+        const current = this.captureCurrentSparkScope(isCurrent);
+        const { sparkLibraryMethods } = await import('./studentSparkLibraryMethods.js');
+        if (!current()) return;
+        return sparkLibraryMethods.fetchCurrentSpark.call(this, { isCurrent: current });
+    }
+
+    async fetchAvailableSparks(...args) {
+        const owner = this.sm.currentUser;
+        const { sparkLibraryMethods } = await import('./studentSparkLibraryMethods.js');
+        if (owner !== this.sm.currentUser) return;
+        return sparkLibraryMethods.fetchAvailableSparks.apply(this, args);
     }
 
     getSparkLibraryStorageKey() {
@@ -163,20 +127,11 @@ export class StudentActivityHomeSpark {
         });
     }
 
-    async hydrateSparkLibraryProgress(sparkIds = []) {
-        const localProgress = this.loadSparkLibraryProgress();
-        if (this.sm.authDisabled || !this.sm.currentUser || sparkIds.length === 0) return localProgress;
-        try {
-            const cloudResponses = await sparkResponsesRepository.listOwn(sparkIds);
-            const merged = this.mergeSparkLibraryProgress(localProgress, cloudResponses);
-            this.persistSparkLibraryProgress(merged);
-            this.retryPendingSparkResponses(merged);
-            return merged;
-        } catch (error) {
-            console.warn('Could not load saved Spark responses:', error);
-            this.retryPendingSparkResponses(localProgress);
-            return localProgress;
-        }
+    async hydrateSparkLibraryProgress(sparkIds = [], { isCurrent = () => true } = {}) {
+        const current = this.captureCurrentSparkScope(isCurrent);
+        const { sparkLibraryMethods } = await import('./studentSparkLibraryMethods.js');
+        if (!current()) return;
+        return sparkLibraryMethods.hydrateSparkLibraryProgress.call(this, sparkIds, { isCurrent: current });
     }
 
     saveSparkLibraryState(state = {}) {
@@ -199,47 +154,11 @@ export class StudentActivityHomeSpark {
         }
     }
 
-    async syncSparkLibraryState(state, sequence) {
-        const queueGeneration = this.sm.progress?.syncQueue?.cloud.cloudGeneration;
-        const ownerUserId = this.sm.currentUser?.uid || getActiveStudentStorageOwner();
-        try {
-            const saved = await sparkResponsesRepository.submit(state, { ownerUserId });
-            if (!isActiveStudentStorageOwner(ownerUserId) || this.sm.currentUser?.uid !== ownerUserId) return;
-            if (this.sparkResponseSyncSequence.get(state.sparkId) !== sequence) return;
-            const progress = this.loadSparkLibraryProgress();
-            progress[state.sparkId] = saved;
-            this.persistSparkLibraryProgress(progress);
-            this.activities.updateArcadeGateDisplay();
-            this.sm.setAuthStatus?.('Synced');
-        } catch (error) {
-            if (!isActiveStudentStorageOwner(ownerUserId) || this.sm.currentUser?.uid !== ownerUserId) return;
-            if (this.sparkResponseSyncSequence.get(state.sparkId) !== sequence) return;
-            const failure = classifySyncError(error, { online: navigator.onLine });
-            if (failure.retryable) {
-                try {
-                    await imageDB.enqueueSyncAction('student-spark-response', {
-                        sparkId: state.sparkId,
-                        answers: state.answers || {},
-                        storageKey: this.getSparkLibraryStorageKey()
-                    }, { ownerUserId });
-                    this.sm.progress?.syncQueue?.scheduleRetry({ ownerUserId, generation: queueGeneration });
-                } catch (queueError) {
-                    if (!isActiveStudentStorageOwner(ownerUserId) || this.sm.currentUser?.uid !== ownerUserId) return;
-                    console.warn('Could not queue the Spark response for later sync:', queueError);
-                    const message = queueError?.code === 'SYNC_QUEUE_FULL'
-                        ? 'Local sync storage is full' : 'Could not save changes for sync';
-                    const queue = this.sm.progress?.syncQueue;
-                    if (queue) queue.setQueueStatus(message, ownerUserId, queue.cloud.cloudGeneration);
-                    else this.sm.setAuthStatus?.(message);
-                    this.sm.showToast?.('Your latest Spark answers could not be queued. Reconnect and save again.');
-                    return;
-                }
-                this.sm.setAuthStatus?.(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
-            } else {
-                this.sm.setAuthStatus?.('Spark response rejected');
-            }
-            console.warn('Could not sync Spark response:', error);
-        }
+    async syncSparkLibraryState(...args) {
+        const owner = this.sm.currentUser;
+        const { sparkLibraryMethods } = await import('./studentSparkLibraryMethods.js');
+        if (owner !== this.sm.currentUser) return;
+        return sparkLibraryMethods.syncSparkLibraryState.apply(this, args);
     }
 
     getCurrentSparkGateWork() {
@@ -261,152 +180,49 @@ export class StudentActivityHomeSpark {
         };
     }
 
-    async refreshCurrentSparkGate({ updateDisplay = true } = {}) {
-        await this.fetchCurrentSpark();
+    async refreshCurrentSparkGate({ updateDisplay = true, isCurrent = () => true } = {}) {
+        const current = this.captureCurrentSparkScope(isCurrent);
+        const assertCurrent = () => {
+            if (!current()) throw new DOMException('Spark scope changed', 'AbortError');
+        };
+        await this.fetchCurrentSpark({ isCurrent: current });
+        assertCurrent();
         if (this.currentSpark?.id) {
-            await this.hydrateSparkLibraryProgress([this.currentSpark.id]);
+            await this.hydrateSparkLibraryProgress([this.currentSpark.id], { isCurrent: current });
+            assertCurrent();
         }
         const work = this.getCurrentSparkGateWork();
         if (updateDisplay) this.activities.updateArcadeGateDisplay();
         return work;
     }
 
-    async renderSparkLibrary() {
-        const container = $('#student-sparks-library');
-        if (!container) return;
-        const view = $('#student-sparks-view');
-        setStudentPageLoading(view, true);
-        this.activities.renderSubjectPicker('#spark-subject-picker');
-        container.innerHTML = getStudentPageSkeleton('sparks', 'Loading Sparks');
-        try {
-            const sparks = await this.fetchAvailableSparks();
-            if (sparks.length === 0) {
-                container.innerHTML = '<p class="teacher-empty-state">No Sparks are available for this class yet.</p>';
-                return;
-            }
-            this.currentSpark = sparks[0];
-            const progress = await this.hydrateSparkLibraryProgress(sparks.map(spark => spark.id));
-            const dateRange = this.getCurrentSparkDateRange();
-            const { SparkReadingActivity } = await import('../activities/sparkReading.js');
-            new SparkReadingActivity(
-                container,
-                {
-                    subjectSlug: this.sm.selectedSubjectSlug || 'technology',
-                    grade: this.getStudentGradeLevel(),
-                    scheduledDate: dateRange.onOrBefore,
-                    onOrAfter: dateRange.onOrAfter,
-                    loadSparks: async () => sparks,
-                    getSparkState: sparkId => progress[sparkId] || null
-                },
-                null,
-                state => this.saveSparkLibraryState(state),
-                progress[sparks[0].id] || null
-            );
-        } catch (error) {
-            console.error('Failed to render Spark library', error);
-            container.innerHTML = '<p class="teacher-empty-state">Could not load Sparks. Please try again.</p>';
-        } finally {
-            setStudentPageLoading(view, false);
-        }
+    async renderSparkLibrary(...args) {
+        const owner = this.sm.currentUser;
+        const { sparkLibraryMethods } = await import('./studentSparkLibraryMethods.js');
+        if (owner !== this.sm.currentUser) return;
+        return sparkLibraryMethods.renderSparkLibrary.apply(this, args);
     }
 
-    async loadAndRenderCurrentSpark(host) {
+    async loadAndRenderCurrentSpark(host, { isCurrent = () => true } = {}) {
         if (!host) return;
-        const owner = this.sm.currentUser, generation = this.home.renderGeneration;
-        const current = () => host.isConnected && owner === this.sm.currentUser && generation === this.home.renderGeneration;
-        try {
-            this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:fetch' });
-            const spark = await this.fetchCurrentSpark();
-            if (!current()) return;
-            if (!spark?.id) {
-                this.removeSparkHomePanel(host);
-                return;
-            }
-            this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:replaceChildren' });
-            host.replaceChildren(this.createStudentSparkCard(spark));
-            this.activities.updateArcadeGateDisplay();
-            refreshIcons(host);
-        } catch (error) {
-            const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
-            showSectionLoadError(host, { label: 'the current Spark', error, current, keepContent: Boolean(host.children.length),
-                retry: () => this.loadAndRenderCurrentSpark(host) });
-        }
+        const scope = this.captureCurrentSparkScope(isCurrent);
+        const render = this.home.renderGeneration;
+        const route = globalThis.location?.hash;
+        const navigation = this.sm.routing?.arcadeReadController?.signal;
+        const dashboard = host.closest?.('#student-home-dashboard');
+        const current = () => scope() && render === this.home.renderGeneration
+            && route === globalThis.location?.hash && !navigation?.aborted
+            && navigation === this.sm.routing?.arcadeReadController?.signal
+            && host.isConnected && dashboard === host.closest?.('#student-home-dashboard');
+        let renderer;
+        try { renderer = await this.home.preparePresentation({ isCurrent: current }); }
+        catch (error) { if (!current()) return; throw error; }
+        if (!current()) return;
+        return renderer.renderCurrentHomeSpark.call(this, host, { isCurrent: current });
     }
 
     getStudentSparkQuestion(spark) {
         return getSparkQuestionsForGrade(spark, this.getStudentGradeLevel())[0]?.prompt || '';
     }
 
-    createStudentSparkCard(spark) {
-        const card = createElement('section', 'student-spark-card');
-        card.setAttribute('aria-label', 'Spark of the Week');
-        const question = this.getStudentSparkQuestion(spark);
-        const safeSourceUrl = getSafeExternalUrl(spark.sourceUrl);
-        const sourceHtml = safeSourceUrl
-            ? `<a href="${escapeHtml(safeSourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spark.sourceTitle || 'Source')}</a>`
-            : '';
-        card.innerHTML = `
-            <div class="student-spark-heading">
-                <span class="student-spark-badge"><i data-lucide="sparkles"></i> Spark of the Week</span>
-                <span>${escapeHtml(SPARK_TYPE_LABELS[spark.sparkType] || 'Spark')}</span>
-            </div>
-            <h3>${escapeHtml(spark.title || 'Technology Spark')}</h3>
-            <p>${escapeHtml(spark.sparkText)}</p>
-            ${spark.whyItMatters ? `
-                <div class="student-spark-detail">
-                    <strong>Why it matters</strong>
-                    <span>${escapeHtml(spark.whyItMatters)}</span>
-                </div>
-            ` : ''}
-            ${question ? `
-                <div class="student-spark-question">
-                    <i data-lucide="message-circle-question"></i>
-                    <span>${escapeHtml(spark.questions.length > 1 ? `${spark.questions.length} Check Your Understanding questions` : question)}</span>
-                </div>
-            ` : ''}
-            ${sourceHtml ? `<div class="student-spark-source">${sourceHtml}</div>` : ''}
-        `;
-        return card;
-    }
-
-    removeSparkHomePanel(host) {
-        this.sm.logStudentDomUpdate?.('student-home-dashboard', { source: 'removeSparkHomePanel' });
-        const panel = host?.closest('.student-home-panel');
-        const tab = $('#student-home-tab-spark');
-        panel?.remove();
-        tab?.remove();
-        const firstTab = $('.student-home-tab');
-        if (firstTab) {
-            firstTab.classList.add('active', 'secondary-tab--active');
-            firstTab.setAttribute('aria-selected', 'true');
-            firstTab.tabIndex = 0;
-            const firstPanel = $(`#${firstTab.getAttribute('aria-controls')}`);
-            firstPanel?.classList.add('active');
-        }
-    }
-
-    createSparkHomePanel(title, subtitle, active = false) {
-        const panel = createElement('section', `student-home-panel student-home-spark-panel${active ? ' active' : ''}`);
-        panel.id = 'student-home-panel-spark';
-        panel.dataset.panel = 'spark';
-        panel.setAttribute('role', 'tabpanel');
-        panel.setAttribute('aria-labelledby', 'student-home-tab-spark');
-        panel.innerHTML = `
-            <div class="teacher-panel-header">
-                <div>
-                    <h3>${title}</h3>
-                    <p>${subtitle}</p>
-                </div>
-            </div>
-            <div class="student-spark-host">
-                ${getStudentPageSkeleton('list', 'Loading Spark')}
-            </div>
-        `;
-        const openButton = createElement('button', 'student-home-spark-open');
-        openButton.type = 'button';
-        openButton.setAttribute('aria-label', 'Open Sparks');
-        openButton.addEventListener('click', () => this.sm.navigateTo({ view: 'sparks' }));
-        panel.appendChild(openButton);
-        return panel;
-    }
 }

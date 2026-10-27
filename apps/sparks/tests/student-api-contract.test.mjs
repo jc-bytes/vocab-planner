@@ -6,6 +6,7 @@ import { supabaseService } from '../js/supabaseService.js';
 const EXPECTED_STUDENT_METHODS = [
     'acceptStudentGiftCoins',
     'buildWordHuntImagePath',
+    'capturePasswordChangeIntent',
     'claimStudentWelcomeBonus',
     'downloadWordHuntImage',
     'ensureOwnStudentProgress',
@@ -13,6 +14,7 @@ const EXPECTED_STUDENT_METHODS = [
     'getProfile',
     'init',
     'onAuthStateChanged',
+    'recoverStudentArcadeMinute',
     'reportStudentActivityTime',
     'signInWithPassword',
     'signOut',

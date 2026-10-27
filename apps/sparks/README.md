@@ -43,6 +43,10 @@ npm install
 
 ## Testing
 
+Browser checks own fresh Vite processes on dedicated test ports, leaving the development servers on 8000/8001 available. Existing `UI_*_PORT` overrides and explicit `UI_*_BASE_URL` reuse remain supported. An occupied test port fails clearly; checks never stop or silently reuse another listener. Run authenticated checks serially because they share dedicated local audit fixtures.
+
+Built checks verify that `dist-desktop` matches the current application inputs, public build configuration and emitted files. After changing application code or build inputs, run `npm run desktop:build:web` before requesting build reuse. The official build writes `.vite/artifact-identity.json`; a direct `vite build` does not complete the asset/worker/validation pipeline or create that identity. See [build-artifact-freshness.md](docs/build-artifact-freshness.md) for the precise scope.
+
 Run the complete source regression suite:
 
 ```bash
@@ -96,7 +100,7 @@ Run the release hardening suite:
 npm run test:release
 ```
 
-The release suite runs the complete source regression suite, production dependency audit, source and built-preview shell smoke, local authenticated and responsive checks, cross-browser smoke, Supabase acceptance/lint/advisor checks, and the desktop web build. It intentionally does not run `npm audit fix`; dependency upgrades must pass the same release gates.
+The release suite runs the complete source regression suite, dependency audit including build and test tools, source and built-preview shell smoke, local authenticated and responsive checks, cross-browser smoke, Supabase acceptance/lint/advisor checks, and the desktop web build. It intentionally does not run `npm audit fix`; dependency upgrades must pass the same release gates.
 
 ## Desktop App
 

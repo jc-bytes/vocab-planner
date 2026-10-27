@@ -1,0 +1,11 @@
+# Student mutation ownership
+
+Apply `20261025035923_bind_active_student_mutations_to_owner.sql` before releasing the matching client. It adds authenticated-only public invoker RPCs for class responses, Spark checks, activity attempts and game scores. Existing RPCs and their grants remain available to older clients. There is no client fallback to an unowned mutation.
+
+The UI captures the intended student before asynchronous work and passes that identity through the repository or student API. Each owned RPC compares that identity with `auth.uid()` before calling the existing private implementation. A session change inside the SDK's token lookup therefore cannot turn an old student's action into a new student's write. Existing authorization, revision checks and return values remain in the private implementation.
+
+Direct repository callers may keep the three-argument interface: the repository verifies the user through the supplied client's `auth.getUser()`. UI callers must pass their captured owner explicitly. The optional classroom write adapter shares one deadline across import, client lookup, user verification and RPC dispatch; an expired request cannot dispatch after a delayed import or lookup completes.
+
+Run `npm run test:student-mutation-ownership:database` with the local Supabase stack. It creates a disposable schema clone and real PostgREST gateway, then pauses the actual SDK token lookup and replaces A's session with B's. All four mutations must reject without changing either student's response, evaluation, attempt or score. Normal A writes must succeed, anonymous execution must fail, and legacy grants must remain identical. This proof does not write to the hosted project or establish production rollout status.
+
+Run `npm run test:private-classrooms` for the real authenticated source workflow. After building, run `PRIVATE_CLASSROOM_UI_DIST=1 npm run test:private-classrooms` against the emitted application. Both modes retain enrollment, private answer/check, teacher review, activity launch/reload and incomplete-work assertions. These flow fixtures seed actual owner-scoped returning-student guide preferences; separate guide checks exercise opening, Next and Skip.

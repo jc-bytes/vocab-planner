@@ -36,7 +36,7 @@ async function resolveBaseUrl() {
         return { baseUrl, server };
     }
 
-    const port = Number(process.env.UI_AUDIT_PORT || 8000);
+    const port = Number(process.env.UI_AUDIT_PORT || 8573);
     const baseUrl = `http://127.0.0.1:${port}`;
     const server = await ensureViteServer({
         baseUrl,
@@ -230,14 +230,17 @@ async function findFirstAssignmentId(page, url, selector) {
 
 async function auditTeacherStudentProfile(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
-    await page.goto(`${baseUrl}/teacher.html#/teacher/students`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}/teacher.html#/teacher/overview`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
-
-    const buttons = page.locator('#student-progress-cards .view-details-btn');
-    await buttons.first().waitFor({ timeout: 10000 });
-
-    await buttons.first().click();
+    const home = page.locator('#teacher-overview-view');
+    await home.getByRole('button', { name: /^Open class / }).first().click();
+    const classes = page.locator('#teacher-classes-view');
+    if (process.env.UI_AUDIT_CLASS_ID) await page.getByLabel('Current class', { exact: true }).selectOption(process.env.UI_AUDIT_CLASS_ID);
+    await classes.getByRole('tab', { name: 'Students', exact: true }).click();
+    await classes.getByRole('button', { name: /^Actions for / }).first().click();
+    await page.getByRole('menuitem', { name: 'View profile', exact: true }).click();
     await page.waitForSelector('#teacher-student-profile-view:not(.hidden)', { timeout: 5000 });
+    await page.locator('#student-profile-content:not(.hidden)').waitFor();
     const ok = await page.evaluate(() => {
         const profile = document.querySelector('#teacher-student-profile-view');
         return Boolean(profile
@@ -247,7 +250,7 @@ async function auditTeacherStudentProfile(page, baseUrl) {
     if (!ok) throw new Error('Student profile did not expose routed profile navigation and tabs.');
 
     await page.locator('#student-profile-back-btn').click();
-    await page.waitForSelector('#teacher-progress-view:not(.hidden)', { timeout: 5000 });
+    await classes.locator('#class-tab-students[aria-selected="true"]').waitFor();
 }
 
 async function assertTeacherMobileMenu(page, baseUrl) {
@@ -372,7 +375,7 @@ async function assertTeacherSparksRoute(page, baseUrl) {
     await page.goto(`${baseUrl}/teacher.html#/teacher/sparks`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
     await page.waitForSelector('#teacher-sparks-view:not(.hidden)', { timeout: 5000 });
-    await page.waitForSelector('#spark-library-list .spark-card, #spark-library-list .teacher-empty-state', { timeout: 10000 });
+    await page.locator('#spark-library-list').getByText('Current Audit Spark', { exact: true }).waitFor({ timeout: 10000 });
 
     const state = await page.evaluate(() => ({
         activeLabel: document.querySelector('.teacher-tab.active')?.textContent?.trim().replace(/\s+/g, ' '),
@@ -496,6 +499,7 @@ async function assertStudentMobileMenu(page, baseUrl) {
                 top: Math.round(rect.top),
                 bottom: Math.round(rect.bottom),
                 height: Math.round(rect.height),
+                width: Math.round(rect.width),
                 centerY: Math.round(rect.top + rect.height / 2)
             };
         };
@@ -507,7 +511,9 @@ async function assertStudentMobileMenu(page, baseUrl) {
             tabsVisible: visible('.student-home-tabs'),
             activeTab: document.querySelector('.student-home-tab.active')?.dataset.panel,
             visiblePanels,
-            subject: rectFor('#student-subject-picker')
+            helpVisible: visible('.student-top-bar .ember-context-help'),
+            visibleClassPickers: ['#student-subject-picker', '#vocab-subject-picker', '#spark-subject-picker'].filter(visible),
+            classTrigger: rectFor('#student-subject-picker .student-subject-trigger')
         };
     });
 
@@ -518,8 +524,10 @@ async function assertStudentMobileMenu(page, baseUrl) {
         || dashboardState.visiblePanels[0] !== 'week') {
         throw new Error(`Student mobile dashboard is not compacted into one active panel: ${JSON.stringify(dashboardState)}`);
     }
-    if (dashboardState.subject?.height) {
-        throw new Error('The legacy subject picker must be hidden for enrolled students.');
+    if (dashboardState.visibleClassPickers.length !== (dashboardState.helpVisible ? 1 : 0)
+        || dashboardState.helpVisible && (dashboardState.visibleClassPickers[0] !== '#student-subject-picker'
+            || dashboardState.classTrigger?.height < 44 || dashboardState.classTrigger?.width < 44)) {
+        throw new Error(`Student help must expose one usable class picker without duplicate page controls: ${JSON.stringify(dashboardState)}`);
     }
 
     await page.locator('#student-mobile-menu-toggle').click();
@@ -549,20 +557,27 @@ async function assertStudentActivityCardsAreButtons(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
     await page.goto(`${baseUrl}/student.html#/unit/${auditUnitId}`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
+    await page.locator('#activity-menu-view.active:not(.hidden)').waitFor();
+    await page.locator('#activity-menu-view .activity-card').first().waitFor();
 
     const result = await page.evaluate(() => {
         return Array.from(document.querySelectorAll('.activity-card')).map(card => card.tagName.toLowerCase());
     });
-    if (result.length > 0 && result.some(tag => tag !== 'button')) {
+    if (result.length === 0 || result.some(tag => tag !== 'button')) {
         throw new Error(`Activity cards must be buttons. Found: ${result.join(', ')}`);
     }
 }
 
 async function main() {
     const { baseUrl, server } = await resolveBaseUrl();
-    let browser;
+    let browser, arcadeFixture;
 
     try {
+        if (process.env.UI_AUDIT_PREPARE_ARCADE_FIXTURE === '1') {
+            const { prepareResponsiveArcadeFixture } = await import('./lib/responsive-arcade-fixture.mjs');
+            arcadeFixture = await prepareResponsiveArcadeFixture({ studentId: process.env.UI_AUDIT_STUDENT_ID,
+                assignmentId: process.env.UI_AUDIT_ASSIGNMENT_ID, classId: process.env.UI_AUDIT_CLASS_ID });
+        }
         browser = await chromium.launch({ headless: true });
         const teacherContext = await browser.newContext({ timezoneId: 'America/Panama' });
         const studentContext = await browser.newContext({ timezoneId: 'America/Panama' });
@@ -595,13 +610,30 @@ async function main() {
             ['Student Classes', `${baseUrl}/student.html#/classes`],
             ['Student Unit Menu', `${baseUrl}/student.html#/unit/${auditUnitId}`],
             ['Student Flashcards', `${baseUrl}/student.html#/unit/${auditUnitId}/activity/flashcards`],
-            ['Student Arcade', `${baseUrl}/student.html#/arcade`]
+            ['Student Arcade', `${baseUrl}/student.html#/arcade`, { beforeAudit: async page => {
+                await page.locator('#arcade-view.active:not(.hidden) #game-selection:not(.hidden)').waitFor();
+                await page.locator('#game-selection .game-card, #game-selection .arcade-game-card').first().waitFor();
+            } }]
         ];
 
         for (const [label, url, options] of teacherRoutes) {
             await auditRoute(teacherPage, url, label, options);
         }
         for (const [label, url, options] of studentRoutes) {
+            if (label === 'Student Arcade' && arcadeFixture) {
+                // First prove the real incomplete-work gate and teardown. Then
+                // prepare an eligible server fixture for actual Arcade geometry.
+                await studentPage.goto(url, { waitUntil: 'load' });
+                await studentPage.locator('#activity-menu-view.active:not(.hidden)').waitFor();
+                await studentPage.waitForFunction(() => !studentApp.activityInstance && !studentApp.currentActivityType
+                    && document.querySelectorAll('.ember-help-button').length === 0
+                    && document.querySelectorAll('.ember-context-help').length === 1);
+                const progressKey = await studentPage.evaluate(() => studentApp.activities.getUnitProgressKey(studentApp.currentVocab));
+                if (progressKey !== arcadeFixture.unitKey) throw new Error('Responsive fixture does not match the active assignment progress key.');
+                await arcadeFixture.complete();
+                await studentPage.reload({ waitUntil: 'load' });
+                await studentPage.locator('#student-tab-shell:not(.hidden)').waitFor();
+            }
             await auditRoute(studentPage, url, label, options);
         }
 
@@ -616,7 +648,8 @@ async function main() {
         console.log(`Responsive UI audit passed across widths: ${widths.join(', ')}`);
     } finally {
         await browser?.close().catch(() => {});
-        server?.kill();
+        try { await arcadeFixture?.restore(); }
+        finally { server?.kill(); }
     }
 }
 

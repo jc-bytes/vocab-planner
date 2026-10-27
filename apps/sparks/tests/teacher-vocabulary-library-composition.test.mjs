@@ -24,6 +24,8 @@ globalThis.window = { addEventListener() {}, removeEventListener() {} };
 const { installTeacherVocabularyLibraryMethods } = await import('../js/teacherVocabularyLibrary.js');
 const { installTeacherVocabularyStorageMethods } = await import('../js/teacherVocabularyStorage.js');
 const { installTeacherVocabularyEditorCoreMethods } = await import('../js/teacherVocabularyEditorCoreMethods.js');
+const { createTeacherVocabularyBrowserModel } = await import('../js/teacherVocabularyLibrary/teacherVocabularyBrowserModel.js');
+const { installTeacherVocabularyPlacementMethods } = await import('../js/teacherVocabularyPlacement.js');
 const { teacherVocabularyBrowserViewMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyBrowserViewMethods.js');
 const { teacherVocabularyDataMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js');
 const { teacherVocabularyRowViewMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyRowViewMethods.js');
@@ -43,39 +45,23 @@ class TestTeacherManager {
 }
 installTeacherVocabularyLibraryMethods(TestTeacherManager);
 
-test('teacher vocabulary installer preserves the complete library workflow surface', () => {
-    [
-        'getTeacherLibrary', 'dedupeTeacherVocabularyItems', 'buildLibraryGroups',
-        'renderLibraryBrowser', 'createTeacherVocabularyRow', 'renderSubjectPicker'
-    ].forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
+test('teacher vocabulary installs headless catalog and shell methods, not browser UI', () => {
+    for (const name of ['getTeacherLibrary', 'dedupeTeacherVocabularyItems', 'describeTeacherVocabulary', 'setVocabularyWorkflowTab'])
+        assert.equal(typeof TestTeacherManager.prototype[name], 'function');
+    for (const name of ['renderLibraryBrowser', 'createTeacherVocabularyRow', 'renderSubjectPicker', 'buildLibraryGroups', 'loadLibrary'])
+        assert.equal(name in TestTeacherManager.prototype, false);
 });
 
 test('JSON import does not depend on the lazy quiz feature', () => {
     assert.doesNotMatch(vocabularyEditorListeners, /manager\.downloadForRepository/);
 });
 
-test('teacher vocabulary responsibilities have one complete owner each', () => {
-    const groups = [
-        teacherVocabularyWorkflowMethods,
-        teacherVocabularyDataMethods,
-        teacherVocabularyRowViewMethods,
-        teacherVocabularyBrowserViewMethods
-    ];
-    const methodNames = groups.flatMap(group => Object.keys(group));
-
-    assert.equal(methodNames.length, 39);
-    assert.equal(new Set(methodNames).size, methodNames.length);
-    methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
-    assert.deepEqual(
-        Object.keys(teacherVocabularyDataMethods).sort(),
-        [
-            'buildLibraryGroups', 'dedupeTeacherVocabularyItems', 'getTeacherLibrary',
-            'getTeacherVocabularyDedupeKeys', 'getTeacherVocabularyItemPriority',
-            'getTeacherVocabularyItemsForDrilldown', 'getTeacherVocabularyPurpose',
-            'loadLibrary', 'mergeTeacherVocabularyItems', 'mergeTeacherVocabularyMetadata',
-            'openTeacherVocabularyItem', 'resetLibraryDrilldown'
-        ]
-    );
+test('headless catalog and private presentation have separate owners', () => {
+    for (const group of [teacherVocabularyDataMethods, teacherVocabularyWorkflowMethods])
+        for (const name of Object.keys(group)) assert.equal(typeof TestTeacherManager.prototype[name], 'function');
+    for (const group of [teacherVocabularyRowViewMethods, teacherVocabularyBrowserViewMethods])
+        for (const name of Object.keys(group)) assert.equal(name in TestTeacherManager.prototype, false);
+    assert.doesNotMatch(vocabularyDataSource, /renderLibraryBrowser|showLibraryLoading|teacherVocabularyModel/);
 });
 
 test('teacher composition omits obsolete vocabulary and progress aliases', () => {
@@ -84,7 +70,7 @@ test('teacher composition omits obsolete vocabulary and progress aliases', () =>
         false
     );
     assert.doesNotMatch(vocabularyStorageSource, /\bdeleteLocalVocab\b/);
-    assert.match(vocabularyStorageSource, /this\.removeLocalVocab\(vocab\.id\)/);
+    assert.doesNotMatch(vocabularyStorageSource, /createTeacherUnitCard/);
     assert.doesNotMatch(teacherSource, /\bVOCAB_COLLECTION\b/);
     assert.doesNotMatch(teacherSource, /teacherLibrary(?:Cache|Promise)/);
     assert.doesNotMatch(vocabularyDataSource, /teacherLibrary(?:Cache|Promise)/);
@@ -250,20 +236,31 @@ test('teacher vocabulary deduplication keeps the strongest source and useful fal
     assert.deepEqual(items[0].vocab.words, [{ word: 'LAN' }]);
 });
 
+function presentationModel() {
+    class Owner extends TestTeacherManager {}
+    installTeacherVocabularyPlacementMethods(Owner);
+    const owner = new Owner();
+    return createTeacherVocabularyBrowserModel({
+        getSubjects: () => [],
+        describeVocabulary: (vocab, type) => owner.describeTeacherVocabulary(vocab, type),
+        describeVocabularyGrouping: vocab => owner.describeTeacherVocabularyGrouping(vocab)
+    });
+}
+
 test('teacher vocabulary hierarchy groups units by subject, grade, and trimester', () => {
-    const manager = new TestTeacherManager();
+    const manager = presentationModel();
     const groups = manager.buildLibraryGroups([
         { type: 'cloud', vocab: { id: 'a', subjectSlug: 'technology', grades: ['6', '7'], trimester: '1' } },
         { type: 'remote', vocab: { id: 'b', subjectSlug: 'robotics', grades: ['6'], trimester: '2' } }
     ]);
 
-    assert.equal(groups.get('technology').get('6').get('1').length, 1);
-    assert.equal(groups.get('technology').get('7').get('1').length, 1);
-    assert.equal(groups.get('robotics').get('6').get('2').length, 1);
+    assert.equal(groups.get('technology').get('6').get('IT').length, 1);
+    assert.equal(groups.get('technology').get('7').get('IT').length, 1);
+    assert.equal(groups.get('robotics').get('6').get('IIT').length, 1);
 });
 
 test('teacher vocabulary drilldown filters only explicitly selected hierarchy levels', () => {
-    const manager = new TestTeacherManager();
+    const manager = presentationModel();
     manager.libraryItems = [
         { type: 'cloud', vocab: { id: 'a', subjectSlug: 'technology', grades: ['6'], trimester: '1', month: 'august' } },
         { type: 'cloud', vocab: { id: 'b', subjectSlug: 'technology', grades: ['7'], trimester: '1', month: 'august' } },
@@ -277,7 +274,7 @@ test('teacher vocabulary drilldown filters only explicitly selected hierarchy le
 });
 
 test('teacher vocabulary word counts support metadata and loaded vocabulary shapes', () => {
-    const manager = new TestTeacherManager();
+    const manager = presentationModel();
 
     assert.equal(manager.getTeacherVocabularyWordCount({ wordCount: 12 }), 12);
     assert.equal(manager.getTeacherVocabularyWordCount({ terms: [{}, {}] }), 2);

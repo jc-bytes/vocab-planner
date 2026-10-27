@@ -137,12 +137,6 @@
     line-height: var(--student-leading-heading);
 }
 
-.student-site #activity-menu-view .activity-menu-title-block > h2 {
-    font-size: var(--student-type-page-title-size);
-    font-weight: var(--student-weight-bold);
-    line-height: var(--student-leading-heading);
-}
-
 .student-site :where(.section-header__title, .teacher-panel-header h3) {
     font-size: var(--student-type-section-title-size);
     font-weight: var(--student-weight-bold);
@@ -161,10 +155,7 @@
     line-height: var(--student-leading-card);
 }
 
-.student-site .student-vocab-card h3,
-.student-site .student-vocab-row strong,
-.student-site .student-spark-card h3,
-.student-site .activity-card h3 {
+.student-site .student-spark-card h3 {
     font-size: var(--student-type-card-title-size);
     font-weight: var(--student-weight-semibold);
     line-height: var(--student-leading-card);
@@ -201,27 +192,10 @@
     line-height: var(--student-leading-secondary);
 }
 
-.student-site #vocab-selection-view :is(.student-vocab-card, .student-vocab-row)
-    :is(.student-vocab-schedule, .student-vocab-purpose, .student-vocab-row-progress small) {
-    font-size: var(--student-type-caption-size);
-    line-height: var(--student-leading-caption);
-}
-
 .student-site .student-top-bar :is(.student-class-picker-label, .student-arcade-balance-label, .student-level-badge, .student-level-title, .student-xp-label),
 .student-site #student-home-dashboard :is(.student-hero-purpose, .student-continue-progress-top, .student-continue-progress-top strong) {
     font-size: var(--student-type-caption-size);
     line-height: var(--student-leading-caption);
-}
-
-.student-site #student-home-dashboard .student-continue-copy p {
-    font-size: var(--student-type-body-size);
-    line-height: var(--student-leading-body);
-}
-
-.student-site #student-home-dashboard .student-arcade-gate-copy :is(strong, span),
-.student-site #student-home-dashboard .student-arcade-gate-notice .btn {
-    font-size: var(--student-type-secondary-size);
-    line-height: var(--student-leading-secondary);
 }
 
 
@@ -337,26 +311,6 @@
     margin-top: var(--student-gap-related);
 }
 
-.student-site .student-continue-hero {
-    gap: var(--student-space-6);
-    padding: var(--student-space-8);
-}
-
-.student-site .student-continue-copy {
-    gap: var(--student-space-3);
-}
-
-.student-site .student-continue-copy h3 {
-    font-size: var(--student-type-display-size);
-    font-weight: var(--student-weight-bold);
-    line-height: var(--student-leading-display);
-}
-
-.student-site .student-continue-copy p {
-    font-size: var(--student-type-body-size);
-    line-height: var(--student-leading-body);
-}
-
 .student-site :where(.student-vocab-card, .student-vocab-row, .student-home-unit) {
     gap: var(--student-space-3);
 }
@@ -390,63 +344,11 @@
         --student-section-gap: var(--student-space-6);
     }
 
-    .student-site #student-home-dashboard .student-continue-copy {
-        min-width: 0;
-        width: 100%;
-    }
-
-    .student-site #student-home-dashboard .student-continue-progress {
-        min-width: 0;
-        padding-right: var(--student-space-0);
-    }
-
-    .student-site #student-home-dashboard .student-continue-progress-top {
-        flex-wrap: wrap;
-    }
-
-    .student-site #student-home-dashboard .student-continue-action {
-        position: static;
-        box-sizing: border-box;
-        width: 100%;
-        margin-top: var(--student-space-4);
-    }
-
-    .student-site .student-continue-hero {
-        gap: var(--student-space-4);
-        padding: var(--student-space-6);
-    }
-
     .student-site :where(.btn, .student-home-tab, .teacher-tab, .vocab-view-toggle-btn) {
         font-size: var(--student-type-secondary-size);
     }
 
-    .student-site #vocab-selection-view .vocab-selection-header {
-        grid-template-columns: minmax(0, 1fr);
-        grid-template-areas:
-            "intro"
-            "subject"
-            "view";
-        align-items: stretch;
-        gap: var(--student-space-3);
-    }
-
-    .student-site #vocab-selection-view .vocab-page-intro {
-        grid-area: intro;
-        width: 100%;
-    }
-
-    .student-site #vocab-selection-view .vocab-header-subject-picker {
-        grid-area: subject;
-        justify-content: stretch;
-        width: 100%;
-    }
-
     .student-site #vocab-selection-view .vocab-header-subject-picker .student-class-picker {
         width: 100%;
-    }
-
-    .student-site #vocab-selection-view .vocab-view-toggle {
-        grid-area: view;
-        justify-self: start;
     }
 }

@@ -2,6 +2,15 @@ import { DEFAULT_COIN_DATA } from '../studentProgressDefaults.js';
 
 export const WORD_HUNT_IMAGE_BUCKET = 'word-hunt-images';
 
+// For local cancellation only. Server auth.uid()/RLS still authorize every write.
+export function readAuthSessionId(session) {
+    try {
+        const payload = String(session?.access_token || '').split('.')[1];
+        const id = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))).session_id;
+        return typeof id === 'string' && id ? id : null;
+    } catch { return null; }
+}
+
 export function cleanUndefined(object) {
     return Object.fromEntries(Object.entries(object).filter(([, value]) => value !== undefined));
 }

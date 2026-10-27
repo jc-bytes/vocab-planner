@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_TEACHER_PAGES_HOST || '127.0.0.1';
-const port = Number(process.env.UI_TEACHER_PAGES_PORT || 8000);
+const port = Number(process.env.UI_TEACHER_PAGES_PORT || 8563);
 const baseUrl = (process.env.UI_TEACHER_PAGES_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 let server;
 let browser;
@@ -27,9 +27,9 @@ try {
         const dataPage = teacherPageRegistry.get('data');
         const settingsPage = teacherPageRegistry.get('settings');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
+        const { installTeacherClassSelectionMethods } = await import('/js/teacherClassSelection.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { teacherVocabularyWorkflowMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
-        const { teacherVocabularyDataMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js');
         const { teacherProgressDataMethods } = await import('/js/teacherStudentProgress/teacherProgressDataMethods.js');
         const teacherSource = await fetch('/teacher.html').then(response => response.text());
         const parsedTeacher = new DOMParser().parseFromString(teacherSource, 'text/html');
@@ -50,6 +50,7 @@ try {
 
         class Manager {
             constructor() {
+                this.currentUser = { id: 'teacher-page-smoke' };
                 this.authDisabled = true;
                 this.isAuthenticated = true;
                 this.isApplyingRoute = false;
@@ -68,7 +69,7 @@ try {
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
             showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
-            showClassesView(context) { this.workspaceContext = context; this.switchView('teacher-classes-view', { updateRoute: false }); }
+            showClassesView(context) { this.workspaceContext = context; if (context.tab === 'students') this.progressLoads += 1; this.switchView('teacher-classes-view', { updateRoute: false }); }
             showAssignmentsView(context) { this.workspaceContext = context; this.switchView(`teacher-${context.mode}-view`, { updateRoute: false }); }
             showSparkEditor(context) { this.workspaceContext = context; this.switchView('teacher-spark-editor-view', { updateRoute: false }); }
             showGroupsView() { this.groupLoads += 1; this.switchView(groupsPage.viewId); }
@@ -85,11 +86,13 @@ try {
             fetchStudentProgressPage() { this.progressLoads += 1; return Promise.resolve(); }
         }
         Manager.prototype.showVocabularyLibrary = teacherVocabularyWorkflowMethods.showVocabularyLibrary;
-        Manager.prototype.resetLibraryDrilldown = teacherVocabularyDataMethods.resetLibraryDrilldown;
+        Manager.prototype.resetLibraryDrilldown = teacherVocabularyWorkflowMethods.resetLibraryDrilldown;
         Manager.prototype.showProgressView = teacherProgressDataMethods.showProgressView;
         installTeacherRoutingMethods(Manager);
+        installTeacherClassSelectionMethods(Manager);
         installTeacherShellMethods(Manager);
         const manager = new Manager();
+        manager.selectTeacherClass('class-a');
         window.teacherPageSmokeManager = manager;
         window.addEventListener('hashchange', () => manager.handleRouteChange());
 
@@ -128,7 +131,7 @@ try {
     }
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
-    await page.waitForFunction(() => window.location.hash === '#/teacher/students');
+    await page.waitForFunction(() => window.location.hash === '#/teacher/classes?class=class-a&tab=students');
     const overviewLoadsBeforeBack = await page.evaluate(() => window.teacherPageSmokeManager.overviewLoads);
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
@@ -192,7 +195,7 @@ try {
     }
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
-    await page.waitForFunction(() => window.location.hash === '#/teacher/students');
+    await page.waitForFunction(() => window.location.hash === '#/teacher/classes?class=class-a&tab=students');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/vocabulary?subject=technology&grade=7&trimester=2&month=May&mode=review'
@@ -238,7 +241,7 @@ try {
     }
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
-    await page.waitForFunction(() => window.location.hash === '#/teacher/students');
+    await page.waitForFunction(() => window.location.hash === '#/teacher/classes?class=class-a&tab=students');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/sparks'
@@ -260,11 +263,11 @@ try {
             loadDelta: manager.progressLoads - loadsBefore
         };
     });
-    if (students.hash !== '#/teacher/students'
-        || students.activeView !== 'teacher-progress-view'
+    if (students.hash !== '#/teacher/classes?class=class-a&tab=students'
+        || students.activeView !== 'teacher-classes-view'
         || students.activeSection !== 'classes'
-        || students.mobileLabel !== 'Classes'
-        || students.topLabel !== 'Classes'
+        || students.mobileLabel !== 'Classwork'
+        || students.topLabel !== 'Classwork'
         || students.loadDelta !== 1) {
         throw new Error(`Students navigation changed: ${JSON.stringify(students)}`);
     }
@@ -280,7 +283,7 @@ try {
             loadDelta: manager.progressLoads - loadsBefore
         };
     });
-    if (studentsDirect.activeView !== 'teacher-progress-view'
+    if (studentsDirect.activeView !== 'teacher-classes-view'
         || studentsDirect.activeSection !== 'classes'
         || studentsDirect.loadDelta !== 1) {
         throw new Error(`Students direct route changed: ${JSON.stringify(studentsDirect)}`);
@@ -290,8 +293,8 @@ try {
     await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
-        window.location.hash === '#/teacher/students'
-        && document.querySelector('.view.active')?.id === 'teacher-progress-view'
+        window.location.hash === '#/teacher/classes?class=class-a&tab=students'
+        && document.querySelector('.view.active')?.id === 'teacher-classes-view'
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'classes'
     ));
 
@@ -308,11 +311,11 @@ try {
             loadDelta: manager.groupLoads - loadsBefore
         };
     });
-    if (groups.hash !== '#/teacher/groups'
+    if (groups.hash !== '#/teacher/groups?class=class-a'
         || groups.activeView !== 'teacher-groups-view'
         || groups.activeSection !== 'classes'
-        || groups.mobileLabel !== 'Classes'
-        || groups.topLabel !== 'Classes'
+        || groups.mobileLabel !== 'Classwork'
+        || groups.topLabel !== 'Classwork'
         || groups.loadDelta !== 1) {
         throw new Error(`Groups navigation changed: ${JSON.stringify(groups)}`);
     }
@@ -338,7 +341,7 @@ try {
     await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
-        window.location.hash === '#/teacher/groups'
+        window.location.hash === '#/teacher/groups?class=class-a'
         && document.querySelector('.view.active')?.id === 'teacher-groups-view'
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'classes'
     ));
@@ -376,8 +379,8 @@ try {
             calls: manager.dataCalls.slice(callsBefore)
         };
     });
-    if (dataDirect.activeView !== 'teacher-review-view'
-        || dataDirect.activeSection !== 'review'
+    if (dataDirect.activeView !== 'teacher-assignments-view'
+        || dataDirect.activeSection !== 'assignments'
         || dataDirect.calls.length !== 0) {
         throw new Error(`Legacy Data export did not redirect Review: ${JSON.stringify(dataDirect)}`);
     }
@@ -386,9 +389,9 @@ try {
     await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
-        window.location.hash === '#/teacher/data?tab=export'
-        && document.querySelector('.view.active')?.id === 'teacher-review-view'
-        && document.querySelector('.teacher-tab.active')?.dataset.section === 'review'
+        window.location.hash === '#/teacher/assignments?class=class-a&tab=needs-review'
+        && document.querySelector('.view.active')?.id === 'teacher-assignments-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'assignments'
     ));
 
     const settings = await page.evaluate(() => {
@@ -445,6 +448,7 @@ try {
 
     const editorNavigation = await page.evaluate(async () => {
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
+        const { installTeacherClassSelectionMethods } = await import('/js/teacherClassSelection.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { installTeacherVocabularyStorageMethods } = await import('/js/teacherVocabularyStorage.js');
         const { installTeacherVocabularySessionMethods } = await import('/js/teacherVocabularySession.js');
@@ -491,6 +495,7 @@ try {
         installTeacherVocabularySessionMethods(Manager);
         installTeacherVocabularyStorageMethods(Manager);
         installTeacherRoutingMethods(Manager);
+        installTeacherClassSelectionMethods(Manager);
         installTeacherShellMethods(Manager);
 
         let resolveLibrary;
@@ -602,7 +607,7 @@ try {
     });
     for (const result of workspaceRoutes) {
         for (const [key, value] of Object.entries(result.route)) {
-            if (result.parsed[key] !== value) throw new Error(`Workspace route lost ${key}: ${JSON.stringify(result)}`);
+            if (result.parsed[key] !== (key === 'view' && value === 'review' ? 'assignments' : value)) throw new Error(`Workspace route lost ${key}: ${JSON.stringify(result)}`);
         }
         if (result.route.classId && result.context.classId !== result.route.classId) throw new Error('Class context was not passed to workspace.');
         if (result.route.assignmentId && result.context.assignmentId !== result.route.assignmentId) throw new Error('Assignment context was not passed to review.');

@@ -1,3 +1,5 @@
+import { loadStudentSparkStyles } from './studentLibraryStyleLoader.js';
+
 function escapeAttribute(value) {
     return String(value || '')
         .replaceAll('&', '&amp;')
@@ -8,7 +10,7 @@ function escapeAttribute(value) {
 
 export function getStudentPageSkeleton(kind = 'activity', label = 'Loading', options = {}) {
     if (kind !== 'dashboard' && globalThis.document?.nodeType === 9) void import('../../css/student-loading-layouts.css');
-    if (kind === 'sparks' && globalThis.document?.nodeType === 9) void import('../../css/student-class-spark.css');
+    if (kind === 'sparks' && globalThis.document?.nodeType === 9) void loadStudentSparkStyles().catch(() => {});
     const id = kind === 'dashboard' ? 'student-dashboard-loading-template' : `student-loading-${kind}-template`;
     const template = globalThis.document?.getElementById(id) || globalThis.document?.getElementById('student-loading-activity-template');
     return (template?.innerHTML || '<div class="student-page-skeleton" role="status" aria-label="Loading"><span class="student-loading-line student-loading-list-row"></span></div>').replace('aria-label="Loading"', `aria-label="${escapeAttribute(label)}"`)

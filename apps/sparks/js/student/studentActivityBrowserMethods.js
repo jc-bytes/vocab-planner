@@ -1,9 +1,11 @@
+import { schoolContext } from '../services/schoolContext.js';
 import { $, createElement } from '../main.js';
 import { StudentActivityBrowserCards } from './studentActivityBrowserCards.js';
 import { StudentActivityBrowserNavigation } from './studentActivityBrowserNavigation.js';
 import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityBrowser {
+    #renderedScope;
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
@@ -14,49 +16,58 @@ export class StudentActivityBrowser {
         this.navigation = new StudentActivityBrowserNavigation(this);
     }
 
-    async renderDashboard({ forceRefresh = false } = {}) {
+    hasCurrentPresentation() {
+        const shown = this.#renderedScope, user = this.sm.currentUser, selection = this.vocabularyData.classSelection;
+        return Boolean(shown && (this.sm.authDisabled || selection?.hasSnapshot) && shown.user === user && shown.cloud === this.sm.progress?.cloud
+            && shown.cloudGeneration === shown.cloud?.cloudGeneration && shown.school === schoolContext.getGeneration()
+            && shown.selection === selection && shown.classId === selection?.selectedId
+            && shown.navigation === this.sm.routing?.arcadeReadController?.signal && !shown.navigation?.aborted
+            && shown.route === globalThis.location?.hash && this.sm.parseRoute?.()?.view === 'units');
+    }
+
+    clearPresentation() { this.#renderedScope = null; }
+
+    #rememberPresentation() {
+        const cloud = this.sm.progress?.cloud, selection = this.vocabularyData.classSelection;
+        this.#renderedScope = { user: this.sm.currentUser, cloud, cloudGeneration: cloud?.cloudGeneration,
+            school: schoolContext.getGeneration(), navigation: this.sm.routing?.arcadeReadController?.signal, selection, classId: selection?.selectedId, route: globalThis.location?.hash };
+    }
+
+    async renderDashboard({ isCurrent = () => true, prepared = null } = {}) {
         const route = globalThis.location?.hash;
         const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
-        const selection = this.vocabularyData.classSelection;
-        const run = this.renderGeneration = (this.renderGeneration || 0) + 1;
-        const selectedId = selection?.selectedId;
-        const current = () => run === this.renderGeneration && route === globalThis.location?.hash
-            && owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id)
-            && (!selectedId || selectedId === selection?.selectedId);
         const container = $('#vocab-list');
         const view = $('#vocab-selection-view');
         if (!container) return;
-        if (!selection?.hasSnapshot && !this.sm.authDisabled) {
+        if (!this.vocabularyData.classSelection?.loadedAt && !this.sm.authDisabled) {
             setStudentPageLoading(view, true);
             container.classList.remove('vocab-grid', 'vocab-groups');
             container.classList.add('teacher-library-browser');
             container.innerHTML = getStudentPageSkeleton(this.getStudentVocabularyViewMode() === 'rows' ? (this.sm.studentVocabularyDrilldown?.month ? 'rows' : 'month-rows') : this.sm.studentVocabularyDrilldown?.month ? 'units' : 'months', 'Loading vocabulary units');
         }
         if (!this.sm.authDisabled) {
-            try { if (await this.vocabularyData.loadClassSelection({ forceRefresh }) === false) return; }
+            try { if (!(prepared || await this.vocabularyData.prepareClassData({ isCurrent }))?.isCurrent()) return; }
             catch (error) {
-                const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
-                showSectionLoadError(container, { label: 'class units', error, current,
-                    keepContent: Boolean(selection?.hasSnapshot && selection.owner === owner),
-                    retry: () => this.renderDashboard({ forceRefresh: true }) });
-                if (current()) setStudentPageLoading(view, false);
+                if (!isCurrent()) return;
+                container.textContent = error.message || 'Could not load class units. Please try again.';
+                setStudentPageLoading(view, false);
                 return;
             }
         }
-        if (route !== globalThis.location?.hash || owner !== (this.sm.currentUser?.uid || this.sm.currentUser?.id)) {
+        if (!isCurrent() || route !== globalThis.location?.hash || owner !== (this.sm.currentUser?.uid || this.sm.currentUser?.id)) {
             setStudentPageLoading(view, false);
             return;
         }
         this.sm.logStudentDomUpdate?.('vocab-list', { source: 'renderDashboard:clear' });
         this.vocabularyData.renderSubjectPicker('#student-subject-picker');
         this.vocabularyData.renderSubjectPicker('#vocab-subject-picker');
-        this.activities.availableVocabs = [];
 
         const { vocabs, message } = this.vocabularyData.getVisibleVocabularyList({ availableOnly: true, currentTrimesterOnly: true });
 
         if (vocabs.length === 0) {
             container.innerHTML = `<p>${message}</p>`;
             this.vocabularyData.classSelection?.renderInvitations(container);
+            this.#rememberPresentation();
             setStudentPageLoading(view, false);
             return;
         }
@@ -64,6 +75,7 @@ export class StudentActivityBrowser {
         this.renderVocabularyBrowser(container, vocabs);
         this.vocabularyData.classSelection?.renderInvitations(container);
         this.scheduleFirstVocabularyPreload(container);
+        this.#rememberPresentation();
         setStudentPageLoading(view, false);
     }
 
@@ -78,13 +90,17 @@ export class StudentActivityBrowser {
         const visibleVocabs = Array.isArray(vocabs)
             ? this.schedule.filterStudentAvailableVocabulary(vocabs)
             : this.vocabularyData.getVisibleVocabularyList({ availableOnly: true, currentTrimesterOnly: true }).vocabs;
+        // Auth and progress refreshes also render this hidden library. Only an
+        // active Units route owns its URL; those background paints keep their
+        // drilldown state without replacing an activity or newer navigation.
+        const ownsUnitsRoute = this.sm.parseRoute?.()?.view === 'units';
         const drilldown = this.sm.studentVocabularyDrilldown || { trimester: null, month: null };
         const trimesterGroups = this.schedule.buildVocabularyTrimesterGroups(visibleVocabs);
         const selectedTrimester = this.calendar.getCurrentTrimesterKey();
         const selectedMonth = drilldown.trimester === selectedTrimester ? drilldown.month : null;
         if (drilldown.trimester !== selectedTrimester) {
             this.sm.studentVocabularyDrilldown = { trimester: selectedTrimester, month: null };
-            this.sm.setRoute({ view: 'units', trimester: selectedTrimester }, { replace: true });
+            if (ownsUnitsRoute) this.sm.setRoute({ view: 'units', trimester: selectedTrimester }, { replace: true });
         }
 
         this.renderStudentVocabularyViewControls();
@@ -94,7 +110,7 @@ export class StudentActivityBrowser {
             if (automaticLocation) {
                 this.sm.studentVocabularyDrilldown = automaticLocation;
                 this.sm.rememberStudentVocabularyLocation(automaticLocation.trimester, automaticLocation.month);
-                this.sm.setRoute({ view: 'units', ...automaticLocation }, { replace: true });
+                if (ownsUnitsRoute) this.sm.setRoute({ view: 'units', ...automaticLocation }, { replace: true });
                 this.renderStudentAssignmentPicker(
                     container,
                     automaticLocation.trimester,

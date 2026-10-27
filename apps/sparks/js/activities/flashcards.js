@@ -1,11 +1,13 @@
 import { createElement } from '../main.js';
 import { shuffled } from '../randomUtils.js';
+import { FlashcardsEmber } from './flashcardsEmber.js';
 import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 const FLASHCARD_MASTERY_VERSION = 3;
 
-export class FlashcardsActivity {
+export class FlashcardsActivity extends FlashcardsEmber {
     constructor(container, words, onProgress, onSaveState, initialState) {
+        super();
         this.container = container;
         this.words = words;
         this.onProgress = onProgress;
@@ -23,6 +25,7 @@ export class FlashcardsActivity {
         this.feedbackTone = '';
         this.reviewLockedCardIndex = null;
 
+
         this.container.classList.add('flashcards-activity-container');
         this.container.closest('#activity-view')?.classList.add('flashcards-active');
         this.init();
@@ -30,6 +33,7 @@ export class FlashcardsActivity {
 
     init() {
         this.restoreState();
+        this.setupEmber();
         this.render();
         this.reportProgress();
     }
@@ -43,8 +47,18 @@ export class FlashcardsActivity {
     }
 
     restoreState() {
-        const state = this.initialState || this.loadLocalState();
+        const localState = this.loadLocalState();
+        // A delayed cloud snapshot must not replace newer same-assignment work.
+        const localSavedAt = Number(localState?.savedAt) || 0;
+        const initialSavedAt = Number(this.initialState?.savedAt) || 0;
+        const state = localSavedAt > initialSavedAt
+            ? localState : (this.initialState || localState);
         if (!state) return false;
+        const guide = state.ember || {};
+        this.guideSkipped = guide.skipped === true;
+        this.introductionShown = guide.introduced === true || (state.answeredCards?.length > 0);
+        this.completionShown = guide.completed === true;
+        this.lastAutoClueCard = Number.isInteger(guide.clueCard) ? guide.clueCard : null;
 
         this.currentIndex = this.clampIndex(state.currentIndex || 0);
         if (Number(state.masteryVersion) >= 2) {
@@ -110,6 +124,9 @@ export class FlashcardsActivity {
     saveState() {
         const state = {
             masteryVersion: FLASHCARD_MASTERY_VERSION,
+            savedAt: Date.now(),
+            ember: { skipped: !!this.guideSkipped, introduced: !!this.introductionShown,
+                completed: !!this.completionShown, clueCard: this.lastAutoClueCard ?? null },
             currentIndex: this.currentIndex,
             answeredCards: Array.from(this.answeredCards),
             questionReadyCards: Array.from(this.questionReadyCards),
@@ -249,6 +266,8 @@ export class FlashcardsActivity {
     }
 
     render() {
+        this.closeSpotlight?.();
+        cancelAnimationFrame(this.emberFrame);
         this.container.innerHTML = '';
 
         if (this.words.length === 0) {
@@ -289,6 +308,7 @@ export class FlashcardsActivity {
         wrapper.appendChild(stage);
         this.container.appendChild(wrapper);
 
+        this.emberFrame = requestAnimationFrame(() => { if (this.emberHelpButton?.isConnected) this.updateEmber(); });
         card.addEventListener('click', () => this.handleCardFlip(card));
         controls.querySelector('#prev-card')?.addEventListener('click', event => this.goToPrevious(event));
         controls.querySelector('#next-card')?.addEventListener('click', event => this.goToNext(event));
@@ -500,6 +520,7 @@ export class FlashcardsActivity {
     }
 
     destroy() {
+        this.destroyEmber();
         this.reviewLockedCardIndex = null;
     }
 }

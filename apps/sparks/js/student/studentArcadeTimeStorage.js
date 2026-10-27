@@ -1,11 +1,9 @@
 import {
     ARCADE_MINUTE_SECONDS,
-    FORMATIVE_PASS_SECONDS,
-    MAX_QUEUED_ARCADE_SECONDS
+    FORMATIVE_PASS_SECONDS
 } from './studentArcadePolicy.js';
 
 const STORAGE_KEY = 'student_arcade_time_v1';
-const SESSION_STORAGE_PREFIX = 'student_arcade_session_v1:';
 
 function normalize(value = {}) {
     return {
@@ -44,39 +42,4 @@ export function consumeLocalArcadeMinute() {
     wallet.availableSeconds -= ARCADE_MINUTE_SECONDS;
     wallet.lifetimeUsedSeconds += ARCADE_MINUTE_SECONDS;
     return writeLocalArcadeTime(wallet);
-}
-
-function sessionKey(studentId) {
-    return `${SESSION_STORAGE_PREFIX}${String(studentId || 'local-dev')}`;
-}
-
-export function readLocalArcadeSession(studentId) {
-    try {
-        const saved = JSON.parse(localStorage.getItem(sessionKey(studentId)) || '{}');
-        return {
-            remainingSeconds: Math.min(MAX_QUEUED_ARCADE_SECONDS, Math.max(0, Math.floor(Number(saved.remainingSeconds) || 0))),
-            gameId: String(saved.gameId || '').slice(0, 120),
-            updatedAt: saved.updatedAt || ''
-        };
-    } catch (_error) {
-        return { remainingSeconds: 0, gameId: '', updatedAt: '' };
-    }
-}
-
-export function writeLocalArcadeSession(studentId, value = {}) {
-    const session = {
-        remainingSeconds: Math.min(MAX_QUEUED_ARCADE_SECONDS, Math.max(0, Math.floor(Number(value.remainingSeconds) || 0))),
-        gameId: String(value.gameId || '').slice(0, 120),
-        updatedAt: new Date().toISOString()
-    };
-    try {
-        if (session.remainingSeconds <= 0) {
-            localStorage.removeItem(sessionKey(studentId));
-            return session;
-        }
-        localStorage.setItem(sessionKey(studentId), JSON.stringify(session));
-    } catch (_error) {
-        // The in-memory timer continues even if browser storage is unavailable.
-    }
-    return session;
 }

@@ -8,6 +8,7 @@ globalThis.localStorage = {
     setItem() {},
     removeItem() {}
 };
+globalThis.cancelAnimationFrame = () => {};
 globalThis.document = {
     readyState: 'loading',
     addEventListener() {},
@@ -51,18 +52,27 @@ globalThis.window = {
 
 const { StudentManager } = await import('../js/student.js');
 const { StudentRouting } = await import('../js/studentRoutingMethods.js');
+const { StudentShell } = await import('../js/studentShellMethods.js');
+const { StudentActivitySession } = await import('../js/student/studentActivitySession.js');
+const { FlashcardsActivity } = await import('../js/activities/flashcards.js');
+const { LazyStudentActivityLauncher } = await import('../js/student/lazyStudentActivityLauncher.js');
 
 function createManager() {
-    return {
+    const manager = {
         authDisabled: true,
         currentUser: null,
         currentVocab: null,
         activities: {
             activityRouteTypes: ['flashcards', 'illustration'],
             availableVocabs: [],
-            renderDashboard() {}
+            renderDashboard() {},
+            vocabularyData: {
+                async prepareClassData() { return { isCurrent: () => true }; },
+                getVisibleVocabularyList() { return { vocabs: manager.activities.availableVocabs }; }
+            }
         }
     };
+    return manager;
 }
 
 test('StudentRouting owns route and lazy-game state', () => {
@@ -168,12 +178,12 @@ test('route parsing and building preserve the public URL contract', () => {
     assert.equal(routing.buildRoute({ view: 'sparks' }), '#/sparks');
 });
 
-test('route lookup and activity validation use the StudentActivities-owned catalog', () => {
+test('route lookup and activity validation use the prepared StudentActivities-owned catalog', async () => {
     const manager = createManager();
     manager.activities.availableVocabs = [{ id: 'unit-1', name: 'Unit One' }];
     const routing = new StudentRouting(manager);
 
-    assert.equal(routing.findVocabByRouteId('unit-1'), manager.activities.availableVocabs[0]);
+    assert.equal(await routing.findVocabByRouteId('unit-1'), manager.activities.availableVocabs[0]);
     assert.equal(routing.isKnownActivityType('flashcards'), true);
     assert.equal(routing.isKnownActivityType('unknown-activity'), false);
 });
@@ -298,6 +308,7 @@ test('arcade routing redirects blocked students to their oldest pending unit', a
     const manager = createManager();
     const pendingVocab = { id: 'unit-1', name: 'Pending Unit' };
     const calls = [];
+    manager.cleanupActivity = () => calls.push(['cleanup']);
     const access = {
         isBlocked: true,
         remainingActivities: 2,
@@ -314,6 +325,7 @@ test('arcade routing redirects blocked students to their oldest pending unit', a
     assert.equal(opened, false);
     assert.deepEqual(calls, [
         ['gate', access],
+        ['cleanup'],
         ['setRoute', { view: 'unit', unitId: 'unit-1' }, { replace: true }],
         ['loadVocabulary', pendingVocab, { fromRoute: true }]
     ]);
@@ -322,6 +334,7 @@ test('arcade routing redirects blocked students to their oldest pending unit', a
 test('arcade routing sends required current Spark work to the Sparks view', async () => {
     const manager = createManager();
     const calls = [];
+    manager.cleanupActivity = () => {};
     const access = {
         isBlocked: true,
         remainingActivities: 1,
@@ -344,4 +357,124 @@ test('arcade routing sends required current Spark work to the Sparks view', asyn
         ['setRoute', { view: 'sparks' }, { replace: true }],
         ['showSparks']
     ]);
+});
+
+test('denied Arcade navigation removes real Flashcards help and invalidates late activity work before showing the unit', async t => {
+    t.mock.method(globalThis, 'cancelAnimationFrame', () => {});
+    const manager = createManager();
+    const session = new StudentActivitySession(manager.activities);
+    manager.activities.session = session;
+    const activity = Object.create(FlashcardsActivity.prototype);
+    let helpConnected = true, idleDestroyed = false, spotlightClosed = false;
+    activity.emberHelpButton = { remove() { helpConnected = false; } };
+    activity.idleWatch = { destroy() { idleDestroyed = true; } };
+    activity.closeSpotlight = () => { spotlightClosed = true; };
+    session.activityInstance = activity;
+    manager.activityInstance = activity;
+    manager.currentActivityType = 'flashcards';
+    const launchId = session.beginActivityLaunch();
+    const signal = session.activityLaunchSignal;
+    const shell = new StudentShell(manager);
+    manager.cleanupActivity = () => shell.cleanupActivity();
+    manager.activities.getPendingRequiredWork = () => ({ isBlocked: true, remainingActivities: 1,
+        next: { vocab: { id: 'required' }, routeId: 'required' } });
+    manager.activities.updateArcadeGateDisplay = () => {};
+    let menuShown = false;
+    manager.activities.loadVocabulary = async () => {
+        assert.equal(helpConnected, false, 'old activity help must leave before menu help attaches');
+        assert.equal(session.activityInstance, null);
+        assert.equal(signal.aborted, true);
+        assert.equal(session.isActivityLaunchCurrent(launchId), false);
+        menuShown = true;
+    };
+    const routing = new StudentRouting(manager);
+    routing.setRoute = () => {};
+    assert.equal(await routing.showArcadeView(), false);
+    assert.equal(menuShown, true);
+    assert.equal(idleDestroyed, true);
+    assert.equal(spotlightClosed, true);
+    assert.equal(manager.currentActivityType, null);
+});
+
+test('denied Arcade cleanup cancels a held eager launcher import even when the required unit and route stay unchanged', async () => {
+    const manager = createManager();
+    manager.currentVocab = { id: 'required' };
+    const session = new StudentActivitySession(manager.activities);
+    manager.activities.session = session;
+    manager.activities.sm = manager;
+    let release, starts = 0;
+    const launcher = new LazyStudentActivityLauncher(manager.activities, () => new Promise(resolve => { release = resolve; }));
+    manager.activities.launcher = launcher;
+    const shell = new StudentShell(manager);
+    manager.cleanupActivity = () => shell.cleanupActivity();
+    manager.activities.getPendingRequiredWork = () => ({ isBlocked: true, remainingActivities: 1,
+        next: { vocab: manager.currentVocab, routeId: 'required' } });
+    manager.activities.updateArcadeGateDisplay = () => {};
+    manager.activities.loadVocabulary = async () => {};
+    const routing = new StudentRouting(manager);
+    routing.setRoute = () => {};
+    const pending = launcher.startActivity('flashcards');
+    await Promise.resolve();
+    await routing.showArcadeView();
+    release({ StudentActivityLauncher: class { startActivity() { starts++; } } });
+    await pending;
+    assert.equal(starts, 0, 'the old import must not restart Flashcards over the required-work menu');
+    assert.equal(launcher.isStarting, false);
+});
+
+test('eligibility failure tears down existing Flashcards and its help', async () => {
+ const manager=createManager();
+ const session=new StudentActivitySession(manager.activities); manager.activities.session=session;
+ const activity=Object.create(FlashcardsActivity.prototype); let removed=false;
+ activity.emberHelpButton={remove(){removed=true;}}; activity.closeSpotlight=()=>{};
+ session.activityInstance=activity; manager.activityInstance=activity; manager.currentActivityType='flashcards';
+ const signal=(session.beginActivityLaunch(),session.activityLaunchSignal);
+ const shell=new StudentShell(manager); manager.cleanupActivity=()=>shell.cleanupActivity();
+ manager.activities.refreshCurrentSparkGate=async()=>{throw Error('offline');};
+ manager.switchView=()=>{};
+ const routing=new StudentRouting(manager);
+ assert.equal(await routing.showArcadeView(),false);
+ assert.equal(removed,true,'existing Flashcards help must be removed on error route');
+ assert.equal(signal.aborted,true);
+});
+test('eligibility failure invalidates held eager activity import', async()=>{
+ const manager=createManager(); manager.currentVocab={id:'unit'};
+ const session=new StudentActivitySession(manager.activities); manager.activities.session=session; manager.activities.sm=manager;
+ let release,starts=0;
+ const launcher=new LazyStudentActivityLauncher(manager.activities,()=>new Promise(r=>release=r)); manager.activities.launcher=launcher;
+ const shell=new StudentShell(manager); manager.cleanupActivity=()=>shell.cleanupActivity();
+ manager.activities.refreshCurrentSparkGate=async()=>{throw Error('offline');}; manager.switchView=()=>{};
+ const routing=new StudentRouting(manager);
+ const pending=launcher.startActivity('flashcards'); await Promise.resolve();
+ await routing.showArcadeView(); release({StudentActivityLauncher:class {startActivity(){starts++;}}}); await pending;
+ assert.equal(starts,0,'held activity must not start over eligibility error');
+});
+
+test('cancelled data-only route lookup never redirects a newer Home intent to Units', async () => {
+    const manager = createManager();
+    let release;
+    manager.activities.vocabularyData.prepareClassData = () => new Promise(resolve => { release = resolve; });
+    const routing = new StudentRouting(manager);
+    const redirects = [];
+    routing.setRoute = route => redirects.push(route);
+    routing.showUnitsView = () => redirects.push('Units');
+    const reading = routing.applyRouteTarget({ view: 'unit', unitId: 'held' });
+    await new Promise(resolve => setImmediate(resolve));
+    release(null);
+    await reading;
+    assert.deepEqual(redirects, []);
+});
+
+test('held lookup remains cancelled across navigation away and back to the same unit hash', async () => {
+    const manager = createManager(), routing = new StudentRouting(manager);
+    let release, guard;
+    manager.activities.vocabularyData.prepareClassData = options => new Promise(resolve => {
+        guard = options.isCurrent;
+        release = () => resolve({ isCurrent: guard });
+    });
+    const lookup = routing.findVocabByRouteId('unit-1');
+    routing.arcadeReadController.abort(); routing.arcadeReadController = new AbortController();
+    release();
+    assert.equal(await lookup, undefined);
+    assert.equal(guard(), false);
 });

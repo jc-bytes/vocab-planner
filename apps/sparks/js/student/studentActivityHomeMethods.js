@@ -1,394 +1,65 @@
+import { schoolContext } from '../services/schoolContext.js';
+import { requestWithTimeout } from '../services/requestReliability.js';
 import { getStudentPageSkeleton } from './studentLoadingSkeletons.js';
-import { $, createElement, escapeHtml, refreshIcons } from '../main.js';
-import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '../services/vocabularyApi.js';
-import { MONTH_INDEX } from './studentActivityConstants.js';
+import { $, createElement } from '../main.js';
 import { StudentActivityHomeSpark } from './studentActivityHomeSpark.js';
-import { getKeyboardNavigatedTab } from '../ui/tabNavigation.js';
+import { createStudentFeatureStyleLoader } from './studentFeatureStyleLoader.js';
+
+const loadHomeStyles = createStudentFeatureStyleLoader(() => import('./studentHomeStyles.js'));
 
 export class StudentActivityHome {
-    constructor(activities) {
+    constructor(activities, { loadHomeRenderer = () => import('./studentHomeRenderer.js'), loadStyles = loadHomeStyles } = {}) {
+        this.loadHomeRenderer = loadHomeRenderer;
+        this.loadStyles = loadStyles;
         this.activities = activities;
         this.sm = activities.sm;
         this.spark = new StudentActivityHomeSpark(this);
     }
 
-    getUnitProgressSummary(vocab) {
-        const completion = this.activities.getUnitRequiredCompletion(vocab);
-        const { scores } = completion;
-        const latestPlayed = Object.values(scores).reduce((latest, scoreData) => {
-            const timestamp = scoreData?.lastPlayed || scoreData?.updatedAt || '';
-            const time = timestamp ? new Date(timestamp).getTime() : 0;
-            return Number.isFinite(time) ? Math.max(latest, time) : latest;
-        }, 0);
-        const bestScore = Object.values(scores).reduce((best, scoreData) => {
-            return Math.max(best, Number(scoreData?.score) || 0);
-        }, 0);
-
-        return {
-            scores,
-            completedRequired: completion.completed,
-            requiredTotal: completion.total,
-            isComplete: completion.isComplete,
-            nextActivityType: completion.nextActivityType,
-            latestPlayed,
-            bestScore
-        };
+    async preparePresentation({ isCurrent, timeoutMs = 10000 }) {
+        return requestWithTimeout(async signal => {
+            const [renderer] = await Promise.all([this.loadHomeRenderer(), this.loadStyles()]);
+            if (signal.aborted || !isCurrent()) throw new DOMException('Home changed.', 'AbortError');
+            return renderer;
+        }, { timeoutMs, label: 'Loading Home' });
     }
 
-    async renderStudentHome({ forceRefresh = false } = {}) {
+    async renderStudentHome({ timeoutMs = 10000, forceRefresh = false } = {}) {
         const container = $('#student-home-dashboard');
         if (!container) return;
         const run = this.renderGeneration = (this.renderGeneration || 0) + 1;
-        const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
-        const selection = this.activities.vocabularyData.classSelection;
-        const selectedId = selection?.selectedId;
-        const current = () => (!selectedId || selectedId === selection?.selectedId) && run === this.renderGeneration && owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id);
-        if (this.readyOwner !== owner || this.readyClass !== selectedId) { this.ready = false; this.readyOwner = owner; }
+        const owner = this.sm.currentUser;
+        const ownerId = owner?.uid || owner?.id;
+        const schoolGeneration = schoolContext.getGeneration();
+        const route = globalThis.location?.hash;
+        const navigation = this.sm.routing?.arcadeReadController?.signal;
+        const selectedId = this.activities.vocabularyData?.classSelection?.selectedId;
+        const current = () => (!selectedId || selectedId === this.activities.vocabularyData?.classSelection?.selectedId) && run === this.renderGeneration && owner === this.sm.currentUser
+            && schoolGeneration === schoolContext.getGeneration() && route === globalThis.location?.hash
+            && !navigation?.aborted && navigation === this.sm.routing?.arcadeReadController?.signal;
+        if (this.readyOwner !== ownerId || this.readyClass !== selectedId) { this.ready = false; this.readyOwner = ownerId; }
         if (!this.ready) {
             container.innerHTML = getStudentPageSkeleton('dashboard');
             $('#main-menu-view')?.classList.add('student-home-loading');
         }
         $('#main-menu-view')?.setAttribute('aria-busy', 'true');
-        this.sm.logStudentDomUpdate?.('student-home-dashboard', { source: 'renderStudentHome:clear' });
-
-        if (!this.sm.authDisabled) {
-            try { if (await this.activities.vocabularyData.loadClassSelection({ forceRefresh }) === false) return; }
-            catch (error) {
-                const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
-                showSectionLoadError(container, { label: 'today’s work', error, current, keepContent: this.ready,
-                    retry: () => this.renderStudentHome({ forceRefresh: true }) });
-                if (current()) { $('#main-menu-view')?.classList.remove('student-home-loading'); $('#main-menu-view')?.setAttribute('aria-busy','false'); }
-                return;
-            }
-        }
-        this.activities.vocabularyData.renderSubjectPicker('#student-subject-picker');
-
         try {
-            await this.refreshCurrentSparkGate({ updateDisplay: false });
+            const { renderStudentHomeContent } = await this.preparePresentation({ isCurrent: current, timeoutMs });
+            if (current()) await renderStudentHomeContent.call(this, { isCurrent: current, forceRefresh });
         } catch (error) {
-            console.warn('Could not refresh the current Spark gate', error);
+            if (!current()) return;
+            container.textContent = 'Could not load Home. Open Units or try again. If retrying does not help, reload the page.';
+            $('#main-menu-view')?.classList.remove('student-home-loading');
+            $('#main-menu-view')?.setAttribute('aria-busy', 'false');
+            const retry = createElement('button', 'btn secondary-btn', 'Try again');
+            retry.type = 'button';
+            retry.addEventListener('click', () => { void this.renderStudentHome(); });
+            container.append(retry);
         }
-
-        if (!current()) return;
-        this.ready = true;
-        this.readyClass = this.activities.vocabularyData.classSelection?.selectedId;
-        const { vocabs, message } = this.activities.vocabularyData.getVisibleVocabularyList({
-            availableOnly: true,
-            currentTrimesterOnly: true
-        });
-
-        const today = new Date();
-        const currentMonth = today.getMonth();
-        const currentWeek = Math.floor((today.getDate() - 1) / 7) + 1;
-        const decoratedVocabs = vocabs.map(vocab => {
-            const schedule = this.activities.schedule.getVocabSchedule(vocab, today);
-            return {
-                kind: 'vocabulary',
-                id: `vocab:${vocab.path || vocab.name || ''}`,
-                vocab,
-                schedule,
-                progress: this.getUnitProgressSummary(vocab),
-                sortTime: schedule.dueDate?.getTime?.() || 0
-            };
-        }).sort((a, b) => {
-            const aTime = a.schedule.dueDate?.getTime() || 0;
-            const bTime = b.schedule.dueDate?.getTime() || 0;
-            if (aTime !== bTime) return aTime - bTime;
-            return String(a.vocab.name || '').localeCompare(String(b.vocab.name || ''));
-        });
-
-        const vocabularyThisWeekItems = decoratedVocabs
-            .filter(item => {
-                if (this.isVocabScheduleInCurrentWeek(item.schedule, today)) return true;
-                const monthIndex = MONTH_INDEX[item.schedule.month];
-                return monthIndex === currentMonth && item.schedule.week === currentWeek;
-            })
-            .slice(0, 3);
-
-        const weekItems = vocabularyThisWeekItems
-            .sort((a, b) => a.sortTime - b.sortTime)
-            .slice(0, 4);
-
-        const arcadeAccess = this.activities.getPendingRequiredWork(today);
-        const recommendation = this.getHomeRecommendation({
-            decoratedVocabs,
-            weekItems,
-            requiredWork: arcadeAccess,
-            today
-        });
-        const dashboardHeading = $('#student-home-heading');
-        if (dashboardHeading) {
-            dashboardHeading.textContent = recommendation.heading;
-            dashboardHeading.closest('.student-dashboard-heading')?.removeAttribute('hidden');
-        }
-        const mainMenuView = $('#main-menu-view');
-        mainMenuView?.classList.remove('student-home-loading');
-        mainMenuView?.setAttribute('aria-busy', 'false');
-
-        const panels = [
-            {
-                key: 'spark',
-                title: 'Spark',
-                subtitle: 'Question of the week'
-            },
-            {
-                key: 'week',
-                title: 'This Week',
-                subtitle: 'Current vocabulary units',
-                items: weekItems,
-                emptyText: 'No work is scheduled this week.'
-            }
-        ];
-
-        container.replaceChildren();
-        container.appendChild(this.createContinueLearningHero(recommendation.item, message, recommendation));
-        if (arcadeAccess.isBlocked) {
-            container.appendChild(this.createArcadeGateNotice(arcadeAccess));
-        }
-
-        const tabList = createElement('div', 'student-home-tabs secondary-tabs');
-        tabList.setAttribute('role', 'tablist');
-        tabList.setAttribute('aria-label', 'Dashboard sections');
-        panels.forEach((panel, index) => {
-            const tab = createElement(
-                'button',
-                `student-home-tab secondary-tab${index === 0 ? ' active secondary-tab--active' : ''}`
-            );
-            tab.type = 'button';
-            tab.id = `student-home-tab-${panel.key}`;
-            tab.dataset.panel = panel.key;
-            tab.setAttribute('role', 'tab');
-            tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
-            tab.setAttribute('aria-controls', `student-home-panel-${panel.key}`);
-            tab.tabIndex = index === 0 ? 0 : -1;
-            tab.innerHTML = `<span>${panel.title}</span>`;
-            tabList.appendChild(tab);
-        });
-        container.appendChild(tabList);
-
-        panels.forEach((panel, index) => {
-            const homePanel = panel.key === 'spark'
-                ? this.createSparkHomePanel(panel.title, panel.subtitle, index === 0)
-                : this.createHomePanel(panel.key, panel.title, panel.subtitle, panel.items, panel.emptyText, index === 0);
-            container.appendChild(homePanel);
-        });
-        this.bindHomePanelTabs(container);
-        this.loadAndRenderCurrentSpark(container.querySelector('.student-spark-host'));
-        this.activities.browser.cards.scheduleFirstVocabularyPreload(container);
-
-        refreshIcons(container);
-    }
-
-    getHomeRecommendation({ decoratedVocabs = [], weekItems = [], requiredWork = {}, today = new Date() } = {}) {
-        const getIdentity = vocab => String(vocab?.path || vocab?.id || vocab?.name || '');
-        const decoratedByIdentity = new Map(
-            decoratedVocabs.map(item => [getIdentity(item.vocab), item])
-        );
-        const requiredItems = (requiredWork.units || [])
-            .map(required => decoratedByIdentity.get(getIdentity(required.vocab)))
-            .filter(Boolean);
-        const oldestRequired = requiredItems.find(item => this.isHomeScheduleBeforeCurrentWeek(item.schedule, today));
-
-        if (oldestRequired) {
-            return {
-                item: oldestRequired,
-                mode: 'required',
-                heading: 'Your oldest required work',
-                badge: 'Catch up',
-                action: 'Continue required work'
-            };
-        }
-
-        const unfinished = decoratedVocabs
-            .filter(item => !item.progress.isComplete && (
-                item.progress.latestPlayed > 0
-                || item.progress.completedRequired > 0
-                || item.progress.bestScore > 0
-            ))
-            .sort((a, b) => {
-                if (a.progress.latestPlayed !== b.progress.latestPlayed) {
-                    return b.progress.latestPlayed - a.progress.latestPlayed;
-                }
-                return a.sortTime - b.sortTime;
-            })[0];
-
-        if (unfinished) {
-            return {
-                item: unfinished,
-                mode: 'unfinished',
-                heading: 'Continue learning',
-                badge: 'In progress',
-                action: 'Continue'
-            };
-        }
-
-        if (weekItems[0]) {
-            return {
-                item: weekItems[0],
-                mode: 'current',
-                heading: 'Start this week\u2019s work',
-                badge: 'This week',
-                action: 'Start unit'
-            };
-        }
-
-        const nextRequired = requiredItems[0] || decoratedVocabs.find(item => !item.progress.isComplete) || null;
-        if (nextRequired) {
-            return {
-                item: nextRequired,
-                mode: 'required',
-                heading: 'Your next required work',
-                badge: 'Required',
-                action: 'Start required work'
-            };
-        }
-
-        return {
-            item: null,
-            mode: 'complete',
-            heading: 'You\u2019re all caught up',
-            badge: '',
-            action: ''
-        };
-    }
-
-    createContinueLearningHero(item, emptyText = '', context = {}) {
-        const hero = createElement(item?.vocab ? 'button' : 'section', 'student-continue-hero');
-        if (item?.vocab) hero.type = 'button';
-        hero.dataset.recommendation = context.mode || (item?.vocab ? 'available' : 'complete');
-
-        if (!item?.vocab) {
-            hero.innerHTML = `
-                <div class="student-continue-copy">
-                    <h3>All caught up for now.</h3>
-                    <p>${escapeHtml(emptyText || 'No current vocabulary work is available yet.')}</p>
-                </div>
-            `;
-            return hero;
-        }
-
-        const { vocab, schedule, progress } = item;
-        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
-        const title = this.formatVocabularyCardTitle?.(vocab) || vocab.name || 'Vocabulary Unit';
-        const purposeLabel = context.badge || this.formatVocabularyPurpose?.(vocab.purpose) || 'Unit';
-        const purposeClass = this.getVocabularyPurposeClass?.(vocab.purpose) || 'is-unit';
-        const recommendationClass = context.mode ? `is-${context.mode}` : '';
-        const actionLabel = context.action || 'Continue';
-        const percent = this.getContinueLearningPercent(progress);
-        const progressText = progress.requiredTotal > 0
-            ? `${progress.completedRequired}/${progress.requiredTotal} required complete`
-            : `${progress.bestScore}% best score`;
-        const scheduleText = schedule.label || this.activities.schedule.getTrimesterLabel(
-            this.activities.schedule.getVocabTrimesterKey(vocab)
-        );
-
-        hero.style.setProperty('--subject-color', subject.color);
-        hero.innerHTML = `
-            <div class="student-continue-copy">
-                <span class="student-hero-purpose ${escapeHtml(purposeClass)} ${escapeHtml(recommendationClass)}">${escapeHtml(purposeLabel)}</span>
-                <h3>${escapeHtml(title)}</h3>
-                <p>${escapeHtml(subject.name)} · ${escapeHtml(scheduleText)}</p>
-                <div class="student-continue-progress" aria-label="${escapeHtml(progressText)}">
-                    <div class="student-continue-progress-top">
-                        <span>Unit progress</span>
-                        <strong>${percent}% complete</strong>
-                    </div>
-                    <div class="student-continue-track" aria-hidden="true">
-                        <span style="width:${percent}%"></span>
-                    </div>
-                </div>
-            </div>
-            <span class="student-continue-action">
-                <span>${escapeHtml(actionLabel)}</span>
-                <i data-lucide="play"></i>
-            </span>
-        `;
-
-        if (vocab.path) {
-            hero.dataset.vocabPath = vocab.path;
-            const preload = () => preloadVocabularyFile(vocab.path);
-            hero.addEventListener('pointerenter', preload, { once: true });
-            hero.addEventListener('focus', preload, { once: true });
-        }
-        hero.addEventListener('click', () => this.activities.vocabularyData.loadVocabulary(vocab));
-        return hero;
     }
 
     renderSparkLibrary() {
         return this.spark.renderSparkLibrary();
-    }
-
-    createArcadeGateNotice(access) {
-        const notice = createElement('aside', 'student-arcade-gate-notice');
-        notice.setAttribute('aria-label', 'Arcade unlock progress');
-        const copy = createElement('div', 'student-arcade-gate-copy');
-        const title = createElement('strong', null, 'Arcade unlock progress');
-        const activityLabel = access.vocabularyRemainingActivities === 1 ? 'activity' : 'activities';
-        const unitLabel = access.unitCount === 1 ? 'unit' : 'units';
-        const parts = [];
-        if (access.spark) parts.push("today's Spark check");
-        if (access.vocabularyRemainingActivities > 0) {
-            parts.push(`${access.vocabularyRemainingActivities} required ${activityLabel} in ${access.unitCount} ${unitLabel}`);
-        }
-        const message = createElement(
-            'span',
-            null,
-            `Complete ${parts.join(' and ')} to unlock Arcade.`
-        );
-        copy.append(title, message);
-        notice.appendChild(copy);
-
-        if (access.spark) {
-            const continueButton = createElement('button', 'btn secondary-btn', 'Complete Spark check');
-            continueButton.type = 'button';
-            continueButton.addEventListener('click', () => this.sm.navigateTo({ view: 'sparks' }));
-            notice.appendChild(continueButton);
-        } else if (access.next?.vocab) {
-            const continueButton = createElement('button', 'btn secondary-btn', 'Continue required work');
-            continueButton.type = 'button';
-            continueButton.addEventListener('click', () => (
-                this.activities.vocabularyData.loadVocabulary(access.next.vocab)
-            ));
-            notice.appendChild(continueButton);
-        }
-
-        return notice;
-    }
-
-    getContinueLearningPercent(progress = {}) {
-        if (progress.requiredTotal > 0) {
-            return Math.min(100, Math.round((progress.completedRequired / progress.requiredTotal) * 100));
-        }
-        return Math.min(100, Math.max(0, Math.round(Number(progress.bestScore) || 0)));
-    }
-
-    isVocabScheduleInCurrentWeek(schedule = {}, date = new Date()) {
-        if (!(schedule.dueDate instanceof Date) || Number.isNaN(schedule.dueDate.getTime())) return false;
-        const bounds = this.getHomeCurrentWeekBounds(date);
-        const scheduleTime = schedule.dueDate.getTime();
-        return scheduleTime >= bounds.start && scheduleTime <= bounds.end;
-    }
-
-    getHomeCurrentWeekBounds(date = new Date()) {
-        const start = new Date(date);
-        start.setHours(0, 0, 0, 0);
-        const daysSinceMonday = (start.getDay() + 6) % 7;
-        start.setDate(start.getDate() - daysSinceMonday);
-        const end = new Date(start);
-        end.setDate(end.getDate() + 6);
-        end.setHours(23, 59, 59, 999);
-        return { start: start.getTime(), end: end.getTime() };
-    }
-
-    isHomeScheduleBeforeCurrentWeek(schedule = {}, date = new Date()) {
-        if (schedule.dueDate instanceof Date && !Number.isNaN(schedule.dueDate.getTime())) {
-            return schedule.dueDate.getTime() < this.getHomeCurrentWeekBounds(date).start;
-        }
-        if (!schedule.month || !schedule.week) return false;
-        const currentMonth = date.getMonth();
-        const currentWeek = Math.floor((date.getDate() - 1) / 7) + 1;
-        const monthIndex = MONTH_INDEX[schedule.month];
-        return monthIndex < currentMonth || (monthIndex === currentMonth && schedule.week < currentWeek);
     }
 
     normalizeSpark(spark = {}) {
@@ -411,117 +82,8 @@ export class StudentActivityHome {
         return this.spark.refreshCurrentSparkGate(options);
     }
 
-    loadAndRenderCurrentSpark(host) {
-        return this.spark.loadAndRenderCurrentSpark(host);
-    }
-
-    getStudentSparkQuestion(spark) {
-        return this.spark.getStudentSparkQuestion(spark);
-    }
-
-    createStudentSparkCard(spark) {
-        return this.spark.createStudentSparkCard(spark);
-    }
-
-    removeSparkHomePanel(host) {
-        return this.spark.removeSparkHomePanel(host);
-    }
-
-    createSparkHomePanel(title, subtitle, active = false) {
-        return this.spark.createSparkHomePanel(title, subtitle, active);
-    }
-
-    bindHomePanelTabs(container) {
-        const tabs = Array.from(container.querySelectorAll('.student-home-tab'));
-        const panels = Array.from(container.querySelectorAll('.student-home-panel'));
-        const activate = (key, focus = false) => {
-            tabs.forEach(tab => {
-                const active = tab.dataset.panel === key;
-                tab.classList.toggle('active', active);
-                tab.classList.toggle('secondary-tab--active', active);
-                tab.setAttribute('aria-selected', active ? 'true' : 'false');
-                tab.tabIndex = active ? 0 : -1;
-                if (active && focus) tab.focus({ preventScroll: true });
-            });
-            panels.forEach(panel => {
-                const active = panel.dataset.panel === key;
-                panel.classList.toggle('active', active);
-            });
-        };
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => activate(tab.dataset.panel));
-            tab.addEventListener('keydown', event => {
-                const nextTab = getKeyboardNavigatedTab(tabs, tab, event.key);
-                if (!nextTab) return;
-                event.preventDefault();
-                activate(nextTab.dataset.panel, true);
-            });
-        });
-    }
-
-    createHomePanel(key, title, subtitle, items, emptyText, active = false) {
-        const panel = createElement('section', `student-home-panel${active ? ' active' : ''}`);
-        panel.id = `student-home-panel-${key}`;
-        panel.dataset.panel = key;
-        panel.setAttribute('role', 'tabpanel');
-        panel.setAttribute('aria-labelledby', `student-home-tab-${key}`);
-        panel.innerHTML = `
-            <div class="teacher-panel-header">
-                <div>
-                    <h3>${title}</h3>
-                    <p>${subtitle}</p>
-                </div>
-            </div>
-        `;
-
-        const list = createElement('div', 'student-home-list');
-        if (items.length === 0) {
-            list.innerHTML = `<p class="teacher-empty-state">${emptyText}</p>`;
-        } else {
-            items.forEach(item => list.appendChild(this.createHomeWorkCard(item)));
-        }
-        panel.appendChild(list);
-        return panel;
-    }
-
-    createHomeWorkCard(item) {
-        return this.createHomeUnitCard(item);
-    }
-
-    createHomeUnitCard(item) {
-        const { vocab, schedule, progress } = item;
-        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
-        const card = createElement('button', 'student-home-unit');
-        card.type = 'button';
-        if (vocab.path) card.dataset.vocabPath = vocab.path;
-
-        const progressText = progress.requiredTotal > 0
-            ? `${progress.completedRequired}/${progress.requiredTotal} required`
-            : `${progress.bestScore}% best`;
-
-        card.innerHTML = `
-            <div class="student-home-unit-icon"><i data-lucide="book-open"></i></div>
-            <div class="student-home-unit-copy">
-                <strong>${escapeHtml(vocab.name || 'Vocabulary Unit')}</strong>
-                <span>Vocabulary · ${escapeHtml(subject.name)} · ${escapeHtml(
-                    schedule.label || this.activities.schedule.getTrimesterLabel(
-                        this.activities.schedule.getVocabTrimesterKey(vocab)
-                    )
-                )}</span>
-            </div>
-            <div class="student-home-unit-status">
-                <span>${progressText}</span>
-                <i data-lucide="chevron-right"></i>
-            </div>
-        `;
-        if (vocab.path) {
-            const preload = () => preloadVocabularyFile(vocab.path);
-            card.addEventListener('pointerenter', preload, { once: true });
-            card.addEventListener('focus', preload, { once: true });
-        }
-        card.addEventListener('click', () => this.activities.vocabularyData.loadVocabulary(vocab));
-        return card;
+    loadAndRenderCurrentSpark(host, options = {}) {
+        return this.spark.loadAndRenderCurrentSpark(host, options);
     }
 
 }

@@ -5,13 +5,13 @@ import test from 'node:test';
 const { defineTeacherPages, teacherPageRegistry } = await import('../js/teacherPageRegistry.js');
 
 const EXPECTED_PRIMARY_PAGES = [
-    { id: 'administration', viewId: 'teacher-administration-view' },
-    { id: 'classes', viewId: 'teacher-classes-view' },
     { id: 'overview', viewId: 'teacher-overview-view' },
+    { id: 'classes', viewId: 'teacher-classes-view' },
     { id: 'vocabulary', viewId: 'teacher-dashboard-view' },
     { id: 'assignments', viewId: 'teacher-assignments-view' },
-    { id: 'review', viewId: 'teacher-review-view' },
-    { id: 'settings', viewId: 'teacher-data-management-view' }
+    { id: 'settings', viewId: 'teacher-data-management-view' },
+    { id: 'administration', viewId: 'teacher-administration-view' },
+    { id: 'platform', viewId: 'teacher-platform-view' }
 ];
 
 function readAttribute(tag, name) {

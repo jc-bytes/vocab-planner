@@ -1,5 +1,6 @@
 import { closeModal, createElement, escapeHtml, openModal, refreshIcons } from '../main.js';
 import { sparksRepository } from '../services/sparksRepository.js';
+import { loadStudentSparkStyles } from '../student/studentLibraryStyleLoader.js';
 import {
     evaluateSparkAnswers,
     getSparkQuestionsForGrade,
@@ -67,7 +68,7 @@ export class SparkReadingActivity {
     }
 
     async init() {
-        if (globalThis.document?.nodeType === 9) await import('../../css/student-class-spark.css');
+        if (globalThis.document?.nodeType === 9) await loadStudentSparkStyles();
         try {
             const sparks = await this.loadEligibleSparks();
             this.sparks = sparks.length > 0 ? sparks : [this.createFallbackSpark()];

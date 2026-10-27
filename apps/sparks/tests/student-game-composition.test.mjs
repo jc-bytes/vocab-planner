@@ -3,6 +3,10 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { runInNewContext } from 'node:vm';
 
+// This suite covers the supported single-tab fallback. Purchase recovery tests
+// separately exercise native Web Locks and cross-tab receipt serialization.
+Object.defineProperty(globalThis.navigator, 'locks', { configurable: true, value: undefined });
+
 globalThis.localStorage = {
     getItem() {
         return null;
@@ -53,6 +57,20 @@ globalThis.window = {
 };
 
 const { StudentGames } = await import('../js/student/studentGames.js');
+const { schoolContext } = await import('../js/services/schoolContext.js');
+// Composition fixtures declare successful class readiness explicitly; the
+// eligibility suite separately exercises missing, failed and delayed reads.
+function readyArcadeManager(sm) {
+    sm.authDisabled ??= !sm.currentUser;
+    sm.activities ||= {};
+    sm.activities.getPendingRequiredWork ||= () => ({ isBlocked: false });
+    sm.activities.vocabularyData ||= { async loadClassSelection() {}, classSelection: {
+        ready: true, owner: sm.currentUser?.uid || sm.currentUser?.id, generation: 1,
+        readySchoolGeneration: schoolContext.getGeneration()
+    } };
+    return sm;
+}
+
 const { StudentManager } = await import('../js/student.js');
 const { StudentGameHtmlLoader } = await import('../js/student/studentGameHtmlLoaderMethods.js');
 const { StudentGameLeaderboard } = await import('../js/student/studentGameLeaderboardMethods.js');
@@ -69,7 +87,8 @@ const { createServerStateQuery } = await import('../js/services/serverStateQuery
 const { leaderboardRepository } = await import('../js/services/leaderboardRepository.js');
 const { settingsRepository } = await import('../js/services/settingsRepository.js');
 const { notifications } = await import('../js/notifications.js');
-const { readLocalArcadeSession, writeLocalArcadeSession, writeLocalArcadeTime } = await import('../js/student/studentArcadeTimeStorage.js');
+const { readLocalArcadeSession, writeLocalArcadeSession } = await import('../js/student/studentArcadeSessionStorage.js');
+const { writeLocalArcadeTime } = await import('../js/student/studentArcadeTimeStorage.js');
 const { refreshLocalFormativeWindow } = await import('../js/student/studentArcadeTimeStorage.js');
 const { supabaseService } = await import('../js/supabaseService.js');
 const legacyScoreBridgeSource = await readFile(
@@ -78,7 +97,7 @@ const legacyScoreBridgeSource = await readFile(
 
 test('StudentGames owns explicit game components', () => {
     const manager = {};
-    const games = new StudentGames(manager);
+    const games = new StudentGames(readyArcadeManager(manager));
 
     assert.equal(games.sm, manager);
     assert.ok(games.settings instanceof StudentGameSettings);
@@ -159,15 +178,15 @@ test('Galactic Breaker launch adapter updates the owning Arcade state', async ()
     globalThis.requestAnimationFrame = () => 1;
     globalThis.cancelAnimationFrame = () => {};
 
-    const games = new StudentGames({
+    const games = new StudentGames(readyArcadeManager({
         activities: { getPendingRequiredWork: () => ({ isBlocked: false }) }
-    });
+    }));
     games.gameTimeRemaining = 9;
     games.lifecycle.updateGameTimer = () => {};
     games.lifecycle.startGameTimer = () => {};
 
     try {
-        assert.equal(games.launchGame('galactic-breaker'), true);
+        assert.equal(await games.launchGame('galactic-breaker'), true);
         await new Promise(resolve => setImmediate(resolve));
 
         assert.ok(games.currentGame, 'The registered Galactic Breaker module should launch.');
@@ -193,13 +212,13 @@ test('destroyed Arcade ignores a canvas module that resolves after teardown', as
         ['#game-score', { style: {} }]
     ]);
     globalThis.document.querySelector = selector => elements.get(selector) || null;
-    const games = new StudentGames({
+    const games = new StudentGames(readyArcadeManager({
         activities: { getPendingRequiredWork: () => ({ isBlocked: false }) }
-    });
+    }));
     games.lifecycle.startGameTimer = () => {};
 
     try {
-        assert.equal(games.launchGame('snake'), true);
+        assert.equal(await games.launchGame('snake'), true);
         games.destroy();
         await new Promise(resolve => setImmediate(resolve));
         assert.equal(games.currentGame, null);
@@ -258,7 +277,7 @@ test('local game settings remain local offline state', async () => {
 });
 
 test('Arcade selection displays the authoritative earned-time balance', async () => {
-    const games = new StudentGames({ currentUser: { uid: 'student-1' } });
+    const games = new StudentGames(readyArcadeManager({ currentUser: { uid: 'student-1' } }));
     const elements = new Map([
         ['#galactic-breaker-cost', { textContent: '' }],
         ['#add-time-btn', { textContent: '' }],
@@ -415,8 +434,8 @@ test('HTML game messages use one normalized score and game-over protocol', () =>
 });
 
 test('StudentGames runtime state is isolated per instance', () => {
-    const first = new StudentGames({});
-    const second = new StudentGames({});
+    const first = new StudentGames(readyArcadeManager({}));
+    const second = new StudentGames(readyArcadeManager({}));
 
     first.currentGame = { gameType: 'snake' };
     first.gameTimeRemaining = 45;
@@ -491,11 +510,11 @@ test('destroy stops Arcade without saving and aborts in-flight score work', asyn
             resolveSubmission = resolve;
         });
     };
-    const games = new StudentGames({
+    const games = new StudentGames(readyArcadeManager({
         authDisabled: false,
         currentUser: { uid: 'student-destroy' },
         studentProfile: { grade: '7' }
-    });
+    }));
     let stopped = 0;
     games.currentGame = { gameType: 'snake', stop: () => { stopped += 1; } };
     games.currentGameScore = 25;
@@ -505,6 +524,7 @@ test('destroy stops Arcade without saving and aborts in-flight score work', asyn
         games.destroy();
         assert.equal(stopped, 1);
         assert.equal(submittedOptions.signal.aborted, true);
+        assert.equal(submittedOptions.ownerUserId, 'student-destroy');
         assert.equal(games.currentGame, null);
         resolveSubmission({ score: 25 });
         await pendingSave;
@@ -525,7 +545,7 @@ test('session destruction cancels delayed scores and rejects replacement-account
         currentUser: { uid: 'student-original' },
         studentProfile: { grade: '7' }
     };
-    const games = new StudentGames(manager);
+    const games = new StudentGames(readyArcadeManager(manager));
 
     try {
         await games.saveHighScore('snake', 10);
@@ -555,11 +575,12 @@ test('session destruction invalidates an Arcade start waiting on old account wor
             getPendingRequiredWork: () => ({ isBlocked: false })
         }
     };
-    const games = new StudentGames(manager);
+    const games = new StudentGames(readyArcadeManager(manager));
     games.loadGlobalSettings = async () => calls.push('settings');
     games.loadArcadeTime = async () => calls.push('time');
 
     const pendingStart = games.startGame('snake');
+    await new Promise(resolve => setImmediate(resolve));
     games.destroy();
     releaseGate();
 
@@ -569,7 +590,7 @@ test('session destruction invalidates an Arcade start waiting on old account wor
 });
 
 test('normal Arcade exit still saves the eligible final score', () => {
-    const games = new StudentGames({});
+    const games = new StudentGames(readyArcadeManager({}));
     const calls = [];
     games.currentGame = { gameType: 'snake', stop: () => calls.push('stop') };
     games.currentGameScore = 30;
@@ -584,7 +605,7 @@ test('normal Arcade exit still saves the eligible final score', () => {
 });
 
 test('exiting an Arcade game owns cleanup before restoring selection', () => {
-    const games = new StudentGames({});
+    const games = new StudentGames(readyArcadeManager({}));
     const calls = [];
     games.lifecycle.stopCurrentGame = () => calls.push('stop');
     games.lifecycle.showGameSelection = () => calls.push('selection');
@@ -595,7 +616,7 @@ test('exiting an Arcade game owns cleanup before restoring selection', () => {
 });
 
 test('additional Arcade time owns concurrency, cap, access, refresh, and failure feedback', async () => {
-    const games = new StudentGames({});
+    const games = new StudentGames(readyArcadeManager({}));
     const originalWarning = notifications.warning;
     const warnings = [];
     notifications.warning = message => warnings.push(message);
@@ -659,7 +680,7 @@ test('additional Arcade time owns concurrency, cap, access, refresh, and failure
 
 test('game selection navigation owns index wrapping and coordinated refresh', () => {
     const calls = [];
-    const games = new StudentGames({});
+    const games = new StudentGames(readyArcadeManager({}));
     games.gamesList = [{ id: 'one' }, { id: 'two' }, { id: 'three' }];
     games.currentGameIndex = 0;
     games.updateGameSelectionUI = () => calls.push('selection');
@@ -681,7 +702,7 @@ test('game selection navigation owns index wrapping and coordinated refresh', ()
 });
 
 test('StudentGames delegates to the owning component', async () => {
-    const games = new StudentGames({});
+    const games = new StudentGames(readyArcadeManager({}));
     const calls = [];
     games.lifecycle.startGame = async type => calls.push(['startGame', type]);
     games.leaderboard.saveHighScore = async (...args) => calls.push(['saveHighScore', ...args]);
@@ -702,11 +723,11 @@ test('leaderboard persistence coalesces intermediate scores and avoids preflight
         submitted.push(payload);
         return { score: payload.score };
     };
-    const games = new StudentGames({
+    const games = new StudentGames(readyArcadeManager({
         authDisabled: false,
         currentUser: { uid: 'student-1' },
         studentProfile: { grade: '7' }
-    });
+    }));
     games.currentGameIndex = games.gamesList.findIndex(game => game.id === 'snake');
     games.leaderboard.loadLeaderboard = async () => {};
 
@@ -729,11 +750,11 @@ test('lower-is-better leaderboard scores keep only improvements', async () => {
         submitted.push(payload.score);
         return { score: payload.score };
     };
-    const games = new StudentGames({
+    const games = new StudentGames(readyArcadeManager({
         authDisabled: false,
         currentUser: { uid: 'student-2' },
         studentProfile: { grade: '7' }
-    });
+    }));
     games.currentGameIndex = games.gamesList.findIndex(game => game.id === 'spacepi');
     games.leaderboard.loadLeaderboard = async () => {};
 
@@ -795,7 +816,7 @@ test('leaderboard ignores stale account, game, and closed-modal reads', async ()
         currentUser: { uid: 'student-one' },
         studentProfile: { grade: '7' }
     };
-    const games = new StudentGames(manager);
+    const games = new StudentGames(readyArcadeManager(manager));
     games.currentGameIndex = games.gamesList.findIndex(game => game.id === 'snake');
 
     try {
@@ -854,7 +875,7 @@ test('blocked game starts redirect before settings load or coin deduction', asyn
         },
         navigateTo: async route => calls.push(['navigateTo', route])
     };
-    const games = new StudentGames(manager);
+    const games = new StudentGames(readyArcadeManager(manager));
     games.loadGlobalSettings = async () => calls.push(['loadGlobalSettings']);
     games.loadArcadeTime = async () => calls.push(['loadArcadeTime']);
 
@@ -867,7 +888,7 @@ test('blocked game starts redirect before settings load or coin deduction', asyn
     ]);
 });
 
-test('direct game launch is rejected while required work is pending', () => {
+test('direct game launch is rejected while required work is pending', async () => {
     const access = { isBlocked: true, remainingActivities: 1 };
     const manager = {
         activities: {
@@ -875,9 +896,9 @@ test('direct game launch is rejected while required work is pending', () => {
             updateArcadeGateDisplay() {}
         }
     };
-    const games = new StudentGames(manager);
+    const games = new StudentGames(readyArcadeManager(manager));
 
-    assert.equal(games.launchGame('snake'), false);
+    assert.equal(await games.launchGame('snake'), false);
     assert.equal(games.currentGame, null);
     assert.equal(games.gameTimerInterval, null);
 });
@@ -901,7 +922,7 @@ test('local Arcade minutes require and consume both coins and formative-earned t
             }
         }
     };
-    const games = new StudentGames(manager);
+    const games = new StudentGames(readyArcadeManager(manager));
     games.settings.globalSettings = { exchangeRate: 10 };
     await games.loadArcadeTime({ force: true });
 
@@ -919,10 +940,10 @@ test('no coins are charged when a student has no formative-earned Arcade time', 
     writeLocalArcadeTime({ availableSeconds: 0 });
 
     let charged = false;
-    const games = new StudentGames({
+    const games = new StudentGames(readyArcadeManager({
         authDisabled: true,
         progress: { async deductCoins() { charged = true; return true; } }
-    });
+    }));
     games.settings.globalSettings = { exchangeRate: 10 };
     await games.loadArcadeTime({ force: true });
 
@@ -949,7 +970,7 @@ test('formative completions refresh the window instead of stacking extra Arcade 
 });
 
 test('manual time additions cannot queue more than ten minutes', () => {
-    const games = new StudentGames({});
+    const games = new StudentGames(readyArcadeManager({}));
     games.gameTimeRemaining = MAX_QUEUED_ARCADE_SECONDS - 30;
 
     games.addGameTime(ARCADE_MINUTE_SECONDS);
@@ -964,7 +985,7 @@ test('queued Arcade time survives recreation without another charge', () => {
     globalThis.localStorage.removeItem = key => values.delete(key);
     writeLocalArcadeSession('student-1', { remainingSeconds: 347, gameId: 'snake' });
 
-    const restored = new StudentGames({ currentUser: { uid: 'student-1' } });
+    const restored = new StudentGames(readyArcadeManager({ currentUser: { uid: 'student-1' } }));
 
     assert.equal(restored.gameTimeRemaining, 347);
     assert.equal(restored.savedGameId, 'snake');
@@ -978,14 +999,14 @@ test('a restored Arcade session resumes without buying another minute', async ()
     globalThis.localStorage.removeItem = key => values.delete(key);
     writeLocalArcadeSession('student-2', { remainingSeconds: 180, gameId: 'snake' });
 
-    const games = new StudentGames({
+    const games = new StudentGames(readyArcadeManager({
         currentUser: { uid: 'student-2' },
         coins: 0,
         activities: {
             async refreshCurrentSparkGate() {},
             getPendingRequiredWork: () => ({ isBlocked: false })
         }
-    });
+    }));
     games.loadGlobalSettings = async () => ({ exchangeRate: 10 });
     games.loadArcadeTime = async () => ({ availableSeconds: 0 });
     games.startArcadeMinute = async () => { throw new Error('must not charge'); };
@@ -1004,10 +1025,11 @@ function arcadeRequest() {
 }
 
 function arcadeOwnerFixture() {
+    localStorage.removeItem('student_arcade_session_v2:student-a');
     const applied = [];
     const progress = { clientId: 'client-a', cloud: { cloudGeneration: 1, applyRemoteCoinProgress: value => applied.push(value) } };
     const sm = { currentUser: { uid: 'student-a' }, authDisabled: false, progress };
-    const games = new StudentGames(sm);
+    const games = new StudentGames(readyArcadeManager(sm));
     return { games, sm, progress, applied };
 }
 
@@ -1025,11 +1047,13 @@ test('Arcade reads and purchases reject stale owner, progress, generation, destr
     ];
     for (const replace of replacements) {
         for (const purchase of [false, true]) {
+            localStorage.removeItem('student_arcade_session_v2:student-a');
             const fixture = arcadeOwnerFixture();
             const request = arcadeRequest();
             let dispatched = 0;
             t.mock.method(supabaseService, purchase ? 'startStudentArcadeMinute' : 'getOwnArcadeTime', () => { dispatched++; return request.promise; });
             const pending = purchase ? fixture.games.access.startMinute('snake') : fixture.games.access.loadArcadeTime();
+            while (!dispatched) await new Promise(resolve => setImmediate(resolve));
             assert.equal(dispatched, 1);
             replace(fixture);
             request.resolve(purchase ? { coinWallet: { coins: 99 }, arcadeTime: { availableSeconds: 600 } } : { availableSeconds: 600 });
@@ -1049,7 +1073,8 @@ test('current Arcade purchase applies its captured wallet and earned-time balanc
     const { games, applied } = arcadeOwnerFixture();
     const result = { coinWallet: { coins: 21 }, arcadeTime: { availableSeconds: 540 }, minuteSeconds: 60 };
     t.mock.method(supabaseService, 'startStudentArcadeMinute', async () => result);
-    assert.equal(await games.access.startMinute('snake'), result);
+    assert.deepEqual(await games.access.startMinute('snake'), { ...result, localCreditApplied: true });
+    assert.equal(games.gameTimeRemaining, 60);
     assert.deepEqual(applied, [result.coinWallet]);
     assert.equal(games.getAvailableArcadeSeconds(), 540);
     t.mock.method(supabaseService, 'getOwnArcadeTime', async () => ({ availableSeconds: 480 }));
@@ -1064,13 +1089,13 @@ test('local Arcade deduction cannot consume time after teardown and valid demo p
     writeLocalArcadeTime({ availableSeconds: 120 });
     const deduction = arcadeRequest();
     const sm = { authDisabled: true, progress: { deductCoins: () => deduction.promise } };
-    const games = new StudentGames(sm);
+    const games = new StudentGames(readyArcadeManager(sm));
     await games.loadArcadeTime();
     const pending = games.access.startMinute('snake');
     games.destroyed = true;
     deduction.resolve(true);
     assert.equal(await pending, null);
-    const next = new StudentGames({ authDisabled: true, progress: { deductCoins: async () => true } });
+    const next = new StudentGames(readyArcadeManager({ authDisabled: true, progress: { deductCoins: async () => true } }));
     assert.equal((await next.loadArcadeTime()).availableSeconds, 120);
     assert.equal((await next.access.startMinute('snake')).arcadeTime.availableSeconds, 60);
 });
@@ -1109,7 +1134,7 @@ function startFixture() {
     const calls = { purchases: 0, launches: [] };
     const manager = { currentUser: { uid: 'start-operation-student' }, coins: 100,
         activities: { refreshCurrentSparkGate: async () => {}, getPendingRequiredWork: () => ({ isBlocked: false }) } };
-    const games = new StudentGames(manager); games.gameTimeRemaining = 0;
+    const games = new StudentGames(readyArcadeManager(manager)); games.gameTimeRemaining = 0;
     games.loadGlobalSettings = async () => {}; games.loadArcadeTime = async () => {};
     games.getExchangeRate = () => 10; games.getAvailableArcadeSeconds = () => 300;
     games.startArcadeMinute = async () => { calls.purchases++; return { minuteSeconds: 60 }; };
@@ -1300,4 +1325,19 @@ test('Stop from minute completion prevents extension dispatch and UI await canno
         assert.equal(games.currentGame, replacement); assert.equal(games.gameTimeRemaining, 60);
         games.destroy();
     }
+});
+
+const { Snake } = await import('../js/games/snake.js');
+test('late actual canvas module cannot start after same-owner school scope changes',async t=>{
+ const elements=new Map([['#game-selection',{classList:{add(){},remove(){}}}],['#game-stage',{classList:{add(){},remove(){}},style:{removeProperty(){}}}],['#game-canvas',{width:400,height:400,style:{},getContext:()=>({}),addEventListener(){}}]]);
+ t.mock.method(document,'querySelector',s=>elements.get(s)||null);
+ let starts=0;t.mock.method(Snake.prototype,'start',()=>{starts++;});
+ const sm={authDisabled:false,currentUser:{uid:'student'},activities:{getPendingRequiredWork:()=>({isBlocked:false}),vocabularyData:{async loadClassSelection(){},classSelection:{ready:true,owner:'student',generation:1,readySchoolGeneration:schoolContext.getGeneration()}}}};
+ const games=new StudentGames(sm);games.lifecycle.startGameTimer=()=>{};
+ try{
+  assert.equal(await games.launchGame('snake'),true);
+  schoolContext.clear();
+  await new Promise(r=>setImmediate(r));
+  assert.equal(starts,0,'late module must honor invalidated eligibility school scope');
+ }finally{games.cleanupCurrentGame({saveScore:false});}
 });

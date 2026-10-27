@@ -4,78 +4,86 @@ import { teacherPageRegistry } from './teacherPageRegistry.js';
 const SETTINGS_PAGE = teacherPageRegistry.get('settings');
 const STUDENTS_PAGE = teacherPageRegistry.get('students');
 
-export function initTeacherProgressListeners(manager) {
-    $('#refresh-student-progress-btn')?.addEventListener('click', () => {
+export function initTeacherProgressListeners(manager, { controller = new AbortController() } = {}) {
+    const on = (element, type, listener) => element?.addEventListener(type, listener, { signal: controller.signal });
+    on($('#refresh-student-progress-btn'), 'click', () => {
         manager.fetchStudentProgressPage({ forceRefresh: true }).catch(() => {});
     });
-    $('#filter-grade')?.addEventListener('change', () => manager.applyFilters());
-    $('#filter-group')?.addEventListener('change', () => manager.applyFilters());
-    $('#filter-search')?.addEventListener('input', () => manager.scheduleStudentProgressFilter());
-    $('#student-progress-pagination')?.addEventListener('click', (event) => {
+    on($('#filter-grade'), 'change', () => manager.applyFilters());
+    on($('#filter-group'), 'change', () => manager.applyFilters());
+    on($('#filter-search'), 'input', () => manager.scheduleStudentProgressFilter());
+    on($('#student-progress-pagination'), 'click', (event) => {
         const button = event.target.closest('[data-progress-page]');
-        if (button && !button.disabled) manager.changeStudentProgressPage(button.dataset.progressPage);
+        if (button && !button.disabled) void manager.changeStudentProgressPage(button.dataset.progressPage).catch(() => {});
     });
-    $('#student-progress-status')?.addEventListener('click', (event) => {
+    on($('#student-progress-status'), 'click', (event) => {
         if (event.target.closest('[data-progress-retry]')) {
             manager.fetchStudentProgressPage({ forceRefresh: true }).catch(() => {});
         }
     });
 
-    $('#student-profile-back-btn')?.addEventListener('click', () => {
+    on($('#student-profile-back-btn'), 'click', () => {
         manager.showTeacherSection(STUDENTS_PAGE.id);
     });
-    $('#student-profile-previous-btn')?.addEventListener('click', () => manager.moveStudentProfile(-1));
-    $('#student-profile-next-btn')?.addEventListener('click', () => manager.moveStudentProfile(1));
+    on($('#student-profile-previous-btn'), 'click', () => manager.moveStudentProfile(-1));
+    on($('#student-profile-next-btn'), 'click', () => manager.moveStudentProfile(1));
     $$('[data-student-profile-tab]').forEach(button => {
-        button.addEventListener('click', () => manager.setStudentProfileTab(button.dataset.studentProfileTab));
+        on(button, 'click', () => manager.setStudentProfileTab(button.dataset.studentProfileTab));
     });
 
-    $('#open-data-management-btn')?.addEventListener('click', () => {
+    on($('#open-data-management-btn'), 'click', () => {
         manager.showTeacherSection(SETTINGS_PAGE.id, { tab: 'export' });
     });
-    $('#open-add-student-modal-btn')?.addEventListener('click', () => {
+    on($('#open-add-student-modal-btn'), 'click', () => {
         manager.showAddStudentModal();
     });
-    $('#import-student-csv-btn')?.addEventListener('click', () => {
+    on($('#import-student-csv-btn'), 'click', () => {
         manager.showStudentCsvPicker();
     });
-    $('#student-csv-input')?.addEventListener('change', (event) => {
+    on($('#student-csv-input'), 'change', (event) => {
         manager.handleStudentCsvImportFiles(event.target.files);
         event.target.value = '';
     });
-    $('#close-add-student-modal')?.addEventListener('click', () => {
+    on($('#close-add-student-modal'), 'click', () => {
         closeDialog('#add-student-modal');
     });
-    $('#cancel-add-student-btn')?.addEventListener('click', () => {
+    on($('#cancel-add-student-btn'), 'click', () => {
         closeDialog('#add-student-modal');
     });
-    $('#add-student-form')?.addEventListener('submit', (event) => {
-        manager.handleAddStudentSubmit(event);
+    on($('#add-student-form'), 'submit', (event) => {
+        event.preventDefault();
+        if ($('#create-student-account-btn')?.disabled) return;
+        void manager.handleAddStudentSubmit(event);
     });
 
-    $('#coin-adjust-btn').addEventListener('click', () => manager.handleCoinAdjust());
+    on($('#coin-adjust-btn'), 'click', () => manager.handleCoinAdjust());
     $$('.quick-coin-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        on(btn, 'click', () => {
             const amt = parseInt(btn.dataset.amount, 10) || 0;
             $('#coin-adjust-input').value = amt;
             manager.handleCoinAdjust();
         });
     });
 
-    $('#select-all-students')?.addEventListener('change', (e) => {
+    on($('#select-all-students'), 'change', (e) => {
         manager.handleSelectAll(e.target.checked);
     });
-    $('#select-visible-students-mobile')?.addEventListener('change', (e) => {
+    on($('#select-visible-students-mobile'), 'change', (e) => {
         manager.handleSelectAll(e.target.checked);
     });
 
-    $('#bulk-add-coins-btn')?.addEventListener('click', () => {
+    on($('#bulk-add-coins-btn'), 'click', () => {
         manager.handleBulkCoinAdjust();
     });
 
-    $('#bulk-clear-selection-btn')?.addEventListener('click', () => {
+    on($('#bulk-clear-selection-btn'), 'click', () => {
         manager.clearSelection();
     });
 
-    $('#reset-student-password-btn')?.addEventListener('click', () => manager.handlePasswordReset());
+    on($('#reset-student-password-btn'), 'click', () => manager.handlePasswordReset());
+    return () => {
+        controller.abort();
+        globalThis.clearTimeout(manager.studentProgressFilterTimer);
+        manager.studentProgressFilterTimer = null;
+    };
 }

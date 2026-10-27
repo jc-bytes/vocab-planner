@@ -194,6 +194,7 @@ function createReadBuilder(result, calls) {
         in(field, value) { calls.push(['in', field, value]); return this; },
         order(field, options) { calls.push(['order', field, options]); return this; },
         limit(value) { calls.push(['limit', value]); return this; },
+        range(start, end) { calls.push(['range', start, end]); return this; },
         abortSignal(value) { calls.push(['abortSignal', value]); return this; },
         maybeSingle() { calls.push(['maybeSingle']); return Promise.resolve(result); },
         then(resolve, reject) { return Promise.resolve(result).then(resolve, reject); }
@@ -208,14 +209,14 @@ test('navigable teacher repository reads forward cancellation signals', async ()
     await withFakeClient({
         from(table) { sparkCalls.push(['from', table]); return sparkBuilder; }
     }, () => sparksRepository.list({ signal }));
-    assert.ok(sparkCalls.some(call => call[0] === 'abortSignal' && call[1] instanceof AbortSignal));
+    assert.ok(sparkCalls.some(call => call[0] === 'abortSignal' && call[1] instanceof AbortSignal && !call[1].aborted));
 
     const vocabularyCalls = [];
     const vocabularyBuilder = createReadBuilder({ data: [], error: null }, vocabularyCalls);
     await withFakeClient({
         rpc(name) { vocabularyCalls.push(['rpc', name]); return vocabularyBuilder; }
     }, () => vocabularyRepository.listMetadata({ signal }));
-    assert.ok(vocabularyCalls.some(call => call[0] === 'abortSignal' && call[1] instanceof AbortSignal));
+    assert.ok(vocabularyCalls.some(call => call[0] === 'abortSignal' && call[1] instanceof AbortSignal && !call[1].aborted));
 });
 
 test('student Spark response reads are scoped to the requested Spark ids', async () => {

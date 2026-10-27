@@ -12,7 +12,7 @@ const [
     dashboardRecentActivity,
     teacherDataViewer,
     studentProgressRenderer,
-    vocabularyStorage,
+    vocabularyBrowser,
     vocabularyWordEditor,
     dataExport,
     dataExportPreviewRenderer
@@ -23,7 +23,7 @@ const [
     read('js/teacherDataDashboardRecentActivityMethods.js'),
     read('js/teacherDataViewer.js'),
     read('js/teacherStudentProgressRenderMethods.js'),
-    read('js/teacherVocabularyStorage.js'),
+    read('js/teacherVocabularyBrowserFeature.js'),
     read('js/teacherVocabularyWordEditorMethods.js'),
     read('js/teacherDataExport.js'),
     read('js/teacherDataExportPreviewRenderer.js')
@@ -239,14 +239,13 @@ test('Teacher vocabulary views keep only data-driven color values inline', () =>
     assert.doesNotMatch(teacherHtml.slice(templateStart, templateEnd), /\sstyle=/,
         'Vocabulary editor template must delegate static presentation to its feature CSS');
 
-    const cardStart = vocabularyStorage.indexOf('    createLibraryCard(');
-    const cardEnd = vocabularyStorage.indexOf('    loadLocalVocabulary(', cardStart);
+    const cardStart = vocabularyBrowser.indexOf('    createLibraryCard(');
+    const cardEnd = vocabularyBrowser.indexOf('    const feature =', cardStart);
     assert.ok(cardStart >= 0 && cardEnd > cardStart, 'Missing bounded vocabulary card renderer');
-    const cardRenderer = vocabularyStorage.slice(cardStart, cardEnd);
+    const cardRenderer = vocabularyBrowser.slice(cardStart, cardEnd);
     assert.doesNotMatch(cardRenderer, /style="(?:background|color|display|margin)/,
         'Vocabulary card renderer must use classes for fixed presentation');
-    assert.match(cardRenderer, /style="--subject-color:\$\{escapeHtml\(subject\.color\)\};"/,
-        'User-configured subject color remains a data-driven CSS custom property');
+    assert.match(cardRenderer, /createTeacherUnitCard/, 'Teacher units delegate to the shared student card renderer');
     assert.doesNotMatch(vocabularyWordEditor, /<span style=/,
         'Vocabulary image errors must use the feature-owned error class');
 

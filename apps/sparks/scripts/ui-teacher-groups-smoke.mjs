@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_TEACHER_GROUPS_HOST || '127.0.0.1';
-const port = Number(process.env.UI_TEACHER_GROUPS_PORT || 8000);
+const port = Number(process.env.UI_TEACHER_GROUPS_PORT || 8565);
 const baseUrl = (process.env.UI_TEACHER_GROUPS_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 
 let server;
@@ -213,15 +213,22 @@ try {
     await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
 
     const staleRoute = await page.evaluate(async () => {
-        document.body.insertAdjacentHTML('beforeend', `
-            <section id="teacher-overview-view" class="view hidden"></section>
-            <section id="teacher-groups-view" class="view hidden"></section>
-        `);
+        const teacherMarkup = await fetch('/teacher.html').then(response => response.text());
+        const teacherDocument = new DOMParser().parseFromString(teacherMarkup, 'text/html');
+        for (const viewId of ['teacher-overview-view', 'teacher-classes-view', 'teacher-assignments-view', 'teacher-groups-view']) {
+            if (document.getElementById(viewId)) continue;
+            const contract = teacherDocument.getElementById(viewId);
+            if (!contract) throw new Error(`Teacher workspace mount is missing: ${viewId}`);
+            const mount = contract.cloneNode(false);
+            mount.classList.add('hidden'); mount.classList.remove('active');
+            document.body.append(mount);
+        }
         const { installTeacherLazyFeatureMethods } = await import(
             `/js/teacherLazyFeatures.js?groups-route-lifecycle=${Date.now()}`
         );
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
+        const { installTeacherClassSelectionMethods } = await import('/js/teacherClassSelection.js');
         class RouteManager {
             constructor() {
                 this.authDisabled = true;
@@ -236,7 +243,10 @@ try {
                 this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
                 this.overviewLoads = 0;
                 this.rosterLoads = 0;
-                this.classroomRepository = { listClasses: () => this.getStudentRosterData() };
+                this.classroomRepository = {
+                    listClasses: async () => [{ id: 'class-a', name: '6A' }],
+                    getRoster: () => this.getStudentRosterData()
+                };
             }
 
             ensureAuthenticated() { return true; }
@@ -247,18 +257,20 @@ try {
             loadTeacherOverview() { this.overviewLoads += 1; }
             refreshIcons() {}
         }
+        installTeacherClassSelectionMethods(RouteManager);
         installTeacherLazyFeatureMethods(RouteManager);
         installTeacherRoutingMethods(RouteManager);
         installTeacherShellMethods(RouteManager);
         const manager = new RouteManager();
         history.replaceState(null, '', '#/teacher/groups');
-        const oldRoute = manager.applyRoute({ view: 'groups' });
+        const oldRoute = manager.applyRoute({ view: 'groups', classId: 'class-a' });
         manager.showTeacherSection('overview');
         const settled = await Promise.race([
             oldRoute.then(() => true),
             new Promise(resolve => setTimeout(() => resolve(false), 100))
         ]);
-        return {
+        await manager.refreshTeacherClassSelector();
+        const result = {
             settled,
             hash: window.location.hash,
             activeView: document.querySelector('.view.active')?.id,
@@ -267,6 +279,8 @@ try {
             overviewLoads: manager.overviewLoads,
             rosterLoads: manager.rosterLoads
         };
+        manager.disposeLoadedTeacherFeatures();
+        return result;
     });
     if (!staleRoute.settled
         || staleRoute.hash !== '#/teacher/overview'
@@ -284,6 +298,7 @@ try {
         );
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
+        const { installTeacherClassSelectionMethods } = await import('/js/teacherClassSelection.js');
         class RouteManager {
             constructor() {
                 this.authDisabled = true;
@@ -297,7 +312,10 @@ try {
                 this.vocabularyMode = 'assign';
                 this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
                 this.rosterOwners = [];
-                this.classroomRepository = { listClasses: () => this.getStudentRosterData() };
+                this.classroomRepository = {
+                    listClasses: async () => [{ id: 'class-a', name: '6A' }],
+                    getRoster: () => this.getStudentRosterData()
+                };
             }
 
             ensureAuthenticated() { return true; }
@@ -308,28 +326,37 @@ try {
             loadTeacherOverview() {}
             refreshIcons() {}
         }
+        installTeacherClassSelectionMethods(RouteManager);
         installTeacherLazyFeatureMethods(RouteManager);
         installTeacherRoutingMethods(RouteManager);
         installTeacherShellMethods(RouteManager);
         const manager = new RouteManager();
+        const showGroups = manager.showGroupsView.bind(manager);
+        manager.showGroupsView = (...args) => {
+            manager.latestGroupsShow = showGroups(...args);
+            return manager.latestGroupsShow;
+        };
         history.replaceState(null, '', '#/teacher/groups');
-        const oldRoute = manager.applyRoute({ view: 'groups' });
+        const oldRoute = manager.applyRoute({ view: 'groups', classId: 'class-a' });
         manager.showTeacherSection('overview');
         manager.currentUser = { id: 'teacher-b' };
         manager.disposeLoadedTeacherFeatures();
-        manager.showTeacherSection('groups');
+        manager.showTeacherSection('groups', { classId: 'class-a' });
         await oldRoute;
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await manager.latestGroupsShow;
+        await manager.refreshTeacherClassSelector();
         const result = {
             hash: window.location.hash,
             activeView: document.querySelector('.view.active')?.id,
             rosterOwners: manager.rosterOwners,
+            selectedClass: manager.getSelectedTeacherClassId(),
             applying: manager.isApplyingRoute
         };
         manager.disposeLoadedTeacherFeatures();
         return result;
     });
-    if (latestOwnerRoute.hash !== '#/teacher/groups'
+    if (latestOwnerRoute.hash !== '#/teacher/groups?class=class-a'
+        || latestOwnerRoute.selectedClass !== 'class-a'
         || latestOwnerRoute.activeView !== 'teacher-groups-view'
         || JSON.stringify(latestOwnerRoute.rosterOwners) !== JSON.stringify(['teacher-b'])
         || latestOwnerRoute.applying) {

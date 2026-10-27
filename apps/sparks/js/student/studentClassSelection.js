@@ -13,6 +13,8 @@ export class StudentClassSelection {
         this.vocabs = [];
         this.selectedId = null;
         this.generation = 0;
+        this.ready = false;
+        this.hasSnapshot = false;
     }
     account() { return this.sm.currentUser?.uid || this.sm.currentUser?.id; }
     reset() {
@@ -20,7 +22,9 @@ export class StudentClassSelection {
         this.controller?.abort();
         this.owner = null;
         this.hasSnapshot = false;
+        this.snapshotClassId = null;
         this.loadedAt = 0;
+        this.ready = false;
         this.classes = [];
         this.vocabs = [];
         this.selectedId = null;
@@ -28,62 +32,107 @@ export class StudentClassSelection {
         this.invitations = [];
         this.schoolInvitations = [];
     }
-    async load({ forceRefresh = false } = {}) {
+    storedSelection(schoolId = schoolContext.getSchoolId()) {
+        try { return localStorage.getItem(`sparks:selected-class:${this.account()}:${schoolId || 'no-school'}`); }
+        catch { return null; }
+    }
+    saveSelection(classroom) {
+        if (!classroom) return;
+        try { localStorage.setItem(`sparks:selected-class:${this.account()}:${classroom.schoolId || schoolContext.getSchoolId() || 'no-school'}`, classroom.id); }
+        catch { /* Class selection still works when browser storage is unavailable. */ }
+    }
+    cancelRead(read) {
+        if (!read || this.pending !== read.pending || this.generation !== read.generation || this.owner !== read.owner) return false;
+        this.controller?.abort();
+        this.generation++;
+        this.ready = false;
+        this.pending = null;
+        return true;
+    }
+    async load({ forceRefresh = false, onPending } = {}) {
         const owner = this.account();
         if (!owner || this.sm.authDisabled) return;
-        if (this.owner === owner && this.pending) return this.pending;
+        if (this.owner === owner && this.pending) {
+            onPending?.(this, { pending: this.pending, generation: this.generation, owner });
+            return this.pending;
+        }
         if (this.owner !== owner) this.reset();
-        if (!forceRefresh && this.owner === owner && Date.now() - this.loadedAt < 30000) return;
+        if (!forceRefresh && this.owner === owner && this.ready
+            && this.readySchoolGeneration === schoolContext.getGeneration()
+            && (globalThis.navigator?.onLine === false || Date.now() - this.loadedAt < 30000)) return;
         this.owner = owner;
+        this.ready = false;
         this.controller?.abort();
         this.controller = new AbortController();
         const signal = this.controller.signal, generation = ++this.generation;
-        const current = () => !signal.aborted && generation === this.generation && owner === this.account();
-        this.pending = (async () => {
+        let schoolGeneration = schoolContext.getGeneration();
+        const current = () => !signal.aborted && generation === this.generation && owner === this.account()
+            && schoolGeneration === schoolContext.getGeneration();
+        const transport = (async () => {
             const [classes, invitations, schoolInvitations] = await Promise.all([
                 this.repository.listMyClasses({ signal }),
                 this.repository.listMyInvitations?.({ signal }) || [],
                 this.repository === classroomRepository ? schoolRepository.listMyInvitations({ signal }) : []
             ]);
             if (!current()) return;
-            const selectedId = classes.some(c => c.id === this.selectedId) ? this.selectedId : classes[0]?.id || null;
+            // The first read can accept a class switch while its assignments are held.
+            if (!this.hasSnapshot) this.classes = classes;
+            const previous = classes.find(c => c.id === this.selectedId);
+            const preferred = previous && (!previous.schoolId || previous.schoolId === schoolContext.getSchoolId())
+                ? this.selectedId : this.storedSelection();
+            const selectedId = classes.find(c => c.id === preferred)?.id
+                || classes.find(c => c.schoolId === schoolContext.getSchoolId())?.id || classes[0]?.id || null;
             const selected = classes.find(c => c.id === selectedId);
             let vocabs = [];
             if (selected) {
                 if (selected.schoolId && schoolContext.getSchoolId() !== selected.schoolId) schoolContext.select(selected.schoolId);
+                schoolGeneration = schoolContext.getGeneration();
                 const assignments = await this.repository.listAssignments(selected.id, { signal });
                 const available = assignments.filter(a => a.kind === 'vocabulary' && !a.withdrawn && new Date(a.release_at) <= new Date());
                 vocabs = await Promise.all(available.map(async a => assignmentVocabulary(await this.repository.readAssignment(a.id, { signal }))));
             }
-            // Commit a complete snapshot, including a confirmed empty result.
-            if (current()) {
-                this.classes = classes;
-                this.invitations = invitations;
-                this.schoolInvitations = schoolInvitations;
-                this.selectedId = selectedId;
-                this.vocabs = vocabs;
-                this.hasSnapshot = true;
-                this.snapshotClassId = selectedId;
-                this.loadedAt = Date.now();
+            if (current() && schoolGeneration === schoolContext.getGeneration()) {
+                this.classes = classes; this.invitations = invitations; this.schoolInvitations = schoolInvitations;
+                this.selectedId = selectedId; this.saveSelection(selected);
+                this.vocabs = vocabs; this.loadedAt = Date.now();
+                this.hasSnapshot = true; this.snapshotClassId = selectedId;
+                this.readySchoolGeneration = schoolGeneration;
+                this.ready = true;
             }
         })();
-        try { await this.pending; if (!current()) return false; }
+        let onAbort;
+        const cancelled = new Promise((_, reject) => {
+            onAbort = () => reject(new DOMException('Class loading cancelled', 'AbortError'));
+            if (signal.aborted) onAbort();
+            else signal.addEventListener('abort', onAbort, { once: true });
+        });
+        const pending = this.pending = Promise.race([transport, cancelled]);
+        onPending?.(this, { pending, generation, owner });
+        try { await pending; }
         catch (error) {
-            if (!current()) return false;
-            if ([401, 403].includes(Number(error?.status)) || error?.code === '42501') {
-                this.classes = []; this.vocabs = []; this.loadedAt = 0; this.hasSnapshot = false;
+            if (current() && ([401, 403].includes(Number(error?.status ?? error?.statusCode)) || error?.code === '42501')) {
+                this.classes = []; this.vocabs = []; this.invitations = []; this.schoolInvitations = [];
+                this.hasSnapshot = false; this.snapshotClassId = null; this.loadedAt = 0;
             }
             throw error;
         }
-        finally { if (current()) this.pending = null; }
+        finally {
+            signal.removeEventListener('abort', onAbort);
+            if (this.pending === pending) this.pending = null;
+        }
     }
     select(id) {
         if (!this.classes.some(c => c.id === id)) return;
         this.generation++;
         this.controller?.abort();
         this.loadedAt = 0;
-        this.selectedId = id;
+        this.ready = false;
         this.hasSnapshot = false;
+        this.snapshotClassId = null;
+        this.selectedId = id;
+        const selected = this.classes.find(c => c.id === id);
+        this.saveSelection(selected);
+        if (selected.schoolId && schoolContext.getSchoolId() !== selected.schoolId) schoolContext.select(selected.schoolId);
         this.vocabs = [];
         this.pending = null;
         this.sm.resetStudentVocabularyDrilldown();

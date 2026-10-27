@@ -1,0 +1,407 @@
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-navigation {
+    --month-navigation-action-size: var(--type-breadcrumb-size);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 30px;
+    margin: 0;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-strip {
+    display: grid;
+    grid-template-columns: minmax(125px, auto) minmax(72px, 1fr) minmax(125px, auto);
+    align-items: center;
+    width: min(100%, 430px);
+    min-height: 36px;
+    border-radius: 9px;
+    background: rgba(173, 198, 255, 0.035);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(218, 226, 253, 0.9);
+    line-height: 1;
+    cursor: pointer;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-btn svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-btn:hover:not(:disabled) {
+    background: rgba(173, 198, 255, 0.09);
+    color: var(--color-primary);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-btn:disabled {
+    border-color: transparent;
+    background: transparent;
+    color: rgba(194, 198, 214, 0.42);
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-back {
+    justify-content: flex-start;
+    min-height: 44px;
+    margin: 0;
+    padding: 2px 0;
+    color: rgba(173, 198, 255, 0.78);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--color-on-surface);
+    line-height: 1;
+    text-align: center;
+}
+
+@media (max-width: 720px) {
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-navigation {
+        --month-navigation-action-size: var(--type-caption-size);
+        align-items: stretch;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-strip {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        width: 100%;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-back {
+        align-self: flex-start;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-month-nav-btn {
+        padding-inline: 6px;
+    }
+}
+
+/* Vocabulary card view: substantial tiles inspired by the unit dashboard concept. */
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .trimester-vocab-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    justify-content: stretch;
+    justify-items: stretch;
+    width: 100%;
+    gap: 16px;
+    margin-top: 0;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .trimester-vocab-grid > .student-vocab-card {
+    width: 100%;
+    max-width: none;
+}
+
+@media (min-width: 1121px) {
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .trimester-vocab-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 720px) and (max-width: 900px) {
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .trimester-vocab-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 244px;
+    padding: 18px;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid rgba(173, 198, 255, 0.2);
+    border-top-color: rgba(173, 198, 255, 0.38);
+    border-radius: 18px;
+    background:
+        linear-gradient(155deg, rgba(173, 198, 255, 0.075), transparent 52%),
+        rgba(26, 24, 72, 0.9);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 22px 54px -42px rgba(0, 0, 0, 0.94);
+    text-align: left;
+    transform: none;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card.is-summative {
+    border-top-color: rgba(255, 183, 134, 0.48);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card.is-practice {
+    border-top-color: rgba(221, 183, 255, 0.46);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(173, 198, 255, 0.4);
+    background:
+        linear-gradient(155deg, rgba(173, 198, 255, 0.11), transparent 54%),
+        rgba(29, 27, 78, 0.96);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        0 26px 58px -40px rgba(173, 198, 255, 0.38);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card-meta {
+    display: grid;
+    justify-items: end;
+    gap: 5px;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-icon {
+    display: inline-flex;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-primary);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card.is-summative .student-vocab-icon {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-tertiary);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card.is-practice .student-vocab-icon {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-secondary);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-icon svg {
+    width: 23px;
+    height: 23px;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-schedule {
+    max-width: 190px;
+    min-height: 0;
+    padding: 5px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--color-secondary);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.09em;
+    line-height: 1.35;
+    text-align: right;
+    text-transform: uppercase;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-progress-percent {
+    color: var(--color-xp);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    min-width: 0;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card h3 {
+    margin: 0;
+    color: #eef3ff;
+    font-size: 1.15rem;
+    font-weight: var(--type-card-title-weight);
+    line-height: 1.2;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-purpose {
+    min-height: 24px;
+    margin-top: 8px;
+    padding: 3px 9px;
+    font-size: var(--type-caption-size);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card p {
+    margin: 12px 0 16px;
+    color: rgba(218, 226, 253, 0.78);
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress {
+    display: grid;
+    gap: 7px;
+    width: 100%;
+    margin: auto 0 14px;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress-copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: rgba(218, 226, 253, 0.72);
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress-copy strong {
+    color: #eef3ff;
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress-track {
+    display: block;
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(173, 198, 255, 0.14);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress-track > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-xp);
+    box-shadow: 0 0 10px rgba(228, 242, 34, 0.3);
+    transition: width 220ms ease;
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card.is-required-complete .student-vocab-progress-percent,
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card.is-required-complete .student-vocab-required-progress-copy strong {
+    color: var(--color-success, #62e6a7);
+}
+
+:is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card.is-required-complete .student-vocab-required-progress-track > span {
+    background: var(--color-success, #62e6a7);
+}
+
+/* Four-column desktop cards: compact, near-square tiles with the same information. */
+@media (min-width: 1121px) {
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card {
+        padding: 14px;
+        border-radius: 14px;
+    }
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card {
+        min-height: 0;
+        aspect-ratio: 1 / 1;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card-head {
+        gap: 9px;
+        margin-bottom: 10px;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-icon {
+        flex-basis: 30px;
+        width: 30px;
+        height: 30px;
+        border-radius: 0;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card-meta {
+        gap: 4px;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-schedule {
+        max-width: 132px;
+        min-height: 0;
+        padding: 3px 0 0;
+        font-size: 0.64rem;
+        line-height: 1.2;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-progress-percent {
+        font-size: 0.86rem;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card h3 {
+        font-size: 1rem;
+        line-height: 1.15;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card .student-vocab-purpose {
+        min-height: 21px;
+        margin-top: 6px;
+        padding: 2px 7px;
+        font-size: 0.64rem;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card p {
+        margin: 8px 0 10px;
+        color: rgba(218, 226, 253, 0.72);
+        font-size: 0.76rem;
+        line-height: 1.35;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card p {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress {
+        gap: 5px;
+        margin: auto 0 10px;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress-copy {
+        gap: 8px;
+        font-size: 0.66rem;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-required-progress-track {
+        height: 5px;
+    }
+
+}
+
+@media (max-width: 640px) {
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .trimester-vocab-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view, .teacher-student-library) .student-vocab-card {
+        min-height: 210px;
+    }
+}
+

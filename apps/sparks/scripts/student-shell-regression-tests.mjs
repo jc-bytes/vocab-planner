@@ -1,10 +1,9 @@
-import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import http from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
+import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = '127.0.0.1';
 const port = Number(process.env.STUDENT_SHELL_TEST_PORT || 8016);
@@ -21,47 +20,11 @@ const views = [
     ['Arcade', 'arcade-view']
 ];
 
-function requestOk(url) {
-    return new Promise(resolve => {
-        const request = http.get(url, response => {
-            response.resume();
-            resolve(response.statusCode >= 200 && response.statusCode < 400);
-        });
-        request.on('error', () => resolve(false));
-        request.setTimeout(1000, () => {
-            request.destroy();
-            resolve(false);
-        });
-    });
-}
-
-async function waitForServer(url, timeoutMs = 15000) {
-    const started = Date.now();
-    while (Date.now() - started < timeoutMs) {
-        if (await requestOk(url)) return true;
-        await new Promise(resolve => setTimeout(resolve, 250));
-    }
-    return false;
-}
-
 async function resolveServer() {
-    if (process.env.STUDENT_SHELL_TEST_BASE_URL) {
-        if (!(await waitForServer(`${baseUrl}/student.html`, 3000))) {
-            throw new Error(`STUDENT_SHELL_TEST_BASE_URL is not reachable: ${baseUrl}`);
-        }
-        return null;
-    }
-
-    if (await requestOk(`${baseUrl}/student.html`)) return null;
-    const server = spawn('npx', ['vite', '--host', host, '--port', String(port), '--strictPort'], {
-        cwd: process.cwd(),
-        stdio: 'ignore'
+    return ensureViteServer({
+        baseUrl, probePath: '/student.html', host, port,
+        external: Boolean(process.env.STUDENT_SHELL_TEST_BASE_URL)
     });
-    if (!(await waitForServer(`${baseUrl}/student.html`))) {
-        server.kill();
-        throw new Error(`Could not start student shell test server at ${baseUrl}`);
-    }
-    return server;
 }
 
 async function installFixture(page) {
@@ -81,6 +44,13 @@ async function installFixture(page) {
 
         app.authDisabled = true;
         app.currentUser = { id: 'student-shell-regression' };
+        const { setActiveStudentStorageOwner, writeStudentValue } = await import('/js/student/persistence/studentStorage.js');
+        setActiveStudentStorageOwner(app.currentUser);
+        // Layout fixtures represent a returning student. Real guide behavior is
+        // exercised separately below, without interrupting every geometry probe.
+        for (const type of ['main-menu-view', 'vocab-selection-view', 'student-sparks-view', 'activity-menu-view', 'activity-view', 'arcade-view']) {
+            writeStudentValue(`ember-guide:screen:${type}`, JSON.stringify({ introduced: true, skipped: true }));
+        }
         app.studentProfile.grade = String(source.grade || source.grades?.[0] || '6');
         app.subjects = [
             { slug: 'technology', name: 'Technology', color: '#adc6ff', active: true },
@@ -341,6 +311,9 @@ async function readShellState(page, width, view) {
             },
             topbar: {
                 visible: isVisible(topbar),
+                helpVisible: isVisible(topbar.querySelector('.ember-context-help, .ember-help-button')),
+                helpHeight: Math.round(topbar.querySelector('.ember-context-help, .ember-help-button')?.getBoundingClientRect().height || 0),
+                identityVisible: isVisible(topbar.querySelector('.header-left')),
                 rect: roundRect(topbar),
                 backgroundColor: topbarStyle.backgroundColor,
                 boxShadow: topbarStyle.boxShadow,
@@ -408,12 +381,14 @@ function assertShellState(state) {
             failures.push(`compact header geometry ${JSON.stringify(state.header)}`);
         }
         if (state.main.rect[0] !== 0 || state.main.marginLeft !== '0px') failures.push(`compact rail ${JSON.stringify(state.main)}`);
-        if (state.topbar.visible) failures.push('wide identity top bar is visible in compact shell');
-        if (state.sidebarPickerVisible) failures.push('compact sidebar picker is visible');
+        const helpContext = state.topbar.helpVisible;
+        if (state.topbar.visible !== helpContext || state.topbar.identityVisible) failures.push('compact help context exposes desktop identity or lacks its help control');
+        if (state.sidebarPickerVisible !== helpContext) failures.push('compact class picker is missing from the help context');
+        if (helpContext && state.topbar.helpHeight < 44) failures.push('compact help control is below its touch-target size');
         if (!state.toggleVisible || state.tabsVisible) failures.push('compact navigation ownership is wrong');
-        if (subjectPage !== state.pagePickerVisible) failures.push('compact page picker ownership is wrong');
+        if ((subjectPage && !helpContext) !== state.pagePickerVisible) failures.push('compact page picker ownership is wrong');
         if (state.heights.toggle !== 44) failures.push(`compact toggle height ${state.heights.toggle}`);
-        if (subjectPage && state.heights.pagePicker !== 44) failures.push(`compact picker height ${state.heights.pagePicker}`);
+        if (subjectPage && !helpContext && state.heights.pagePicker !== 44) failures.push(`compact picker height ${state.heights.pagePicker}`);
     } else {
         if (state.compactClass) failures.push('compact class remains active in wide shell');
         if (state.header.position !== 'fixed' || state.header.rect[0] !== 0 || state.header.rect[2] !== 240) {
@@ -499,7 +474,7 @@ async function assertNarrowActivityControlsReachable(page, width) {
     const controls = await page.evaluate(() => {
         const candidates = [
             document.querySelector('#back-to-vocab'),
-            document.querySelector('#student-vocab-export-menu summary'),
+            document.querySelector('#student-vocab-export-menu .floating-action-menu-trigger'),
             ...document.querySelectorAll('#activity-menu-view [data-activity]:not(:disabled)')
         ].filter(Boolean);
         return candidates.map((control, index) => {
@@ -830,6 +805,60 @@ let browser = null;
 const browserProblems = [];
 const manifest = {};
 
+async function assertFinalControlReachable(page, width, view) {
+    const result = await page.evaluate(() => {
+        const active = document.querySelector('main > .view.active:not(.hidden)');
+        const controls = [...active.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled)')]
+            .filter(control => !control.closest('.hidden,[hidden],[inert]') && control.getBoundingClientRect().width && control.getBoundingClientRect().height
+                && getComputedStyle(control).opacity !== '0' && getComputedStyle(control).position !== 'fixed');
+        const control = controls.at(-1);
+        if (!control) return null;
+        const previous = { active: active.scrollTop, x: scrollX, y: scrollY };
+        control.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+        control.focus({ preventScroll: true });
+        const rect = control.getBoundingClientRect(), owner = active.getBoundingClientRect();
+        const wide = innerWidth > 1120;
+        const result = {
+            label: control.getAttribute('aria-label') || control.textContent.trim() || control.id,
+            focused: document.activeElement === control,
+            reachable: rect.top >= Math.max(0, wide ? owner.top : 0) - 1
+                && rect.bottom <= Math.min(innerHeight, wide ? owner.bottom : innerHeight) + 1
+                && rect.left >= -1 && rect.right <= innerWidth + 1,
+            rootStable: !wide || scrollY === previous.y,
+            rect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }
+        };
+        control.blur(); active.scrollTop = previous.active; window.scrollTo(previous.x, previous.y);
+        return result;
+    });
+    if (!result) return;
+    assert.ok(result.reachable && result.focused && result.rootStable,
+        `${view} final control is inaccessible at ${width}px: ${JSON.stringify(result)}`);
+}
+
+async function assertRealGuidePreservesShell(page) {
+    await page.setViewportSize({ width: 1280, height: viewportHeight });
+    await page.evaluate(() => studentApp.switchView('main-menu-view'));
+    await page.waitForTimeout(340);
+    const before = await page.evaluate(() => ({ padding: document.body.style.paddingBottom, y: scrollY }));
+    await page.evaluate(() => studentApp.screenEmber.show());
+    const dialog = page.getByRole('dialog', { name: 'Start your work', exact: true });
+    await dialog.waitFor();
+    const during = await page.evaluate(() => ({
+        padding: document.body.style.paddingBottom, y: scrollY,
+        mainTop: document.querySelector('.app-container > main').getBoundingClientRect().top,
+        overflow: document.documentElement.scrollHeight - innerHeight
+    }));
+    assert.equal(during.padding, before.padding, 'The wide guide must not add body scrolling space');
+    assert.equal(during.y, before.y, 'The wide guide must scroll its actual content owner');
+    assert.equal(during.mainTop, 52, 'The guide must keep the outer frame aligned');
+    assert.equal(during.overflow, 0, 'The guide must not create a document scrollbar');
+    await dialog.getByRole('button', { name: 'Next', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Skip guide', exact: true }).click();
+    assert.equal(await page.locator('.ember-spotlight').count(), 0);
+    assert.equal(await page.evaluate(() => document.body.style.paddingBottom), before.padding);
+    assertShellState(await readShellState(page, 1280, 'Today'));
+}
+
 try {
     if (snapshotDir) {
         fs.mkdirSync(snapshotDir, { recursive: true });
@@ -864,6 +893,7 @@ try {
             const state = await readShellState(page, width, view);
             assertShellState(state);
             await assertStudentDesignSystem(page, width, view);
+            await assertFinalControlReachable(page, width, view);
             if (view === 'Vocabulary') await assertHiddenControlsOutsideTabOrder(page, state);
             if (view === 'Activity menu' && width <= 390) {
                 await assertNarrowActivityControlsReachable(page, width);
@@ -877,6 +907,7 @@ try {
     }
 
     await assertCompactTodaySupportRow(page);
+    await assertRealGuidePreservesShell(page);
     // Exercise the empty hero as well as the populated button hero.
     await page.clock.setFixedTime(new Date('2026-01-01T15:00:00Z'));
     await page.evaluate(async () => {

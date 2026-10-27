@@ -33,13 +33,17 @@ const { StudentActivityProgressPersistence } = await import('../js/student/stude
 const { StudentProgressCloud } = await import('../js/student/studentProgressCloudMethods.js');
 const { imageDB } = await import('../js/db.js');
 const { supabaseService } = await import('../js/supabaseService.js');
-test.beforeEach(t => t.mock.method(imageDB, 'retireUnitSyncActions', async () => {}));
+test.beforeEach(t => {
+    t.mock.method(imageDB, 'retireUnitSyncActions', async () => {});
+    t.mock.method(imageDB, 'reviveRetryableSyncActions', async () => {});
+    t.mock.method(imageDB, 'getNewerUnitSyncAction', async () => null);
+});
 const {
     getActiveStudentStorageOwner,
     setActiveStudentStorageOwner
 } = await import('../js/student/persistence/studentStorage.js');
 
-function createPersistence() {
+async function createPersistence() {
     const localSaves = [];
     const coinAwards = [];
     const sm = {
@@ -71,12 +75,292 @@ function createPersistence() {
         updateArcadeGateDisplay() {}
     };
     const persistence = new StudentActivityProgressPersistence(activities);
+    activities.progressPersistence = persistence;
     persistence.activityProgressDebounceMs = 5;
+    await persistence.prepareActiveRuntime();
     return { persistence, sm, localSaves, coinAwards };
 }
 
-test('authenticated activity autosave does not mint coins before the authoritative RPC', () => {
-    const { persistence, localSaves, coinAwards } = createPersistence();
+for (const recovery of ['same completion', 'new progress', 'explicit flush']) {
+    test(`uncertain activity save plus quota failure preserves its receipt for ${recovery}`, async t => {
+        const previousOwner = getActiveStudentStorageOwner();
+        t.after(() => setActiveStudentStorageOwner(previousOwner));
+        setActiveStudentStorageOwner('student-1');
+        const { persistence, sm } = await createPersistence();
+        const requests = [], commits = new Map(), statuses = [];
+        let storageAvailable = false;
+        sm.progress.syncQueue = { cloud: { cloudGeneration: 1 }, scheduleRetry() {},
+            setQueueStatus: message => statuses.push(message) };
+        t.mock.method(console, 'warn', () => {});
+        t.mock.method(imageDB, 'enqueueSyncAction', async () => {
+            if (!storageAvailable) throw new DOMException('Quota exceeded', 'QuotaExceededError');
+        });
+        t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
+            requests.push(structuredClone(payload));
+            if (!commits.has(payload.eventId)) commits.set(payload.eventId, { eventId: payload.eventId });
+            if (requests.length === 1) throw Object.assign(new Error('Response lost after commit'), { code: 'NETWORK_ERROR' });
+            return commits.get(payload.eventId);
+        });
+        t.mock.method(persistence, 'applyActivityProgressResult', () => {});
+        const completed = { score: 100, details: 'Done', isComplete: true, isFinished: true };
+        await persistence.syncActivityProgressToCloud('matching', completed);
+        assert.equal([...persistence.activitySyncStates.values()][0].lastSubmittedFingerprint, '', 'an unsaved event is not retired');
+        assert.match(statuses.at(-1), /not synced/i);
+        storageAvailable = true;
+        if (recovery === 'explicit flush') await persistence.flushPendingActivityProgress();
+        else await persistence.syncActivityProgressToCloud('matching', recovery === 'new progress'
+            ? { ...completed, score: 90, details: 'New attempt' } : completed);
+        assert.equal(requests.length, recovery === 'new progress' ? 3 : 2);
+        assert.deepEqual(requests[1], requests[0], 'replay must use the original immutable payload and receipt');
+        assert.equal(commits.size, recovery === 'new progress' ? 2 : 1, 'lost responses cannot duplicate the original commit');
+        if (recovery === 'new progress') assert.notEqual(requests[2].eventId, requests[0].eventId);
+    });
+}
+
+test('durably queued activity completion retires its fingerprint without resending', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = await createPersistence();
+    sm.progress.syncQueue = { cloud: { cloudGeneration: 1 }, scheduleRetry() {} };
+    let requests = 0, queued = 0;
+    t.mock.method(console, 'warn', () => {});
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async () => {
+        requests++; throw Object.assign(new Error('Network unavailable'), { code: 'NETWORK_ERROR' });
+    });
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => { queued++; });
+    const completed = { score: 100, isComplete: true, isFinished: true };
+    await persistence.syncActivityProgressToCloud('matching', completed);
+    await persistence.syncActivityProgressToCloud('matching', completed);
+    assert.equal(requests, 1);
+    assert.equal(queued, 1);
+});
+
+test('unsaved receipts remain immutable and retained lanes stop at the existing capacity', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = await createPersistence();
+    const statuses = [], requests = [];
+    sm.progress.syncQueue = { cloud: { cloudGeneration: 1 }, setQueueStatus: text => statuses.push(text) };
+    persistence.syncCoordinator.maxSettledSyncStates = 2;
+    t.mock.method(console, 'warn', () => {});
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => { throw new Error('Storage unavailable'); });
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
+        requests.push(structuredClone(payload));
+        throw Object.assign(new Error('Offline'), { code: 'NETWORK_ERROR' });
+    });
+    const evidence = { items: ['original'] };
+    await persistence.syncActivityProgressToCloud('matching', { score: 100, isComplete: true, evidence });
+    evidence.items.push('later edit');
+    await persistence.syncActivityProgressToCloud('quiz', { score: 100, isComplete: true });
+    await persistence.syncActivityProgressToCloud('scramble', { score: 100, isComplete: true });
+    assert.equal(requests.length, 2, 'a third ambiguous request cannot exceed retained-lane capacity');
+    assert.equal(persistence.activitySyncStates.size, 2);
+    persistence.syncCoordinator.pruneSettledSyncStates(0);
+    assert.equal(persistence.activitySyncStates.size, 2, 'unacknowledged receipts cannot be evicted');
+    await persistence.flushPendingActivityProgress();
+    assert.deepEqual(requests[2], requests[0], 'later source edits cannot mutate the retained replay');
+    assert.equal(statuses.at(-1), 'Progress is not synced. Keep this page open.');
+    persistence.resetForSession();
+    assert.equal(persistence.activitySyncStates.size, 0);
+});
+
+test('persistence observers cannot turn an acknowledged response into queued work', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence } = await createPersistence();
+    t.mock.method(console, 'warn', () => {});
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async () => ({ totalXp: 0 }));
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => assert.fail('acknowledged writes must not be queued'));
+    for (const observer of [() => { throw new Error('Observer failed'); }, async () => { throw new Error('Observer failed'); }]) {
+        assert.deepEqual(await persistence.submitActivityProgressPayload({ eventId: 'acknowledged' }, {
+            ownerUserId: 'student-1', onPersistenceOutcome: observer
+        }), { totalXp: 0 });
+    }
+});
+
+test('a canceled owner cannot revive an unsaved lane after the transport settles', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = await createPersistence();
+    let release;
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', () => new Promise(resolve => { release = resolve; }));
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => assert.fail('old-owner work cannot enqueue after teardown'));
+    t.mock.method(persistence, 'applyActivityProgressResult', () => assert.fail('old-owner response cannot apply'));
+    const pending = persistence.syncActivityProgressToCloud('matching', { score: 100, isComplete: true });
+    persistence.resetForSession();
+    sm.currentUser = { uid: 'student-2' };
+    setActiveStudentStorageOwner('student-2');
+    release({ totalXp: 100 });
+    await pending;
+    assert.equal(persistence.activitySyncStates.size, 0);
+});
+
+test('same completion during an uncertain write shares its receipt and all callers settle after quota failure', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = await createPersistence();
+    sm.progress.syncQueue = { cloud: { cloudGeneration: 1 }, setQueueStatus() {} };
+    const requests = [];
+    let rejectFirst;
+    t.mock.method(console, 'warn', () => {});
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => { throw new Error('Storage unavailable'); });
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', payload => {
+        requests.push(structuredClone(payload));
+        if (requests.length === 1) return new Promise((_, reject) => { rejectFirst = reject; });
+        return Promise.resolve({ totalXp: 0 });
+    });
+    t.mock.method(persistence, 'applyActivityProgressResult', () => {});
+    const completed = { score: 100, isComplete: true, isFinished: true };
+    const first = persistence.syncActivityProgressToCloud('matching', completed);
+    const duplicate = persistence.syncActivityProgressToCloud('matching', completed);
+    rejectFirst(Object.assign(new Error('Response lost'), { code: 'NETWORK_ERROR' }));
+    await Promise.all([first, duplicate]);
+    await persistence.syncActivityProgressToCloud('matching', completed);
+    assert.equal(requests.length, 2);
+    assert.deepEqual(requests[1], requests[0]);
+});
+
+for (const missing of [null, undefined]) {
+    test(`an empty ${String(missing)} activity response does not acknowledge the receipt`, async t => {
+        const previousOwner = getActiveStudentStorageOwner();
+        t.after(() => setActiveStudentStorageOwner(previousOwner));
+        setActiveStudentStorageOwner('student-1');
+        const { persistence, sm } = await createPersistence();
+        sm.progress.syncQueue = { cloud: { cloudGeneration: 1 }, setQueueStatus() {} };
+        const requests = [];
+        t.mock.method(console, 'warn', () => {});
+        t.mock.method(imageDB, 'enqueueSyncAction', async () => { throw new Error('Storage unavailable'); });
+        t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
+            requests.push(payload);
+            return requests.length === 1 ? missing : { totalXp: 0 };
+        });
+        t.mock.method(persistence, 'applyActivityProgressResult', () => {});
+        const completed = { score: 100, isComplete: true };
+        await persistence.syncActivityProgressToCloud('matching', completed);
+        assert.equal([...persistence.activitySyncStates.values()][0].lastSubmittedFingerprint, '');
+        await persistence.syncActivityProgressToCloud('matching', completed);
+        assert.equal(requests.length, 2);
+        assert.deepEqual(requests[1], requests[0]);
+    });
+}
+
+test('unexpected status callback rejection retains the original receipt and settles callers', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = await createPersistence();
+    sm.progress.syncQueue = { cloud: { cloudGeneration: 1 }, setQueueStatus() { throw new Error('Status view disposed'); } };
+    const requests = [];
+    t.mock.method(console, 'warn', () => {});
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => { throw new Error('Storage unavailable'); });
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
+        requests.push(payload);
+        if (requests.length === 1) throw Object.assign(new Error('Response lost'), { code: 'NETWORK_ERROR' });
+        return { totalXp: 0 };
+    });
+    t.mock.method(persistence, 'applyActivityProgressResult', () => {});
+    const completed = { score: 100, isComplete: true };
+    await persistence.syncActivityProgressToCloud('matching', completed);
+    assert.equal([...persistence.activitySyncStates.values()][0].lastSubmittedFingerprint, '');
+    await persistence.flushPendingActivityProgress();
+    assert.equal(requests.length, 2);
+    assert.deepEqual(requests[1], requests[0]);
+});
+
+test('activity payload snapshots preserve JSON wire semantics for optional function-bearing evidence', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence } = await createPersistence();
+    const requests = [];
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
+        requests.push(payload); return { totalXp: 0 };
+    });
+    t.mock.method(persistence, 'applyActivityProgressResult', () => {});
+    await persistence.syncActivityProgressToCloud('matching', { score: 20, isFinished: true,
+        evidence: { label: 'retained', ignored() {}, alsoIgnored: undefined } });
+    assert.equal(requests.length, 1);
+    assert.deepEqual(requests[0].details.evidence, { label: 'retained' });
+});
+
+for (const confirmed of [false, true]) {
+    test(`unexpected submit rejection ${confirmed ? 'after' : 'before'} confirmation preserves receipt semantics`, async t => {
+        const previousOwner = getActiveStudentStorageOwner();
+        t.after(() => setActiveStudentStorageOwner(previousOwner));
+        setActiveStudentStorageOwner('student-1');
+        const { persistence } = await createPersistence();
+        t.mock.method(console, 'warn', () => {});
+        const requests = [];
+        t.mock.method(persistence, 'submitActivityProgressPayload', async (payload, options) => {
+            requests.push(payload);
+            if (requests.length === 1) {
+                if (confirmed) options.onPersistenceOutcome('acknowledged');
+                throw new Error('Unexpected disposed callback');
+            }
+            options.onPersistenceOutcome('acknowledged');
+            return { totalXp: 0 };
+        });
+        const completed = { score: 100, isComplete: true };
+        await persistence.syncActivityProgressToCloud('matching', completed);
+        await persistence.syncActivityProgressToCloud('matching', completed);
+        assert.equal(requests.length, confirmed ? 1 : 2);
+        if (!confirmed) assert.deepEqual(requests[1], requests[0]);
+    });
+}
+
+test('duplicate completion and explicit flush join the handled operation when the submit seam rejects', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence } = await createPersistence();
+    let reject;
+    t.mock.method(console, 'warn', () => {});
+    t.mock.method(persistence, 'submitActivityProgressPayload', () => new Promise((_, failure) => { reject = failure; }));
+    const completed = { score: 100, isComplete: true, isFinished: true };
+    const first = persistence.syncActivityProgressToCloud('matching', completed);
+    const duplicate = persistence.syncActivityProgressToCloud('matching', completed);
+    const flush = persistence.flushPendingActivityProgress();
+    reject(new Error('Unexpected disposed callback'));
+    const outcomes = await Promise.allSettled([first, duplicate, flush]);
+    assert.deepEqual(outcomes.map(outcome => outcome.status), ['fulfilled', 'fulfilled', 'fulfilled']);
+    assert.ok([...persistence.activitySyncStates.values()][0].unsaved);
+});
+
+test('newer progress submitted after an unsaved result survives another failed retry and explicit recovery', async t => {
+    const previousOwner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(previousOwner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = await createPersistence();
+    sm.progress.syncQueue = { cloud: { cloudGeneration: 1 }, setQueueStatus() {} };
+    const requests = [];
+    let recovered = false;
+    t.mock.method(console, 'warn', () => {});
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => { throw new Error('Storage unavailable'); });
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
+        requests.push(structuredClone(payload));
+        if (!recovered) throw Object.assign(new Error('Network unavailable'), { code: 'NETWORK_ERROR' });
+        return { totalXp: 0 };
+    });
+    t.mock.method(persistence, 'applyActivityProgressResult', () => {});
+    await persistence.syncActivityProgressToCloud('matching', { score: 100, isComplete: true, isFinished: true, details: 'A' });
+    await persistence.syncActivityProgressToCloud('matching', { score: 90, isFinished: true, details: 'B' });
+    assert.equal(requests.length, 2);
+    assert.deepEqual(requests[0], requests[1]);
+    recovered = true;
+    await persistence.flushPendingActivityProgress();
+    assert.equal(requests.length, 4, 'explicit recovery drains the original receipt before the retained newer snapshot');
+    assert.deepEqual(requests[2], requests[0]);
+    assert.equal(requests[3].details.summary, 'B');
+    assert.notEqual(requests[3].eventId, requests[2].eventId);
+});
+
+test('authenticated activity autosave does not mint coins before the authoritative RPC', async () => {
+    const { persistence, localSaves, coinAwards } = await createPersistence();
     const submitted = [];
     persistence.syncActivityProgressToCloud = (...args) => submitted.push(args);
 
@@ -87,8 +371,8 @@ test('authenticated activity autosave does not mint coins before the authoritati
     assert.equal(coinAwards.length, 0);
 });
 
-test('only a first non-Flashcards completion requests Arcade refresh feedback', () => {
-    const { persistence, sm } = createPersistence();
+test('only a first non-Flashcards completion requests Arcade refresh feedback', async () => {
+    const { persistence, sm } = await createPersistence();
     const submissions = [];
     persistence.syncActivityProgressToCloud = (...args) => submissions.push(args);
 
@@ -104,9 +388,9 @@ test('only a first non-Flashcards completion requests Arcade refresh feedback', 
     assert.equal(submissions[2][2].notifyArcadeRefresh, false);
 });
 
-test('auth-disabled activities retain immediate local coin rewards', () => {
+test('auth-disabled activities retain immediate local coin rewards', async () => {
     for (const activityType of ['matching', 'flashcards']) {
-        const { persistence, sm, coinAwards } = createPersistence();
+        const { persistence, sm, coinAwards } = await createPersistence();
         sm.authDisabled = true;
         sm.currentActivityType = activityType;
         persistence.syncActivityProgressToCloud = () => null;
@@ -118,8 +402,8 @@ test('auth-disabled activities retain immediate local coin rewards', () => {
     }
 });
 
-test('reviewing completed flashcards preserves verified completion metadata', () => {
-    const { persistence, sm } = createPersistence();
+test('reviewing completed flashcards preserves verified completion metadata', async () => {
+    const { persistence, sm } = await createPersistence();
     sm.currentActivityType = 'flashcards';
     sm.unitScores.flashcards = {
         score: 100,
@@ -138,7 +422,7 @@ test('reviewing completed flashcards preserves verified completion metadata', ()
 });
 
 test('intermediate progress is coalesced to the newest payload', async () => {
-    const { persistence } = createPersistence();
+    const { persistence } = await createPersistence();
     const submitted = [];
     persistence.submitActivityProgressPayload = async payload => {
         submitted.push(payload);
@@ -154,8 +438,8 @@ test('intermediate progress is coalesced to the newest payload', async () => {
     assert.match(submitted[0].eventId, /^activity-progress:/);
 });
 
-test('attempt-aware activity deltas merge one score without replacing other local units', () => {
-    const { persistence, sm } = createPersistence();
+test('attempt-aware activity deltas merge one score without replacing other local units', async () => {
+    const { persistence, sm } = await createPersistence();
     sm.progressData.units = {
         'unit-1': { scores: { matching: { score: 20 }, quiz: { score: 80 } }, states: {} },
         'unit-2': { scores: { flashcards: { score: 100 } }, states: {} }
@@ -179,8 +463,8 @@ test('attempt-aware activity deltas merge one score without replacing other loca
     assert.equal(sm.progressData.version, 7);
 });
 
-test('finished matching runs carry weighted counts and a coherent state snapshot', () => {
-    const { persistence, sm } = createPersistence();
+test('finished matching runs carry weighted counts and a coherent state snapshot', async () => {
+    const { persistence, sm } = await createPersistence();
     sm.unitStates = {
         matching: { attempts: 7, roundStats: [{ accuracy: 80 }] }
     };
@@ -202,8 +486,8 @@ test('finished matching runs carry weighted counts and a coherent state snapshot
     assert.deepEqual(payload.stateSnapshot, sm.unitStates.matching);
 });
 
-test('completed flashcards omit inconsistent optional accuracy counts', () => {
-    const { persistence, sm } = createPersistence();
+test('completed flashcards omit inconsistent optional accuracy counts', async () => {
+    const { persistence, sm } = await createPersistence();
     sm.currentActivityType = 'flashcards';
 
     const payload = persistence.buildActivityProgressPayload('flashcards', {
@@ -230,7 +514,7 @@ test('time-reporting failure does not block the authoritative completion request
     const originalOwner = getActiveStudentStorageOwner();
     const originalReportTime = supabaseService.reportStudentActivityTime;
     const originalSubmitProgress = supabaseService.submitStudentActivityProgress;
-    const { persistence } = createPersistence();
+    const { persistence } = await createPersistence();
     let completionRequests = 0;
     setActiveStudentStorageOwner('student-1');
     supabaseService.reportStudentActivityTime = async () => {
@@ -266,7 +550,7 @@ test('verified formative completion reports the authoritative Arcade balance', a
     const originalOwner = getActiveStudentStorageOwner();
     const originalSubmitProgress = supabaseService.submitStudentActivityProgress;
     const originalGetArcadeTime = supabaseService.getOwnArcadeTime;
-    const { persistence, sm } = createPersistence();
+    const { persistence, sm } = await createPersistence();
     const toasts = [];
     setActiveStudentStorageOwner('student-1');
     sm.showToast = message => toasts.push(message);
@@ -296,8 +580,8 @@ test('verified formative completion reports the authoritative Arcade balance', a
     }
 });
 
-test('a finished below-mastery quiz is recorded without marking mastery', () => {
-    const { persistence } = createPersistence();
+test('a finished below-mastery quiz is recorded without marking mastery', async () => {
+    const { persistence } = await createPersistence();
     const payload = persistence.buildActivityProgressPayload('quiz', {
         score: 60,
         accuracy: 60,
@@ -311,8 +595,8 @@ test('a finished below-mastery quiz is recorded without marking mastery', () => 
     assert.deepEqual(payload.metrics, { correctActions: 3, attemptedActions: 5 });
 });
 
-test('best-attempt details and state stay paired when a later attempt is lower', () => {
-    const { persistence, sm } = createPersistence();
+test('best-attempt details and state stay paired when a later attempt is lower', async () => {
+    const { persistence, sm } = await createPersistence();
     sm.progressData.units = { 'unit-1': { scores: {}, states: {} } };
     persistence.applyActivityProgressResult({
         version: 3,
@@ -339,13 +623,12 @@ test('best-attempt details and state stay paired when a later attempt is lower',
         { selectedAnswers: [{ selected: 'A', isCorrect: true }] });
 });
 
-test('authoritative completion refreshes a visible current-unit menu', () => {
-    const { persistence, sm } = createPersistence();
+test('authoritative completion refreshes a visible current-unit menu', async () => {
+    const { persistence, sm } = await createPersistence();
     let menuRefreshes = 0;
-    persistence.activities.showActivityMenu = options => {
+    persistence.activities.menu = { refreshVisible() {
         menuRefreshes += 1;
-        assert.deepEqual(options, { fromRoute: true, skipActivityPreload: true });
-    };
+    } };
     const originalQuerySelector = document.querySelector;
     document.querySelector = selector => selector === '#activity-menu-view'
         ? { classList: { contains: () => false } }
@@ -371,7 +654,7 @@ test('authoritative completion refreshes a visible current-unit menu', () => {
 });
 
 test('completion flushes immediately and unchanged payloads are suppressed', async () => {
-    const { persistence } = createPersistence();
+    const { persistence } = await createPersistence();
     const submitted = [];
     persistence.submitActivityProgressPayload = async payload => {
         submitted.push(payload);
@@ -387,7 +670,7 @@ test('completion flushes immediately and unchanged payloads are suppressed', asy
 });
 
 test('empty zero-progress launch events never reach the server', async () => {
-    const { persistence } = createPersistence();
+    const { persistence } = await createPersistence();
     let submitted = 0;
     persistence.submitActivityProgressPayload = async () => { submitted += 1; };
 
@@ -538,7 +821,7 @@ test('a too-fast completion is durable before exit returns and retries in the ba
     const owner = getActiveStudentStorageOwner();
     t.after(() => setActiveStudentStorageOwner(owner));
     setActiveStudentStorageOwner('student-1');
-    const { persistence, sm } = createPersistence();
+    const { persistence, sm } = await createPersistence();
     persistence.activities.session.activityAttempt.minimumSeconds = 5;
     let callback;
     let queued;
@@ -628,19 +911,21 @@ test('overlapping queue flushes share one request for the current account genera
     t.mock.method(imageDB, 'completeSyncAction', async (_id, options) => { acknowledgeOptions = options; });
     let requests = 0;
     let finish;
+    let announceRequest;
+    const requestStarted = new Promise(resolve => { announceRequest = resolve; });
     const cloud = new StudentProgressCloud({ sm: { authDisabled: false,
         currentUser: { uid: 'student-1' }, setAuthStatus() {} } });
-    cloud.syncQueuedRecord = () => { requests++; return new Promise(resolve => { finish = resolve; }); };
+    cloud.syncQueuedRecord = () => { requests++; announceRequest(); return new Promise(resolve => { finish = resolve; }); };
     const first = cloud.flushLocalSyncQueue({ silent: true });
     const second = cloud.flushLocalSyncQueue({ silent: true });
-    await Promise.resolve();
+    await requestStarted;
     assert.equal(requests, 1);
     finish();
     await Promise.all([first, second]);
     assert.equal(acknowledgeOptions.expectedRevision, 2);
 });
 
-test('queue schedules delayed startup work, retries failures, and stops after exhaustion', async (t) => {
+test('queue schedules delayed startup work, retries transport failures, and stops for permanent rejection', async (t) => {
     const owner = getActiveStudentStorageOwner();
     t.after(() => setActiveStudentStorageOwner(owner));
     setActiveStudentStorageOwner('student-1');
@@ -656,9 +941,9 @@ test('queue schedules delayed startup work, retries failures, and stops after ex
         return rows;
     });
     t.mock.method(imageDB, 'getFailedSyncActions', async () => failures);
-    t.mock.method(imageDB, 'markSyncActionFailed', async record => {
+    t.mock.method(imageDB, 'markSyncActionFailed', async (record, _error, options) => {
         const updated = { ...record, revision: record.revision + 1, attempts: record.attempts + 1,
-            nextAttemptAt: new Date(now + 1000).toISOString(), status: record.attempts >= 1 ? 'failed' : 'pending' };
+            nextAttemptAt: new Date(now + 1000).toISOString(), status: options.terminal ? 'failed' : 'pending' };
         rows = updated.status === 'failed' ? [] : [updated];
         failures = updated.status === 'failed' ? [updated] : [];
         return updated;
@@ -669,7 +954,11 @@ test('queue schedules delayed startup work, retries failures, and stops after ex
         setTimeout: (callback, delay) => { timer = { callback, delay, id: ++timerId }; return timerId; },
         clearTimeout: id => { if (timer?.id === id) timer = null; } };
     let requests = 0;
-    cloud.syncQueuedRecord = async () => { requests++; throw new TypeError('Failed to fetch'); };
+    cloud.syncQueuedRecord = async () => {
+        requests++;
+        if (requests > 1) throw Object.assign(new Error('Invalid activity'), { status: 422 });
+        throw new TypeError('Failed to fetch');
+    };
     await cloud.flushLocalSyncQueue({ silent: true });
     assert.equal(requests, 0);
     assert.equal(timer.delay, 5000, 'Both persisted retry deadlines are respected');
@@ -682,7 +971,7 @@ test('queue schedules delayed startup work, retries failures, and stops after ex
     { const fire = timer.callback; timer = null; fire(); }
     await cloud.flushLocalSyncQueue({ silent: true });
     assert.equal(requests, 2);
-    assert.equal(timer, null, 'Exhausted rows do not create a polling loop');
+    assert.equal(timer, null, 'Rejected rows do not create a polling loop');
     assert.equal(statuses.at(-1), 'Some local changes need attention');
     await cloud.flushLocalSyncQueue({ silent: true });
     assert.equal(statuses.at(-1), 'Some local changes need attention', 'Startup/drains keep existing failures visible');
@@ -717,7 +1006,7 @@ test('new online activity and unit enqueues wake the queue without a reconnect e
     setActiveStudentStorageOwner('student-1');
     t.mock.method(imageDB, 'enqueueSyncAction', async () => ({}));
     t.mock.method(supabaseService, 'submitStudentActivityProgress', async () => { throw new TypeError('Failed to fetch'); });
-    const { persistence, sm } = createPersistence();
+    const { persistence, sm } = await createPersistence();
     const cloud = new StudentProgressCloud({ sm });
     sm.progress.syncQueue = cloud.syncQueue;
     let schedules = 0;
@@ -1013,4 +1302,121 @@ test('late previous-session enqueue cannot cancel the active account retry timer
     assert.equal(canceled, 0);
     assert.equal(cloud.syncQueue.retryTimer, 1);
     cloud.syncQueue.cancelRetry();
+});
+
+test('a timed-out installed activity write queues its receipt, releases the lane, and replays the same event', async t => {
+    const { installSupabaseStudentWriteMethods } = await import('../js/supabaseStudentWriteMethods.js');
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = await createPersistence();
+    const cloud = new StudentProgressCloud({ sm });
+    sm.progress.syncQueue = cloud.syncQueue;
+    sm.activities = { progressPersistence: persistence };
+    persistence.activityProgressDebounceMs = 1;
+    t.after(() => persistence.syncCoordinator.resetForSession());
+    const requests = [];
+    const queued = [];
+    const applied = [];
+    let announceFirstRequest;
+    const firstRequest = new Promise(resolve => { announceFirstRequest = resolve; });
+    const service = {
+        async init() {},
+        client: {
+            auth: { async getUser() { return { data: { user: { id: 'student-1' } } }; } },
+            rpc(name, params) {
+                requests.push({ name, params });
+                if (requests.length === 1) {
+                    announceFirstRequest();
+                    return new Promise(() => {});
+                }
+                return Promise.resolve({ data: { eventId: params.p_event_id } });
+            }
+        }
+    };
+    installSupabaseStudentWriteMethods(service);
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', (payload, options) => (
+        service.submitStudentActivityProgress(payload, { ...options, timeoutMs: 10 })
+    ));
+    t.mock.method(imageDB, 'enqueueSyncAction', async (type, payload, options) => {
+        queued.push({ type, payload: structuredClone(payload), ownerUserId: options.ownerUserId });
+    });
+    t.mock.method(cloud.syncQueue, 'scheduleRetry', () => {});
+    t.mock.method(persistence, 'applyActivityProgressResult', result => applied.push(result));
+    t.mock.method(console, 'warn', () => {});
+
+    const first = persistence.syncActivityProgressToCloud('matching', { score: 20, details: '2/10' });
+    await firstRequest;
+    const second = persistence.syncActivityProgressToCloud('matching', { score: 40, details: '4/10' });
+    let watchdog;
+    try {
+        await Promise.race([
+            Promise.all([first, second]),
+            new Promise((_, reject) => { watchdog = setTimeout(() => reject(new Error('The activity write lane stayed blocked')), 500); })
+        ]);
+    } finally { clearTimeout(watchdog); }
+
+    assert.equal(queued.length, 1);
+    assert.equal(queued[0].type, 'student-activity-progress');
+    assert.equal(queued[0].ownerUserId, 'student-1');
+    assert.equal(queued[0].payload.eventId, requests[0].params.p_event_id);
+    assert.equal(queued[0].payload.score, 20);
+    assert.equal(requests[1].params.p_score, 40, 'Later work must leave the released lane');
+    assert.deepEqual(applied, [{ eventId: requests[1].params.p_event_id }]);
+    assert.notEqual(requests[0].params.p_event_id, requests[1].params.p_event_id);
+
+    await cloud.syncQueue.syncQueuedRecord(queued[0], { ownerUserId: 'student-1' });
+    assert.equal(requests[2].params.p_event_id, requests[0].params.p_event_id, 'Replay preserves the original receipt');
+    assert.equal(requests[2].params.p_expected_user_id, 'student-1');
+    assert.equal(requests[2].params.p_score, 20);
+});
+
+test('a stalled Arcade feedback read releases the activity lane after an accepted save', async t => {
+    const { installSupabaseStudentWriteMethods } = await import('../js/supabaseStudentWriteMethods.js');
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence } = await createPersistence();
+    persistence.activityProgressDebounceMs = 1;
+    t.after(() => persistence.syncCoordinator.resetForSession());
+    const service = { async init() {}, client: { rpc: () => new Promise(() => {}) } };
+    installSupabaseStudentWriteMethods(service);
+    let accepted = 0;
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async () => {
+        accepted++;
+        return { activity: { isComplete: true, verified: true } };
+    });
+    t.mock.method(supabaseService, 'getOwnArcadeTime', () => service.getOwnArcadeTime({ timeoutMs: 5 }));
+    t.mock.method(persistence, 'applyActivityProgressResult', () => {});
+    t.mock.method(console, 'warn', () => {});
+    let watchdog;
+    try {
+        await Promise.race([
+            (async () => {
+                await persistence.syncActivityProgressToCloud('matching', { score: 20 }, { notifyArcadeRefresh: true });
+                await persistence.syncActivityProgressToCloud('matching', { score: 40 }, { notifyArcadeRefresh: true });
+            })(),
+            new Promise((_, reject) => { watchdog = setTimeout(() => reject(new Error('Arcade read blocked the accepted-save lane')), 500); })
+        ]);
+    } finally { clearTimeout(watchdog); }
+    assert.equal(accepted, 2);
+});
+
+test('timer reports through real persistence do not acknowledge a swallowed transport failure', async t => {
+    const { StudentActivitySession } = await import('../js/student/studentActivitySession.js');
+    const { persistence } = await createPersistence();
+    let now = 0;
+    t.mock.method(supabaseService, 'reportStudentActivityTime', async () => { throw new Error('Network disconnected'); });
+    t.mock.method(console, 'warn', () => {});
+    const session = new StudentActivitySession(persistence.activities);
+    persistence.activities.session = session;
+    persistence.activities.progressPersistence = persistence;
+    const timer = session.workTimer;
+    timer.now = () => now;
+    t.after(() => timer.destroy());
+    timer.start({ attemptId: 'attempt-report-failed-via-persistence' });
+    now = 30_000; timer.tick();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(timer.lastReportedSeconds, 0);
+    assert.equal(timer.nextReportAt, 60_000);
 });

@@ -56,7 +56,7 @@ try {
     await checkpoint('invite-dialog', ['dialog']);
     await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
     await classes.getByRole('button', { name: 'Work', exact: true }).click();
-    await classes.getByRole('button', { name: 'Review work' }).first().waitFor();
+    await classes.getByRole('button', { name: /^Review work / }).first().waitFor();
     await checkpoint('class-work', ['#teacher-classes-view']);
     await classes.getByRole('button', { name: 'Assign material' }).click();
     await page.getByRole('dialog').locator('input[type="checkbox"]:checked').first().waitFor();
@@ -67,10 +67,10 @@ try {
     await page.locator('#tab-assignments').click();
     const assignments = page.locator('#teacher-assignments-view');
     await assignments.locator('select[name=class]').selectOption(classId);
-    await assignments.getByRole('button', { name: 'Review work' }).first().waitFor();
+    await assignments.getByRole('button', { name: /^Open / }).first().waitFor();
     await checkpoint('assignments', ['#teacher-assignments-view']);
-    await assignments.getByRole('button', { name: 'Review work' }).first().click();
-    const review = page.locator('#teacher-review-view');
+    await assignments.getByRole('button', { name: /^Open / }).first().click();
+    const review = page.locator('#teacher-assignments-view');
     await review.getByRole('button', { name: 'Export results' }).waitFor();
     await checkpoint('review', ['#teacher-review-view']);
     await review.getByRole('button', { name: 'Export results' }).click();

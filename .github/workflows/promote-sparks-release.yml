@@ -23,6 +23,10 @@ jobs:
     steps:
       - name: Check out release verification tools
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Setup Node for release verification
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
       - name: Verify successful validation and matching application source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -45,28 +49,15 @@ jobs:
           mkdir validated-site
           tar -xf validated-artifact/artifact.tar -C validated-site
       - name: Retain previously published immutable assets
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          # Promotions publish Pages too. Keep two promoted artifacts so a
-          # previously skipped release can also be restored during this rollout.
-          previous_runs=$(
-            gh run list --repo "$GITHUB_REPOSITORY" --workflow static.yml --branch main --status success --limit 1 --json databaseId --jq '.[].databaseId'
-            gh run list --repo "$GITHUB_REPOSITORY" --workflow promote-sparks-release.yml --status success --limit 2 --json databaseId --jq '.[].databaseId'
-          )
-          for previous_run in $previous_runs; do
-            previous_dir=$(mktemp -d)
-            if gh run download "$previous_run" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$previous_dir"; then
-              mkdir -p "$previous_dir/site"
-              tar -xf "$previous_dir/artifact.tar" -C "$previous_dir/site"
-              if [ -d "$previous_dir/site/assets" ]; then
-                rsync -a --ignore-existing "$previous_dir/site/assets/" validated-site/assets/
-              fi
-            fi
-          done
           node apps/sparks/scripts/retain-hosted-assets.mjs "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" validated-site
           retained_bytes=$(du -sb validated-site | cut -f1)
           test "$retained_bytes" -le $((30 * 1024 * 1024))
+      - name: Verify required hosted owned RPCs before publishing
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: node apps/sparks/scripts/verify-owned-rpc-readiness.mjs
       - name: Upload validated Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:

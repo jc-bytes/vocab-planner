@@ -1,16 +1,9 @@
-import { schoolSessionKey } from '../services/schoolScope.js';
-import { $ } from '../main.js';
 import { getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import { serverStateQuery } from '../services/serverStateQuery.js';
-import { showLoadingState } from '../ui/loadingState.js';
-import { filterTeacherVocabularyItems } from './teacherVocabularyModel.js';
-
+import { teacherPageRegistry } from '../teacherPageRegistry.js';
+const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 export const TEACHER_VOCABULARY_CLOUD_QUERY_KEY = ['teacher', 'vocabulary-library-cloud'];
-
-function staleTeacherLibraryResult() {
-    return { cloudVocabs: [], remoteVocabs: [], localVocabs: [], items: [], stale: true };
-}
-
+function staleTeacherLibraryResult() { return { cloudVocabs: [], remoteVocabs: [], localVocabs: [], localCopyIds: [], items: [], stale: true }; }
 export const teacherVocabularyDataMethods = {
 async getTeacherLibrary({ forceRefresh = false } = {}) {
         const isCurrent = this.createTeacherVocabularyOperationGuard();
@@ -41,11 +34,12 @@ async getTeacherLibrary({ forceRefresh = false } = {}) {
         if (!isCurrent() || !isLatest()) return staleTeacherLibraryResult();
 
         cloudVocabs = cloudVocabs.map(vocab => ({ ...vocab }));
-        // Published materials come from the current school's private repository.
-        // The retired public catalog is intentionally absent from production assets.
+        // Published school materials are private; do not fetch the retired public catalogue.
         const remoteVocabs = [];
         const cloudIds = new Set(cloudVocabs.map(vocab => vocab.id).filter(Boolean));
-        const localVocabs = this.getLocalVocabs().filter(vocab => !cloudIds.has(vocab.id));
+        const allLocalVocabs = this.getLocalVocabs();
+        const localCopyIds = [...new Set(allLocalVocabs.filter(vocab => cloudIds.has(vocab.id)).map(vocab => vocab.id))];
+        const localVocabs = allLocalVocabs.filter(vocab => !cloudIds.has(vocab.id));
         const items = this.dedupeTeacherVocabularyItems([
             ...cloudVocabs.map(vocab => ({ vocab, type: 'cloud' })),
             ...remoteVocabs.map(vocab => ({ vocab, type: 'remote' })),
@@ -56,15 +50,14 @@ async getTeacherLibrary({ forceRefresh = false } = {}) {
             cloudVocabs,
             remoteVocabs,
             localVocabs,
+            localCopyIds,
             items,
             loadedAt: Date.now()
         };
     },
-
 getTeacherVocabularyItemPriority(type = '') {
         return { cloud: 3, local: 2, remote: 1 }[type] || 0;
     },
-
 getTeacherVocabularyPurpose(vocab = {}, itemType = '') {
         const sourceLabels = new Set(['cloud', 'remote', 'local', 'repo', 'draft']);
         const candidates = [vocab?.purpose, vocab?.assessmentPurpose, vocab?.type, itemType];
@@ -76,7 +69,6 @@ getTeacherVocabularyPurpose(vocab = {}, itemType = '') {
         }
         return '';
     },
-
 getTeacherVocabularyDedupeKeys(vocab = {}) {
         const keys = [];
         const id = String(vocab?.id || '').trim().toLowerCase();
@@ -93,7 +85,6 @@ getTeacherVocabularyDedupeKeys(vocab = {}) {
         keys.push(`placement:${subject}:${grades}:${trimester}:${month}:${week}:${name}`);
         return keys;
     },
-
 mergeTeacherVocabularyMetadata(primary = {}, fallback = {}) {
         const primaryPurpose = this.getTeacherVocabularyPurpose(primary);
         const fallbackPurpose = this.getTeacherVocabularyPurpose(fallback);
@@ -112,7 +103,6 @@ mergeTeacherVocabularyMetadata(primary = {}, fallback = {}) {
         merged.subjectSlug = getVocabSubjectSlug(merged);
         return merged;
     },
-
 mergeTeacherVocabularyItems(existingItem, incomingItem) {
         const existingPriority = this.getTeacherVocabularyItemPriority(existingItem?.type);
         const incomingPriority = this.getTeacherVocabularyItemPriority(incomingItem?.type);
@@ -124,7 +114,6 @@ mergeTeacherVocabularyItems(existingItem, incomingItem) {
             vocab: this.mergeTeacherVocabularyMetadata(primary.vocab, fallback.vocab)
         };
     },
-
 dedupeTeacherVocabularyItems(items = []) {
         const deduped = [];
         const indexByKey = new Map();
@@ -149,106 +138,16 @@ dedupeTeacherVocabularyItems(items = []) {
 
         return deduped;
     },
-
-async loadLibrary(options = {}) {
-        const guard = this.createTeacherVocabularyOperationGuard(options);
-        const run = this.vocabularyReadGeneration = (this.vocabularyReadGeneration || 0) + 1;
-        const isCurrent = () => guard() && run === this.vocabularyReadGeneration;
-        const list = $('#library-list');
-        if (!list || !isCurrent()) return;
-
-        if (!this.authDisabled && !this.isAuthenticated) {
-            list.innerHTML = '<p>Please sign in to view the library.</p>';
-            return;
-        }
-
-        const scope = schoolSessionKey(this.currentUser?.uid || this.currentUser?.id);
-        const keepContent = this.vocabularyLoadedScope === scope;
-        if (!keepContent) showLoadingState(list, 'Loading library...');
-        list.setAttribute('aria-busy', 'true');
-
-        try {
-            const { cloudVocabs, remoteVocabs, localVocabs, items, stale } = await this.getTeacherLibrary({
-                forceRefresh: options.forceRefresh === true
-            });
-            if (!isCurrent() || stale) return;
-
-            this.vocabularyLoadedScope = scope;
-            list.innerHTML = '';
-
-            if (cloudVocabs.length === 0 && remoteVocabs.length === 0 && localVocabs.length === 0) {
-                list.innerHTML = '<p>No vocabularies found.</p>';
-                return;
-            }
-
-            this.libraryItems = items;
-            this.renderLibraryBrowser(list);
-            this.refreshIcons();
-        } catch (error) {
-            if (!isCurrent()) return;
-            const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
-            showSectionLoadError(list, { label: 'the vocabulary library', error, current: isCurrent, keepContent,
-                retry: () => this.loadLibrary({ forceRefresh: true }) });
-        } finally {
-            if (isCurrent()) list.removeAttribute('aria-busy');
-        }
-    },
-
-resetLibraryDrilldown() {
-        this.libraryDrilldown = {
-            subject: null,
-            grade: null,
-            trimester: null,
-            month: null
-        };
-    },
-
-buildLibraryGroups(items = this.libraryItems) {
-        const subjectGroups = new Map();
-
-        items.forEach(({ vocab, type }) => {
-            const subjectSlug = getVocabSubjectSlug(vocab);
-            const grades = this.getVocabGrades(vocab);
-            const trimesterKey = this.getTeacherTrimesterKey(vocab);
-
-            if (!subjectGroups.has(subjectSlug)) {
-                subjectGroups.set(subjectSlug, new Map());
-            }
-            const gradeGroups = subjectGroups.get(subjectSlug);
-
-            grades.forEach(grade => {
-                if (!gradeGroups.has(grade)) {
-                    gradeGroups.set(grade, new Map());
-                }
-
-                const trimesterGroups = gradeGroups.get(grade);
-                if (!trimesterGroups.has(trimesterKey)) {
-                    trimesterGroups.set(trimesterKey, []);
-                }
-
-                trimesterGroups.get(trimesterKey).push({ vocab, type });
-            });
-        });
-
-        return subjectGroups;
-    },
-
-getTeacherVocabularyItemsForDrilldown(drilldown = {}) {
-        return filterTeacherVocabularyItems(this.libraryItems, drilldown, {
-            getGrades: vocab => this.getVocabGrades(vocab),
-            getTrimesterKey: vocab => this.getTeacherTrimesterKey(vocab),
-            getMonthKey: vocab => this.getTeacherMonthKey(vocab)
-        });
-    },
-
 async openTeacherVocabularyItem(vocab, type) {
         if (!this.ensureAuthenticated(false)) return;
         const returnRoute = this.parseRoute?.() || { view: VOCABULARY_PAGE.id };
         const navigation = this.beginTeacherNavigation();
         const isCurrent = () => this.isTeacherNavigationCurrent(navigation);
-        this.setRoute({ view: 'editor', vocabularyId: vocab?.id || null });
+        this.setRoute({ view: 'editor', vocabularyId: vocab?.id || null, ...(type === 'local-copy' ? { localCopy: true } : {}) });
         let loaded = true;
-        if (type === 'remote') {
+        if (type === 'local-copy') {
+            loaded = await this.loadVocabularyById(vocab?.id, { isCurrent, localCopy: true });
+        } else if (type === 'remote') {
             loaded = await this.loadVocabularyFromPath(vocab.path, { isCurrent });
         } else if (type === 'cloud') {
             loaded = await this.loadCloudVocabularyById(vocab.id, { isCurrent });
@@ -258,5 +157,16 @@ async openTeacherVocabularyItem(vocab, type) {
         if (!loaded && isCurrent()) {
             this.setRoute(returnRoute, { replace: true });
         }
-    }
+    },
+describeTeacherVocabularyGrouping(vocab = {}) {
+        return { grades: this.getVocabGrades(vocab), trimesterKey: this.getTeacherTrimesterKey(vocab) };
+    },
+ describeTeacherVocabulary(vocab = {}, type = '') {
+ const trimester = this.getTeacherTrimesterKey(vocab), month = this.getTeacherMonthKey(vocab);
+ return { grades: this.getVocabGrades(vocab).map(value => ({ value, label: this.formatGradeLabel(value), order: this.getGradeSortValue(value) })),
+ trimester: { key: trimester, label: this.getTeacherTrimesterLabel(trimester), shortLabel: this.getTeacherTrimesterShortLabel(trimester), order: this.getTeacherTrimesterOrder(trimester) },
+ month: { key: month, label: this.getTeacherMonthLabel(month), shortLabel: this.getTeacherMonthShortLabel(month), order: this.getTeacherMonthOrder(month) },
+ week: vocab.week || this.inferTeacherWeek(vocab) || '', purpose: this.getTeacherVocabularyPurpose(vocab, type),
+ placement: this.formatVocabPlacementLabel(vocab), placementOrder: this.getVocabPlacementSortValue(vocab), sortName: this.getVocabSortName(vocab) };
+ }
 };

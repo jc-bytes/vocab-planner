@@ -103,3 +103,4 @@
     .student-loading-spark-answer-field { height: 180px; }
     .student-loading-spark-save { width: 100%; }
 }
+.student-page-skeleton--sparks { max-width: none; margin-inline: 0; }

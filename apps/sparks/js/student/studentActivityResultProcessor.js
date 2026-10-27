@@ -4,10 +4,12 @@ export class StudentActivityResultProcessor {
         this.sm = activities.sm;
     }
 
-    applyActivityProgressResult(progress, payload = {}) {
+    applyActivityProgressResult(progress, payload = {}, options = {}) {
         if (!progress) return;
         if (!progress.activity) {
-            this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true,
+                preserveLocalStateForUnit: options.preserveLocalState ? payload.unitKey : undefined,
+                preservedUnitStates: options.localStates });
             return;
         }
 
@@ -16,6 +18,7 @@ export class StudentActivityResultProcessor {
         const activityType = activity.activityType || payload.activityType;
         const units = this.sm.progressData.units ||= {};
         const unit = units[unitKey] ||= { ...(payload.unitContext || {}), scores: {}, states: {} };
+        if (options.localStates !== undefined) unit.states = options.localStates;
         unit.scores ||= {};
         const previous = unit.scores[activityType] || {};
         const bestAttempt = activity.bestAttempt && typeof activity.bestAttempt === 'object'
@@ -50,7 +53,7 @@ export class StudentActivityResultProcessor {
             lastPlayed: activity.lastPlayed || previous.lastPlayed,
             updatedAt: activity.updatedAt || progress.updatedAt
         };
-        if (bestAttempt?.state !== undefined && bestAttempt.state !== null) {
+        if (!options.preserveLocalState && bestAttempt?.state !== undefined && bestAttempt.state !== null) {
             unit.states ||= {};
             unit.states[activityType] = bestAttempt.state;
         }
@@ -63,6 +66,7 @@ export class StudentActivityResultProcessor {
             && this.activities.getUnitProgressKey(this.sm.currentVocab) === unitKey;
         if (isCurrentUnit) {
             this.sm.unitScores = unit.scores;
+            if (options.localStates !== undefined) this.sm.unitStates = unit.states;
         }
         this.sm.progress.updateLevelDisplay?.();
         this.sm.progress.saveLocalProgress(true);
@@ -76,7 +80,7 @@ export class StudentActivityResultProcessor {
             ? null
             : document.querySelector('#activity-menu-view');
         if (isCurrentUnit && activityMenuView && !activityMenuView.classList.contains('hidden')) {
-            this.activities.showActivityMenu?.({ fromRoute: true, skipActivityPreload: true });
+            this.activities.menu?.refreshVisible();
         }
     }
 

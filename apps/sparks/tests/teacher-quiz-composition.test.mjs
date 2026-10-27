@@ -440,11 +440,12 @@ test('TeacherManager and shell do not own Quiz implementation state', async () =
     assert.match(shellSource, /showQuizzesView\(\{ resumeEditor: true \}\)/);
     assert.match(lazySource, /publicMethods:\s*\{\s*showQuizzesView: 'show',\s*openQuizMaker: 'open'\s*\}/);
     assert.match(lazySource, /createTeacherQuizFeature\(\{/);
-    assert.match(lazySource, /createQuizVocabularyBrowserAdapter\(manager\)/);
+    assert.match(lazySource, /createQuizVocabularyBrowserAdapter\(\{ getSubjects: \(\) => manager\.getSubjects\(\)/);
+    assert.match(adapterSource, /createTeacherVocabularyBrowserModel\(dependencies\)/);
     assert.doesNotMatch(lazySource, /^import \{ createQuizVocabularyBrowserAdapter \}/m);
     assert.match(lazySource, /await import\(['"]\.\/teacherQuizVocabularyBrowserAdapter\.js['"]\)/);
     assert.match(featureSource, /context\.quizMaker = null/);
-    assert.equal(QUIZ_VOCABULARY_BROWSER_CAPABILITIES.length, 10);
+    assert.equal(QUIZ_VOCABULARY_BROWSER_CAPABILITIES.length, 12);
     assert.match(browserSource, /this\.vocabularyBrowser\.getRowLayout\(this\.quizDrilldown\)/);
     assert.match(browserSource, /this\.vocabularyBrowser\.compareRows\(itemA, itemB, this\.quizDrilldown\)/);
     assert.match(adapterSource, /manager\.getTeacherVocabularyRowColumns\(drilldown\)/);

@@ -44,6 +44,8 @@ const [themeCss, studentCss, teacherCss, ...guardedSources] = await Promise.all(
     ...guardedStyles.map(read)
 ]);
 
+const unitMenuCss = await read('css/student-unit-menu.css');
+
 function themeBlock(selector) {
     const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const match = themeCss.match(new RegExp(`${escaped}\\s*\\{([\\s\\S]*?)\\}`));
@@ -115,9 +117,9 @@ test('app shell identity effects and activity summary meters use semantic tokens
 
     assert.doesNotMatch(landingCss(), /rgba\((?:99, 102, 241|14, 165, 233|249, 115, 22),/);
     assert.match(
-        studentCss,
+        unitMenuCss,
         /activity-menu-summary-meter div\s*\{[^}]*background:\s*var\(--color-brand\)/s,
-        'student.css meter must use --color-brand'
+        'Unit workspace meter must use --color-brand'
     );
     assert.doesNotMatch(teacherCss, /activity-menu-summary-meter/);
 });

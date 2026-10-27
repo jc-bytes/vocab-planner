@@ -14,7 +14,6 @@ import {
     writeStudentJson
 } from '../js/student/persistence/studentStorage.js';
 import {
-    MAX_SYNC_ATTEMPTS,
     classifySyncError,
     getSyncRetryDelayMs
 } from '../js/services/syncQueuePolicy.js';
@@ -50,7 +49,7 @@ test('browser storage commits drawings and ordered offline work reliably', async
     await deleteDB(db.dbName);
 });
 
-test('offline work is deduplicated, delayed, and quarantined after bounded retries', async () => {
+test('offline work is deduplicated and retries transient failures without retiring the receipt', async () => {
     const db = new ImageDB();
     await deleteDB(db.dbName);
 
@@ -64,13 +63,13 @@ test('offline work is deduplicated, delayed, and quarantined after bounded retri
     assert.equal(replaced.payload.score, 40);
 
     let record = replaced;
-    for (let attempt = 1; attempt <= MAX_SYNC_ATTEMPTS; attempt += 1) {
+    for (let attempt = 1; attempt <= 8; attempt += 1) {
         record = await db.markSyncActionFailed(record, new Error('network'));
         assert.equal(record.attempts, attempt);
     }
-    assert.equal(record.status, 'failed');
-    assert.equal((await db.getFailedSyncActions())[0].id, first.id);
-    assert.deepEqual(await db.getPendingSyncActions({ now: Date.now() + 1_000_000 }), []);
+    assert.equal(record.status, 'pending');
+    assert.deepEqual(await db.getFailedSyncActions(), []);
+    assert.equal((await db.getPendingSyncActions({ now: Date.now() + 1_000_000 }))[0].id, first.id);
 
     await db.close();
     await deleteDB(db.dbName);
@@ -329,4 +328,47 @@ test('successful unit save retires only confirmed or older snapshots atomically'
         await db.close();
         await deleteDB(db.dbName);
     }
+});
+
+test('durable queue order survives equal timestamps, coalescing and separate database connections', async () => {
+    const a = new ImageDB(), b = new ImageDB();
+    a.dbName = b.dbName = `causal-order-${crypto.randomUUID()}`;
+    const owner = { ownerUserId: 'causal-owner' };
+    try {
+        const first = await a.enqueueSyncAction('student-unit-work', {eventId:'A',unitKey:'same',snapshotOrder:1}, owner);
+        const activity = await b.enqueueSyncAction('student-activity-progress', {eventId:'C',unitKey:'same'}, owner);
+        const replacement = await a.enqueueSyncAction('student-unit-work', {eventId:'B',unitKey:'same',snapshotOrder:2}, owner);
+        assert.equal(replacement.id, first.id);
+        assert.equal(replacement.createdAt, first.createdAt);
+        assert.equal(replacement.revision, first.revision + 1);
+        assert.deepEqual((await b.getPendingSyncActions(owner)).map(r=>r.payload.eventId), ['C','B']);
+        const retried = await b.enqueueSyncAction('student-unit-work', replacement.payload, owner);
+        assert.equal(retried.queueOrder, replacement.queueOrder, 'immutable receipt retry retains causal order');
+        const concurrent = await Promise.all(Array.from({length:8}, (_,i)=>(i%2?a:b).enqueueSyncAction('student-activity-progress', {eventId:`parallel-${i}`,unitKey:`unit-${i}`}, owner)));
+        assert.equal(new Set(concurrent.map(r=>r.queueOrder)).size, 8, 'readwrite transactions serialize allocation across connections');
+        const db=await a.open(),tx=db.transaction(a.syncStoreName,'readwrite'),store=tx.objectStore(a.syncStoreName);
+        for(const row of await store.getAll()) await store.put({...row,createdAt:'2026-01-01T00:00:00.000Z'});
+        await tx.done;
+        const pending=await b.getPendingSyncActions(owner);
+        assert.deepEqual(pending.map(r=>r.queueOrder), [...pending.map(r=>r.queueOrder)].sort((x,y)=>x-y));
+        assert.equal(pending[0].id,activity.id);
+    } finally { await a.close(); await b.close(); await deleteDB(a.dbName); }
+});
+
+test('legacy causal-order fallback is stable and meaningful coalescing moves to the durable tail', async () => {
+    const db=new ImageDB();db.dbName=`legacy-order-${crypto.randomUUID()}`;
+    const options={ownerUserId:'legacy-owner'};
+    try {
+        const storage=await db.open(),tx=storage.transaction(db.syncStoreName,'readwrite'),store=tx.objectStore(db.syncStoreName);
+        for(const [id,type,payload] of [
+            ['z','student-unit-work',{eventId:'legacy-unit',unitKey:'same',snapshotOrder:1}],
+            ['a','student-activity-progress',{eventId:'legacy-activity',unitKey:'same'}]
+        ])await store.put({id,type,payload,ownerUserId:options.ownerUserId,status:'pending',revision:1,createdAt:'2026-01-01',dedupeKey:type==='student-unit-work'?'student-unit-work:unit:same':'legacy-activity'});
+        await tx.done;
+        assert.deepEqual((await db.getPendingSyncActions(options)).map(r=>r.id),['a','z']);
+        const fresh=await db.enqueueSyncAction('student-spark-response',{eventId:'fresh',sparkId:'independent'},options);
+        const coalesced=await db.enqueueSyncAction('student-unit-work',{eventId:'newer-unit',unitKey:'same',snapshotOrder:2},options);
+        assert.deepEqual((await db.getPendingSyncActions(options)).map(r=>r.payload.eventId),['legacy-activity','fresh','newer-unit']);
+        assert.ok(coalesced.queueOrder>fresh.queueOrder);
+    } finally {await db.close();await deleteDB(db.dbName);}
 });

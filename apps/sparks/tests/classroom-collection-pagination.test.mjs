@@ -11,12 +11,13 @@ function fixture({ cap = 1000, count = true, beforePage = () => {} } = {}) {
         const query = {
             select(columns, options) { call.columns = columns; call.count = options?.count; return query; },
             eq(key, value) { call.filters.push([key, value]); return query; },
+            in(key, values) { call.filters.push([key, values]); return query; },
             order(key, options) { call.orders.push([key, options?.ascending !== false]); return query; },
             range(start, end) { call.start = start; call.end = end; return query; },
             abortSignal(signal) { call.signal = signal; return query; },
             then(resolve, reject) { return Promise.resolve().then(() => {
                 beforePage(call, { controller, setScope: value => { scope = value; } });
-                let rows = (tables[table] || []).filter(row => call.filters.every(([key, value]) => row[key] === value));
+                let rows = (tables[table] || []).filter(row => call.filters.every(([key, value]) => Array.isArray(value) ? value.includes(row[key]) : row[key] === value));
                 rows = rows.toSorted((a, b) => { for (const [key, asc] of call.orders) { const comparison = String(a[key]).localeCompare(String(b[key])); if (comparison) return asc ? comparison : -comparison; } return 0; });
                 return { data: rows.slice(call.start, Math.min(call.end + 1, call.start + cap)), error: null,
                     count: count && call.count === 'exact' ? rows.length : null };
@@ -27,6 +28,18 @@ function fixture({ cap = 1000, count = true, beforePage = () => {} } = {}) {
     return { repository, calls, tables, controller, get clientCalls() { return clientCalls; } };
 }
 const rows = (n, extra = {}) => Array.from({ length: n }, (_, i) => ({ id: String(i).padStart(5, '0'), school_id: 'school-a', class_id: 'class-a', name: 'Same', title: 'Same', release_at: '2026-01-01', ...extra }));
+
+test('review metadata batches assignment IDs and survives server caps without reading answers', async () => {
+    const f = fixture({ cap: 7 });
+    const ids = Array.from({ length: 53 }, (_, i) => `assignment-${i}`);
+    f.tables.class_assignment_responses = ids.flatMap(assignment_id => rows(9).map(row => ({ assignment_id, student_id: row.id })));
+    assert.equal((await f.repository.listReviewResponses(ids)).length, 53 * 9);
+    assert.ok(f.calls.every(call => call.columns === 'assignment_id,student_id,revision,evaluation'));
+    assert.ok(f.calls.every(call => call.filters[0][1].length <= 50));
+    assert.deepEqual(await f.repository.listReviewResponses([]), []);
+    f.controller.abort();
+    await assert.rejects(f.repository.listReviewResponses(ids, { signal: f.controller.signal }), { name: 'AbortError' });
+});
 
 test('assignments beyond 1000 survive a lower server cap, tie ordering and captured school scope', async () => {
     const f = fixture({ cap: 123, beforePage: (_call, { setScope }) => setScope('school-b') });
@@ -39,7 +52,7 @@ test('assignments beyond 1000 survive a lower server cap, tie ordering and captu
         assert.deepEqual(call.filters, [['school_id', 'school-a']]);
         assert.deepEqual(call.orders, [['release_at', false], ['id', false]]);
         assert.ok(call.signal instanceof AbortSignal);
-        assert.equal(call.signal.aborted, false);
+            assert.equal(call.signal.aborted, false);
     }
     assert.equal(f.calls.filter(call => call.count === 'exact').length, 1);
 });

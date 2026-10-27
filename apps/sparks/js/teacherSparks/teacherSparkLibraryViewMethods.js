@@ -1,3 +1,4 @@
+import { renderTeacherSparkBrowser } from './teacherSparkStudentLibrary.js';
 import { schoolContext } from '../services/schoolContext.js';
 import { createElement, escapeHtml } from '../main.js';
 import { normalizeSparkCheckMode, normalizeSparkQuestions, SPARK_CHECK_MODES } from '../sparkCheckModel.js';
@@ -10,29 +11,7 @@ export const teacherSparkLibraryViewMethods = {
 renderSparkLibrary() {
         const list = this.query('#spark-library-list');
         if (!list) return;
-        list.innerHTML = '';
-
-        if (this.weeklySparkItems.length === 0) {
-            list.innerHTML = '<p class="teacher-empty-state">No Sparks yet. Add one to start the weekly routine.</p>';
-            return;
-        }
-
-        const data = this.getSparkLibraryData();
-        const help = createElement('p', 'form-helper', 'Save reusable Sparks here. Use Assign to choose classes and availability. Editing a material does not change published copies.');
-        list.appendChild(help);
-        list.appendChild(this.createSparkViewTabs(data));
-
-        const body = createElement('div', 'spark-library-body');
-        if (this.weeklySparkActiveView === 'month') {
-            this.renderSparkMonthView(body, data);
-        } else if (this.weeklySparkActiveView === 'types') {
-            this.renderSparkTypeView(body, data);
-        } else if (this.weeklySparkActiveView === 'planning') {
-            this.renderSparkPlanningView(body, data);
-        } else {
-            this.renderSparkWeekView(body, data);
-        }
-        list.appendChild(body);
+        return renderTeacherSparkBrowser(this, list);
     },
 
 createSparkOverview(data) {

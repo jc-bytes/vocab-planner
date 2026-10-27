@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, realpath, stat, lstat } from 'node:fs/promises';
 import path from 'node:path';
 import {
     DEFAULT_PRACTICE_REQUIRED_ROTATION,
@@ -161,25 +161,55 @@ export function validateVocabulary(vocabulary = {}, source = vocabulary.id || 'u
     return errors;
 }
 
-export async function loadVocabularyCatalog(workspaceRoot) {
-    const manifestPath = path.join(workspaceRoot, 'vocabularies', 'manifest.json');
-    const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-    const vocabularyRoot = `${path.join(workspaceRoot, 'vocabularies')}${path.sep}`;
-    const records = [];
+function insideDirectory(root, target) {
+    const relative = path.relative(root, target);
+    return relative && relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
+}
 
-    for (const entry of manifest.vocabularies || []) {
-        const sourcePath = path.resolve(workspaceRoot, entry.path || '');
-        if (!sourcePath.startsWith(vocabularyRoot)) {
-            throw new Error(`Vocabulary path is outside the catalog: ${entry.path}`);
+// Keep the exact bytes paired with their validated paths/IDs for delivery.
+export async function loadVocabularyCatalogBundle(workspaceRoot) {
+    const root = await realpath(workspaceRoot);
+    const vocabularyDirectory = path.join(root, 'vocabularies');
+    if ((await lstat(vocabularyDirectory)).isSymbolicLink()) throw new Error('Vocabulary directory cannot be a symbolic link');
+    const vocabularyRoot = await realpath(vocabularyDirectory);
+    if (!insideDirectory(root, vocabularyRoot)) throw new Error('Vocabulary catalog is outside the workspace');
+    const manifestFile = path.join(vocabularyRoot, 'manifest.json');
+    if ((await lstat(manifestFile)).isSymbolicLink()) throw new Error('Vocabulary manifest cannot be a symbolic link');
+    const manifestPath = await realpath(manifestFile);
+    if (!insideDirectory(vocabularyRoot, manifestPath)) throw new Error('Vocabulary manifest is outside the catalog');
+    const manifestBytes = await readFile(manifestPath);
+    const manifest = JSON.parse(manifestBytes.toString('utf8'));
+    if (!Array.isArray(manifest?.vocabularies)) throw new Error('Vocabulary manifest must contain a vocabularies array');
+    const records = [], ids = new Set(), paths = new Set();
+    for (const entry of manifest.vocabularies) {
+        if (typeof entry?.id !== 'string' || !entry.id.trim() || entry.id !== entry.id.trim() || ids.has(entry.id)) {
+            throw new Error('Vocabulary manifest has an invalid or duplicate id');
         }
-        const fileVocabulary = JSON.parse(await readFile(sourcePath, 'utf8'));
-        const vocabulary = { ...entry, ...fileVocabulary };
-        if (entry.id !== fileVocabulary.id) {
-            throw new Error(`${entry.path}: manifest id does not match file id`);
+        const catalogPath = entry.path;
+        if (catalogPath === 'vocabularies/manifest.json' || typeof catalogPath !== 'string' || !/^vocabularies\/(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+\.json$/.test(catalogPath)
+            || catalogPath.split('/').some(part => part === '.' || part === '..') || paths.has(catalogPath)) {
+            throw new Error(`Vocabulary path is invalid or duplicated: ${catalogPath}`);
         }
-        records.push({ entry, sourcePath, fileVocabulary, vocabulary });
+        let component = root;
+        for (const part of catalogPath.split('/')) {
+            component = path.join(component, part);
+            if ((await lstat(component)).isSymbolicLink()) throw new Error(`Vocabulary path contains a symbolic link: ${catalogPath}`);
+        }
+        const sourcePath = await realpath(path.resolve(root, catalogPath));
+        if (!insideDirectory(vocabularyRoot, sourcePath) || !(await stat(sourcePath)).isFile()) {
+            throw new Error(`Vocabulary path is outside the catalog: ${catalogPath}`);
+        }
+        const sourceBytes = await readFile(sourcePath);
+        const fileVocabulary = JSON.parse(sourceBytes.toString('utf8'));
+        if (entry.id !== fileVocabulary.id) throw new Error(`${catalogPath}: manifest id does not match file id`);
+        ids.add(entry.id); paths.add(catalogPath);
+        records.push({ entry, sourcePath, sourceBytes, fileVocabulary, vocabulary: { ...entry, ...fileVocabulary } });
     }
-    return records;
+    return { manifestBytes, records };
+}
+
+export async function loadVocabularyCatalog(workspaceRoot) {
+    return (await loadVocabularyCatalogBundle(workspaceRoot)).records;
 }
 
 export async function writeNormalizedVocabulary(record) {

@@ -10,6 +10,8 @@ import { ensureViteServer } from './lib/local-vite-server.mjs';
 const port = Number(process.env.UI_SECTION_RECOVERY_PORT || 8760);
 const baseUrl = `http://127.0.0.1:${port}`;
 const built = process.env.SECTION_RECOVERY_DIST === '1';
+const roles = process.env.UI_SECTION_RECOVERY_ROLE ? [process.env.UI_SECTION_RECOVERY_ROLE] : ['student', 'teacher'];
+assert.ok(roles.every(role => ['student', 'teacher'].includes(role)), 'Unknown section recovery role');
 let server, browser;
 try {
     const seeded = await seedLocalAuditData();
@@ -19,7 +21,7 @@ try {
         ...(built ? { args: ['vite', 'preview', '--outDir', 'dist-desktop', '--host', '127.0.0.1', '--port', String(port), '--strictPort'] } : {}) });
     browser = await chromium.launch();
     const output = await mkdtemp(join(tmpdir(), 'sparks-section-recovery-'));
-    for (const role of ['student', 'teacher']) {
+    for (const role of roles) {
         const context = await browser.newContext({ serviceWorkers: 'block' });
         await context.grantPermissions(['local-network-access'], { origin: baseUrl });
         await context.addInitScript(value => { window.SUPABASE_CONFIG = value; }, config);
@@ -28,29 +30,31 @@ try {
             const html = (await response.text()).replace("connect-src 'self'", `connect-src 'self' ${config.url} ${config.url.replace('http:', 'ws:')}`);
             await route.fulfill({ response, body: html });
         });
-        let unavailable = false, failPath = null;
+        let unavailable = false, failPath = null, failureStatus = 503, onReadStalled = () => {};
         const pageErrors = [];
-        const endpoint = role === 'student' ? 'my_teaching_classes_v1' : 'get_teacher_dashboard_analytics_school_v1';
+        const endpoint = role === 'student' ? 'my_teaching_classes_v1' : 'list_teaching_classes_v1';
         let stall = false;
         const stalled = [];
         await context.route('**/rest/v1/**', async route => {
             const path = new URL(route.request().url()).pathname;
             if (stall && path.endsWith(`/rpc/${endpoint}`)) {
+                onReadStalled();
                 await new Promise(resolve => stalled.push(resolve));
                 await route.continue().catch(() => {});
                 return;
             }
             if (unavailable && path.endsWith(`/rpc/${endpoint}`) || failPath && path.endsWith(failPath)) {
-                await route.fulfill({ status: 503, json: { message: 'Controlled section outage' } });
+                await route.fulfill({ status: failureStatus, json: { message: 'Controlled section outage' } });
             } else await route.continue();
         });
         let holdHomeModule = role === 'teacher';
         const heldHomeModules = [];
-        await context.route(url => /\/teacherOverview(?:-[\w-]+)?\.js$/.test(url.pathname), async route => {
+        await context.route(url => /\/teacherWorkspaceFeature(?:-[\w-]+)?\.js$/.test(url.pathname), async route => {
             if (holdHomeModule) await new Promise(resolve => heldHomeModules.push(resolve));
             await route.continue().catch(() => {});
         });
         const page = await context.newPage();
+        await page.addLocatorHandler(page.getByRole('button', { name: 'Skip guide', exact: true }), async control => control.click());
         page.on('pageerror', error => pageErrors.push(error.message));
         await page.clock.setFixedTime(new Date('2026-08-24T15:00:00Z'));
         await page.goto(`${baseUrl}/${role}.html`, { waitUntil: 'domcontentloaded' });
@@ -108,23 +112,42 @@ try {
             await sparkRecovery.getByRole('button',{name:'Try again',exact:true}).click();
             await sparkRecovery.waitFor({state:'detached'});
         } else {
-            const moduleRecovery = page.locator('#overview-recent-activity [data-section-recovery]');
+            // Home now owns class navigation. Exercise the same bounded lazy-module
+            // and fresh-read recovery through its current private workspace owner.
+            const moduleRecovery = page.locator('#teacher-overview-view [data-section-recovery]');
             await moduleRecovery.waitFor({timeout:15000});
             holdHomeModule = false;
             heldHomeModules.splice(0).forEach(resolve => resolve());
             await moduleRecovery.getByRole('button',{name:'Try again',exact:true}).click();
             await moduleRecovery.waitFor({state:'detached'});
-            await page.locator('#overview-total-students').filter({hasText:'1'}).waitFor();
+            await page.locator('#teacher-overview-view .teacher-class-card').first().waitFor();
             unavailable = true;
             await page.evaluate(() => window.teacherApp.loadTeacherOverview({forceRefresh:true}));
-            const recovery = page.locator('#overview-recent-activity [data-section-recovery]');
+            const recovery = page.locator('#teacher-overview-view [data-section-recovery]');
             await recovery.waitFor();
-            assert.ok(await page.locator('#overview-total-students').innerText() !== '--', 'Keep loaded student count');
             await assertNoAccessibilityViolations(page, `${role} section recovery`, {include:['[data-section-recovery]']});
             unavailable = false;
             await recovery.getByRole('button', {name:'Try again',exact:true}).click();
             await recovery.waitFor({state:'detached'});
+            await page.locator('#teacher-overview-view .teacher-class-card').first().waitFor();
+            failureStatus = 403; unavailable = true;
+            await page.evaluate(() => window.teacherApp.loadTeacherOverview({forceRefresh:true}));
+            await recovery.waitFor();
+            assert.match(await recovery.innerText(), /access may have changed/);
+            assert.equal(await page.locator('#teacher-overview-view .teacher-class-card').count(), 0, 'Access denial clears previous class data');
+            unavailable = false; failureStatus = 503;
+            await recovery.getByRole('button', {name:'Try again',exact:true}).click();
+            await recovery.waitFor({state:'detached'});
+            await page.locator('#teacher-overview-view .teacher-class-card').first().waitFor();
+            const readEntered = new Promise(resolve => { onReadStalled = resolve; });
+            stall = true;
+            const departedHomeRead = page.evaluate(() => window.teacherApp.loadTeacherOverview({forceRefresh:true}));
+            await readEntered;
             await page.locator('#tab-vocabulary').click();
+            stall = false; stalled.splice(0).forEach(resolve => resolve());
+            await departedHomeRead;
+            assert.equal(await page.locator('#teacher-overview-view .teacher-class-card').count(), 0, 'A departed class Home cannot paint its late read');
+
             await page.locator('#library-list button').first().waitFor();
             failPath = '/rpc/list_vocabulary_metadata_school_v1';
             await page.evaluate(() => window.teacherApp.loadLibrary({forceRefresh:true}));
@@ -134,15 +157,14 @@ try {
             failPath = null;
             await libraryRecovery.getByRole('button',{name:'Try again',exact:true}).click();
             await libraryRecovery.waitFor({state:'detached'});
-            await page.evaluate(() => window.teacherApp.showTeacherSection('overview'));
+            // A second forced private catalogue failure must remain recoverable
+            // after a healthy retry, without a full page reload.
             failPath = '/rpc/list_vocabulary_metadata_school_v1';
-            await page.evaluate(() => window.teacherApp.loadOverviewVocabCount({forceRefresh:true}));
-            const countRecovery = page.locator('[data-section-count-status] [data-section-recovery]');
-            await countRecovery.waitFor();
-            assert.equal(await page.locator('#overview-vocab-count').count(), 1, 'Count recovery preserves its render target');
+            await page.evaluate(() => window.teacherApp.loadLibrary({forceRefresh:true}));
+            await libraryRecovery.waitFor();
             failPath = null;
-            await countRecovery.getByRole('button',{name:'Try again',exact:true}).click();
-            await countRecovery.waitFor({state:'detached'});
+            await libraryRecovery.getByRole('button',{name:'Try again',exact:true}).click();
+            await libraryRecovery.waitFor({state:'detached'});
             failPath = '/weekly_sparks';
             await page.evaluate(() => window.teacherApp.showTeacherSection('sparks'));
             const sparkRecovery = page.locator('#spark-library-list [data-section-recovery]');
@@ -152,8 +174,11 @@ try {
             await sparkRecovery.waitFor({state:'detached'});
             for (const section of ['classes','assignments','review']) {
                 failPath = section === 'classes' ? '/rpc/list_teaching_classes_v1' : '/class_assignments';
-                await page.evaluate(section => window.teacherApp.showTeacherSection(section), section);
-                const sectionRecovery = page.locator(`#teacher-${section}-view [data-section-recovery]`);
+                await page.evaluate(section => {
+                    if (!teacherApp.getSelectedTeacherClassId()) teacherApp.selectTeacherClass(teacherApp.teacherClassOptions[0]?.id);
+                    teacherApp.showTeacherSection(section);
+                }, section);
+                const sectionRecovery = page.locator(`#teacher-${section === 'review' ? 'assignments' : section}-view [data-section-recovery]`);
                 await sectionRecovery.waitFor();
                 await page.setViewportSize({width:390,height:844});
                 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);

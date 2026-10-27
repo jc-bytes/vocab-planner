@@ -1,52 +1,79 @@
 import { captureStudentReport } from './studentReportSession.js';
-import { imageDB } from '../db.js';
 import { $, notifications, refreshIcons } from '../main.js';
-import { studentApi } from '../services/studentApi.js';
+import { requestWithTimeout } from '../services/requestReliability.js';
+import { schoolContext } from '../services/schoolContext.js';
 import {
     getActiveStudentStorageOwner,
     readStudentJson
 } from './persistence/studentStorage.js';
 
 export class StudentActivityWordHunt {
-    constructor(activities) {
+    constructor(activities, { loadIO = () => import('./studentWordHuntEvidenceIO.js'), timeoutMs = 30000 } = {}) {
         this.activities = activities;
         this.sm = activities.sm;
         this.wordHuntExportInProgress = false;
+        this.loadIO = loadIO;
+        this.timeoutMs = timeoutMs;
+        this.ioPromise = null;
+    }
+
+    captureEvidenceScope({ migration = false } = {}) {
+        const sm = this.sm, user = sm.currentUser, vocab = sm.currentVocab;
+        const unit = this.activities.progressFlow.getCurrentUnitProgress();
+        const unitName = vocab ? this.activities.getUnitProgressKey(vocab) : null;
+        const session = this.activities.session, load = session?.vocabularyLoadId;
+        const cloud = sm.progress?.cloud, cloudGeneration = cloud?.cloudGeneration;
+        const persistence = this.activities.progressPersistence, reset = persistence?.runtimeGeneration;
+        const school = schoolContext.getGeneration(), mode = sm.authDisabled;
+        const ownerUserId = user?.uid || user?.id;
+        const pathContext = { userId: ownerUserId, assignmentId: vocab?.assignmentId,
+            schoolYear: unit?.schoolYear, trimesterKey: unit?.trimester, grade: unit?.grade,
+            unitId: unit?.unitId, subjectSlug: unit?.subjectSlug };
+        const assertCurrent = () => {
+            if (user !== sm.currentUser || ownerUserId !== (sm.currentUser?.uid || sm.currentUser?.id)
+                || mode !== sm.authDisabled || vocab !== sm.currentVocab || pathContext.assignmentId !== sm.currentVocab?.assignmentId
+                || unitName !== (sm.currentVocab ? this.activities.getUnitProgressKey(sm.currentVocab) : null)
+                || session !== this.activities.session || load !== session?.vocabularyLoadId
+                || cloud !== sm.progress?.cloud || cloudGeneration !== cloud?.cloudGeneration
+                || reset !== persistence?.runtimeGeneration || school !== schoolContext.getGeneration()
+                || (migration && sm.progressData?.units && (sm.progressData.units[unitName]?.images !== unit?.images
+                    || sm.progressData.units[unitName]?.wordHunt !== unit?.wordHunt))) {
+                throw new DOMException('The account, school, or assignment changed.', 'AbortError');
+            }
+        };
+        return { ownerUserId, storageOwnerUserId: ownerUserId || getActiveStudentStorageOwner(), unit, unitName, pathContext, authDisabled: mode, assertCurrent,
+            signal: persistence?.runtimeController?.signal,
+            saveLocal: () => { assertCurrent(); sm.unitImages = unit.images; sm.unitWordHunt = unit.wordHunt; sm.progress.saveLocalProgress(); } };
+    }
+
+    async runEvidenceIO(scope, operation) {
+        return requestWithTimeout(async signal => {
+            const assertCurrent = () => { signal.throwIfAborted(); scope.assertCurrent(); };
+            assertCurrent();
+            if (!this.ioPromise) {
+                const pending = Promise.resolve().then(() => this.loadIO())
+                    .catch(error => { if (this.ioPromise === pending) this.ioPromise = null; throw error; });
+                this.ioPromise = pending;
+            }
+            const pending = this.ioPromise;
+            signal.addEventListener('abort', () => { if (this.ioPromise === pending) this.ioPromise = null; }, { once: true });
+            const module = await pending;
+            assertCurrent();
+            this.io ||= module.createWordHuntEvidenceIO();
+            return operation(this.io, { ...scope, signal, assertCurrent });
+        }, { signal: scope.signal, timeoutMs: this.timeoutMs, label: 'Word Hunt evidence' });
     }
 
     async uploadWordHuntImage(word, blob, imageInfo = {}) {
         if (this.sm.authDisabled || !this.sm.currentUser) return null;
-
-        const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
-        const path = studentApi.buildWordHuntImagePath({
-            userId: this.sm.currentUser.uid,
-            assignmentId: this.sm.currentVocab?.assignmentId,
-            schoolYear: unitProgress.schoolYear,
-            trimesterKey: unitProgress.trimester,
-            grade: unitProgress.grade,
-            unitId: unitProgress.unitId,
-            subjectSlug: unitProgress.subjectSlug,
-            word
-        });
-
-        await studentApi.uploadWordHuntImage({ path, blob });
-
-        const now = new Date().toISOString();
-        return {
-            hasImage: true,
-            imagePath: path,
-            imageSizeBytes: imageInfo.sizeBytes || blob.size,
-            imageWidth: imageInfo.width || null,
-            imageHeight: imageInfo.height || null,
-            imageUpdatedAt: now,
-            updatedAt: now,
-            pendingImageUpload: false
-        };
+        const scope = this.captureEvidenceScope();
+        return this.runEvidenceIO(scope, (io, owned) => io.uploadImage(owned, word, blob, imageInfo));
     }
 
     async loadWordHuntImage(path) {
         if (this.sm.authDisabled || !path) return null;
-        return studentApi.downloadWordHuntImage(path);
+        const scope = this.captureEvidenceScope();
+        return this.runEvidenceIO(scope, (io, owned) => io.loadImage(owned, path));
     }
 
     getLocalWordHuntEntries(vocab = this.sm.currentVocab) {
@@ -114,8 +141,11 @@ export class StudentActivityWordHunt {
 
     async downloadWordHuntSubmission() {
         if (!this.sm.currentVocab) return;
-        if (this.wordHuntExportInProgress) return;
-
+        const scope = this.captureEvidenceScope();
+        if (this.wordHuntExportInProgress) {
+            try { this.exportScope?.assertCurrent(); return; } catch { /* The old export no longer owns this page. */ }
+        }
+        this.exportScope = scope;
         this.wordHuntExportInProgress = true;
         this.setWordHuntExportButtonState(true);
 
@@ -129,70 +159,40 @@ export class StudentActivityWordHunt {
                 wordHunt: this.getReportWordHuntEntries(),
                 trimester: this.activities.progressFlow.getCurrentUnitProgress()?.trimester || ''
             });
-            const { ReportGenerator } = await import('../reportGenerator.js');
-            report.assertCurrent();
-            await ReportGenerator.generateWordHuntReport(report.profile, report.vocabulary, {
-                wordHunt: report.wordHunt, trimester: report.trimester,
-                ownerUserId: report.ownerUserId || getActiveStudentStorageOwner(),
-                assertCurrent: report.assertCurrent,
-                loadImage: path => { report.assertCurrent(); return this.loadWordHuntImage(path); }
-            });
+            await this.runEvidenceIO(scope, (io, owned) => io.exportReport(owned, report, path => this.loadWordHuntImage(path)));
         } catch (error) {
-            console.error('Failed to export Word Hunt PDF:', error);
-            notifications.error('Could not export Word Hunt PDF.');
+            let current = true;
+            try { scope.assertCurrent(); } catch { current = false; }
+            if (current && error.name !== 'AbortError' && error.code !== 'REQUEST_ABORTED') {
+                console.error('Failed to export Word Hunt PDF:', error);
+                notifications.error('Could not export Word Hunt PDF.');
+            }
         } finally {
-            this.wordHuntExportInProgress = false;
-            this.setWordHuntExportButtonState(false);
+            if (this.exportScope === scope) {
+                this.wordHuntExportInProgress = false;
+                this.exportScope = null;
+                try { scope.assertCurrent(); this.setWordHuntExportButtonState(false); } catch { /* Stale exports cannot update replacement UI. */ }
+            }
         }
     }
 
     async migrateLegacyWordHuntImages() {
         if (this.sm.authDisabled || !this.sm.currentUser || !this.sm.currentVocab) return;
-
-        const unitName = this.activities.getUnitProgressKey(this.sm.currentVocab);
-        const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
-        const images = unitProgress.images || {};
-        const wordHunt = unitProgress.wordHunt || {};
-        let changed = false;
-
-        for (const [word, dataUrl] of Object.entries(images)) {
-            if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) continue;
-
-            const existingEntry = wordHunt[word] || {};
-            if (existingEntry.imagePath) {
-                delete images[word];
-                changed = true;
-                continue;
-            }
-
-            try {
-                const { compressImageToWebp, dataUrlToBlob } = await import('../imageUtils.js');
-                const sourceBlob = await dataUrlToBlob(dataUrl);
-                const imageData = await compressImageToWebp(sourceBlob);
-                await imageDB.saveDrawing(unitName, word, imageData.blob, {
-                    ownerUserId: this.sm.currentUser.uid
-                });
-                const metadata = await this.uploadWordHuntImage(word, imageData.blob, imageData);
-                wordHunt[word] = {
-                    ...existingEntry,
-                    ...metadata,
-                    hasImage: true,
-                    updatedAt: metadata?.updatedAt || new Date().toISOString()
-                };
-                delete images[word];
-                changed = true;
-            } catch (error) {
-                console.warn('Could not migrate legacy Word Hunt image:', unitName, word, error);
-            }
+        const scope = this.captureEvidenceScope({ migration: true });
+        if (!Object.values(scope.unit.images || {}).some(value => typeof value === 'string' && value.startsWith('data:image/'))) return;
+        if (this.migration?.scope.unitName === scope.unitName
+            && this.migration.scope.unit.images === scope.unit.images
+            && this.migration.scope.unit.wordHunt === scope.unit.wordHunt) {
+            try { this.migration.scope.assertCurrent(); return this.migration.promise; } catch { /* New scope can retry independently. */ }
         }
-
-        if (changed) {
-            unitProgress.images = images;
-            unitProgress.wordHunt = wordHunt;
-            this.sm.unitImages = images;
-            this.sm.unitWordHunt = wordHunt;
-            this.sm.progress.saveLocalProgress();
-        }
+        const record = { scope };
+        record.promise = this.runEvidenceIO(scope, (io, owned) => io.migrateLegacyImages(owned)).catch(error => {
+            if (error.name !== 'AbortError' && error.code !== 'REQUEST_ABORTED') {
+                console.warn('Could not migrate legacy Word Hunt images:', error);
+            }
+        }).finally(() => { if (this.migration === record) this.migration = null; });
+        this.migration = record;
+        return record.promise;
     }
 
     handleIllustrationSave(vocabName, word, payload) {

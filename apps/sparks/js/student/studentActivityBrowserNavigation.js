@@ -1,3 +1,4 @@
+import { renderLibraryViewToggle } from '../learningLibraryView.js';
 import { $, createElement, refreshIcons } from '../main.js';
 import { renderStudentMonthNavigation } from './studentMonthNavigation.js';
 
@@ -114,31 +115,19 @@ export class StudentActivityBrowserNavigation {
 
     setStudentVocabularyViewMode(mode) {
         this.activities.studentVocabularyViewMode = mode === 'rows' ? 'rows' : 'cards';
-        localStorage.setItem('student_vocabulary_view_mode', this.activities.studentVocabularyViewMode);
-        this.browser.renderDashboard();
+        try {
+            localStorage.setItem('student_vocabulary_view_mode', this.activities.studentVocabularyViewMode);
+        } catch {
+            // The selected layout still works for this page when storage is full or denied.
+        }
+        this.activities.renderDashboard();
     }
 
     renderStudentVocabularyViewControls() {
         const container = $('#vocab-view-toggle');
         if (!container) return;
 
-        const currentMode = this.getStudentVocabularyViewMode();
-        container.innerHTML = `
-            <button class="vocab-view-toggle-btn segmented-control__item ${currentMode === 'cards' ? 'is-active segmented-control__item--active' : ''}" type="button" data-vocab-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
-                <i data-lucide="layout-grid"></i>
-                <span>Cards</span>
-            </button>
-            <button class="vocab-view-toggle-btn segmented-control__item ${currentMode === 'rows' ? 'is-active segmented-control__item--active' : ''}" type="button" data-vocab-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
-                <i data-lucide="list"></i>
-                <span>Rows</span>
-            </button>
-        `;
-
-        container.querySelectorAll('[data-vocab-view-mode]').forEach(button => {
-            button.addEventListener('click', () => {
-                this.setStudentVocabularyViewMode(button.dataset.vocabViewMode);
-            });
-        });
+        renderLibraryViewToggle(container, this.getStudentVocabularyViewMode(), mode => this.setStudentVocabularyViewMode(mode));
         refreshIcons(container);
     }
 

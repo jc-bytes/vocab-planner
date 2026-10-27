@@ -34,6 +34,7 @@ export function createTeacherWordHuntReviewFeature({
     isAuthenticationDisabled,
     getCurrentUser = () => null,
     getSubjects,
+    getClassScope = () => null,
     refreshIcons,
     queryService = serverStateQuery,
     repository = {
@@ -61,6 +62,7 @@ export function createTeacherWordHuntReviewFeature({
         isAuthenticationDisabled,
         getCurrentUser,
         getSubjects,
+        getClassScope,
         refreshIcons,
         queryService,
         repository,

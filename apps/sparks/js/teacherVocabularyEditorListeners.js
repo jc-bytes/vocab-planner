@@ -1,7 +1,7 @@
+import { upgradeActionMenu } from './ui/floatingActionMenu.js';
 import { $, $$, closeModal as closeDialog } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
-import { getKeyboardNavigatedTab } from './ui/tabNavigation.js';
 
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
@@ -50,34 +50,9 @@ function bindVocabularyPublishListeners(manager) {
 }
 
 function bindVocabularyToolbarMenus() {
-    const menus = $$('.vocab-editor-heading .toolbar-menu');
-    if (!menus.length) return;
-
-    menus.forEach(menu => {
-        menu.addEventListener('toggle', () => {
-            if (!menu.open) return;
-            menus.forEach(otherMenu => {
-                if (otherMenu !== menu) otherMenu.removeAttribute('open');
-            });
-        });
-
-        menu.querySelectorAll('.toolbar-menu-item').forEach(item => {
-            item.addEventListener('click', () => {
-                menu.removeAttribute('open');
-            });
-        });
-    });
-
-    document.addEventListener('click', (event) => {
-        menus.forEach(menu => {
-            if (!menu.contains(event.target)) menu.removeAttribute('open');
-        });
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key !== 'Escape') return;
-        menus.forEach(menu => menu.removeAttribute('open'));
-    });
+    for (const menu of $$('.vocab-editor-heading details.toolbar-menu')) {
+        upgradeActionMenu(menu, 'More save options');
+    }
 }
 
 function bindVocabularyEditorTabs() {
@@ -178,18 +153,11 @@ function bindVocabularyWorkflowTabs(manager) {
         tab.addEventListener('click', () => {
             manager.setVocabularyWorkflowTab(tab.dataset.vocabularyTab || 'assign');
         });
-        tab.addEventListener('keydown', (event) => {
-            const tabs = Array.from($$('.activity-workflow-tab[data-vocabulary-tab]'));
-            const nextTab = getKeyboardNavigatedTab(tabs, tab, event.key);
-            if (!nextTab) return;
-            event.preventDefault();
-            nextTab.focus();
-            manager.setVocabularyWorkflowTab(nextTab.dataset.vocabularyTab || 'assign');
-        });
     });
 }
 
 export function initTeacherVocabularyEditorListeners(manager) {
+    $('#import-vocabulary-btn')?.addEventListener('click', () => $('#import-file').click());
     $('#create-new-btn').addEventListener('click', () => {
         manager.startNewVocab();
     });
