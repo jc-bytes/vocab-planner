@@ -359,19 +359,22 @@ test('private classes enforce ownership and verified enrollment through real aut
                 assert.equal(await classCard.count(), 1, 'Only this teacher’s matching class is listed');
                 await classCard.getByText('Technology · 2026', { exact: true }).waitFor();
                 await classCard.getByRole('button', { name: 'Open class 6A', exact: true }).click();
-                await teacherView.getByRole('tab', { name: 'Students', exact: true }).click();
-                await teacherView.getByRole('button', { name: 'Invite students', exact: true }).click();
+                await teacherPage.locator('#tab-students').click();
+                const studentsView = teacherPage.locator('#teacher-class-students-view');
+                await studentsView.getByRole('region', { name: 'Class students', exact: true }).waitFor();
+                assert.equal(await teacherPage.getByLabel('Current class', { exact: true }).inputValue(), ca.id, 'Students retains the class selected in Classwork');
+                await studentsView.getByRole('button', { name: 'Invite students', exact: true }).click();
                 const inviteDialog = teacherPage.getByRole('dialog', { name: 'Invite students', exact: true });
                 await inviteDialog.getByLabel('Student emails', { exact: true }).fill(neither.email);
                 await inviteDialog.getByRole('button', { name: 'Invite students', exact: true }).click();
                 await inviteDialog.waitFor({ state: 'detached' });
-                await teacherView.locator('.class-pending-invitations summary').click();
-                await teacherView.getByText(neither.email + ' · Invited', { exact: false }).waitFor();
-                await teacherView.getByRole('tab', { name: 'Classwork', exact: true }).click();
+                await studentsView.locator('.class-pending-invitations summary').click();
+                await studentsView.getByText(neither.email + ' · Invited', { exact: false }).waitFor();
+                await teacherPage.locator('#tab-classes').click();
                 const baseline = await a.repo.listAssignments(ca.id);
                 async function publishSavedMaterial(label) {
                     await teacherPage.locator('#tab-classes').click();
-                    await teacherView.getByRole('tab', { name: 'Classwork', exact: true }).click();
+                    assert.equal(await teacherPage.getByLabel('Current class', { exact: true }).inputValue(), ca.id, 'Classwork retains the class selected in Students');
                     await teacherView.getByRole('button', { name: 'Assign material', exact: true }).click();
                     const dialog = teacherPage.getByRole('dialog', { name: 'Assign material', exact: true });
                     await dialog.locator('select[name=material]').selectOption({ label });

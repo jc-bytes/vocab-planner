@@ -350,7 +350,7 @@ async function assertDataAndSettingsTabs(page, baseUrl) {
         };
     });
 
-    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar'
+    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification'
         || settingsState.selectedTab !== 'subjects'
         || settingsState.tabListHeight > 72
         || settingsState.visiblePanels.length !== 1
