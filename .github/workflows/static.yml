@@ -38,7 +38,6 @@ jobs:
     permissions:
       contents: read
       actions: read
-      packages: read
     env:
       SUPABASE_TELEMETRY_DISABLED: "1"
       UI_SMOKE_PORT: "8560"
@@ -83,10 +82,8 @@ jobs:
           version: 2.114.0
       - name: Check Docker
         run: docker info
-      - name: Authenticate read-only container image pulls
-        env:
-          GHCR_TOKEN: ${{ github.token }}
-        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+      - name: Use the public Supabase image mirror
+        run: printf '%s\n' 'SUPABASE_INTERNAL_IMAGE_REGISTRY=public.ecr.aws' >> "$GITHUB_ENV"
       - name: Start local Supabase
         env:
           SUPABASE_TELEMETRY_DISABLED: 1
