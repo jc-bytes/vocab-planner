@@ -116,3 +116,16 @@ test('local release and actual CI reject database warning regressions', () => {
         assert.ok(validation.includes(`run: ${command}`), `Actual CI must retain ${command}`);
     }
 });
+
+
+test('compiled CI checks inherit the same hosted public configuration as the build stamp', () => {
+    const local = validation.indexOf('- name: Configure local worker lifecycle builds');
+    const release = validation.indexOf('- name: Align compiled checks with hosted build configuration');
+    const build = validation.indexOf('- name: Build site');
+    assert.ok(local >= 0 && local < release && release < build);
+    const step = validation.slice(release, build);
+    for (const [variable, secret] of [['VITE_SUPABASE_URL', 'SUPABASE_URL'], ['VITE_SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_PUBLISHABLE_KEY']]) {
+        assert.ok(step.includes(variable + ': $' + '{{ secrets.' + secret + ' }}'));
+        assert.ok(step.includes(`printf '${variable}=%s\\n' "$${variable}" >> "$GITHUB_ENV"`));
+    }
+});

@@ -112,6 +112,13 @@ jobs:
         run: supabase db lint --local --fail-on warning
       - name: Supabase advisors
         run: supabase db advisors --local --level warn --fail-on warn --type all
+      - name: Align compiled checks with hosted build configuration
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          printf 'VITE_SUPABASE_URL=%s\n' "$VITE_SUPABASE_URL" >> "$GITHUB_ENV"
+          printf 'VITE_SUPABASE_PUBLISHABLE_KEY=%s\n' "$VITE_SUPABASE_PUBLISHABLE_KEY" >> "$GITHUB_ENV"
       - name: Build site
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
