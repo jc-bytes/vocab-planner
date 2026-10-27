@@ -1,4 +1,5 @@
 import { notifications } from './notifications.js';
+import { loadStudentFeatureStyles } from './student/studentFeatureStyleLoader.js';
 import { getStudentPageSkeleton, setStudentPageLoading } from './student/studentLoadingSkeletons.js';
 import { parseHashLocation, writeHashLocation } from './services/hashRouting.js';
 
@@ -11,10 +12,13 @@ export class StudentRouting {
         this.games = null;
         this.gamesPromise = null;
         this.gamesGeneration = 0;
+        this.arcadeReadController = new AbortController();
         this.loadGamesModule = () => import('./student/studentGames.js');
     }
 
     reset() {
+        this.arcadeReadController.abort();
+        this.arcadeReadController = new AbortController();
         this.routeReady = false;
         this.isApplyingRoute = false;
         this.pendingRoute = null;
@@ -173,7 +177,12 @@ export class StudentRouting {
     }
 
     setRoute(route, options = {}) {
-        writeHashLocation(this.buildRoute(route), options);
+        const hash = this.buildRoute(route);
+        if (hash !== window.location.hash) {
+            this.arcadeReadController.abort();
+            this.arcadeReadController = new AbortController();
+        }
+        writeHashLocation(hash, options);
     }
 
     async navigateTo(route, options = {}) {
@@ -198,6 +207,8 @@ export class StudentRouting {
         if (!this.routeReady) return;
         if (!this.sm.authDisabled && !this.sm.currentUser) return;
         const route = this.parseRoute();
+        this.arcadeReadController.abort();
+        this.arcadeReadController = new AbortController();
         if (this.isApplyingRoute) {
             this.pendingRoute = route;
             return;
@@ -205,15 +216,22 @@ export class StudentRouting {
         this.applyRoute(route);
     }
 
-    findVocabByRouteId(unitId) {
+    async findVocabByRouteId(unitId) {
         const normalized = String(unitId || '').trim();
         if (!normalized) return null;
 
-        if (this.sm.activities.availableVocabs.length === 0) {
-            this.sm.activities.renderDashboard();
-        }
-
-        const visible = this.sm.activities.availableVocabs.find(vocab => this.getVocabRouteId(vocab) === normalized);
+        const route = globalThis.location?.hash;
+        const navigation = this.arcadeReadController.signal;
+        const prepared = await this.sm.activities.vocabularyData.prepareClassData({
+            signal: navigation,
+            isCurrent: () => !navigation.aborted && navigation === this.arcadeReadController.signal
+                && route === globalThis.location?.hash
+        });
+        if (!prepared?.isCurrent()) return undefined;
+        const { vocabs } = this.sm.activities.vocabularyData.getVisibleVocabularyList({
+            availableOnly: true, currentTrimesterOnly: true
+        });
+        const visible = vocabs.find(vocab => this.getVocabRouteId(vocab) === normalized);
         if (visible) return visible;
         // Archived sets remain addressable for their own grade's saved evidence.
         const grade = String(this.sm.studentProfile?.grade || '');
@@ -276,17 +294,30 @@ export class StudentRouting {
     }
 
     async showArcadeView() {
-        await this.sm.activities.refreshCurrentSparkGate?.({ updateDisplay: false });
-        const access = this.sm.activities.getPendingRequiredWork();
+        const user = this.sm.currentUser;
+        const route = window.location.hash;
+        const current = () => this.sm.currentUser === user && window.location.hash === route;
+        const { prepareArcadeEligibility, showArcadeEligibilityError } = await import('./student/studentArcadeEligibility.js');
+        let eligibility;
+        try {
+            eligibility = await prepareArcadeEligibility(this.sm, { isCurrent: current });
+            if (eligibility?.isCurrent()) this.sm.activities.renderSubjectPicker?.('#student-subject-picker');
+        } catch {
+            if (current()) showArcadeEligibilityError(this.sm);
+            return false;
+        }
+        if (!eligibility?.isCurrent()) return false;
+        const { access } = eligibility;
         this.sm.activities.updateArcadeGateDisplay(access);
         if (access.isBlocked) {
             await this.redirectToPendingRequiredWork(access);
             return false;
         }
 
+        await loadStudentFeatureStyles();
+        if (!eligibility.isCurrent()) return false;
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
-        await import('./student/studentFeatureStyles.js');
         this.sm.switchView('arcade-view');
         const arcadeView = document.getElementById('arcade-view');
         setStudentPageLoading(arcadeView, true);
@@ -294,11 +325,12 @@ export class StudentRouting {
         if (placeholder) placeholder.outerHTML = getStudentPageSkeleton('arcade', 'Loading Arcade');
         try {
             const games = await this.getGames();
-            if (!games) return false;
+            if (!games || !eligibility.isCurrent()) return false;
             await Promise.all([
                 games.updateArcadeUI(),
                 games.updateGameSelectionUI()
             ]);
+            if (!eligibility.isCurrent()) return false;
             games.updateLeaderboardGame();
             return true;
         } finally {
@@ -307,6 +339,7 @@ export class StudentRouting {
     }
 
     async redirectToPendingRequiredWork(access = this.sm.activities.getPendingRequiredWork()) {
+        this.sm.cleanupActivity();
         const next = access.next;
         if (next?.kind === 'spark' || access.spark) {
             notifications.warning('Arcade is locked. Complete today\'s Spark check first.');
@@ -351,8 +384,11 @@ export class StudentRouting {
     }
 
     async applyRouteTarget(targetRoute) {
+        const navigation = this.arcadeReadController.signal;
+        const isCurrent = () => !navigation.aborted && navigation === this.arcadeReadController.signal;
         try {
             await this.flushActivityProgressBeforeRoute(targetRoute);
+            if (!isCurrent()) return;
             if (targetRoute.view === 'classes') {
                 this.setRoute({ view: 'units' }, { replace: true });
                 this.showUnitsView();
@@ -391,7 +427,9 @@ export class StudentRouting {
             if (targetRoute.view === 'unit' || targetRoute.view === 'activity') {
                 const vocab = /^assignment\.[0-9a-f-]{36}$/.test(targetRoute.unitId || '')
                     ? { assignmentId: targetRoute.unitId.slice(11), name: 'Class assignment' }
-                    : this.findVocabByRouteId(targetRoute.unitId);
+                    : await this.findVocabByRouteId(targetRoute.unitId);
+                // Cancellation is distinct from a successfully prepared missing unit.
+                if (!isCurrent() || vocab === undefined) return;
                 if (!vocab) {
                     this.setRoute({ view: 'units' }, { replace: true });
                     this.showUnitsView();
@@ -404,6 +442,7 @@ export class StudentRouting {
                     skipActivityPreload: targetRoute.view === 'activity',
                     deferActivityMenu: targetRoute.view === 'activity' && !vocab.activitySettings?.retiredWeeklySet
                 });
+                if (!isCurrent()) return;
 
                 if (vocab.activitySettings?.retiredWeeklySet) {
                     this.setRoute({ view: 'unit', unitId: this.getVocabRouteId(vocab) }, { replace: true });
@@ -430,20 +469,10 @@ export class StudentRouting {
                     hasWordParam: targetRoute.hasWordParam,
                     wordWasInvalid: targetRoute.wordWasInvalid
                 });
-
-                if (targetRoute.activityType === 'illustration') {
-                    const restoredWord = (this.sm.activityInstance?.currentIndex || 0) + 1;
-                    if (targetRoute.wordWasInvalid || !targetRoute.hasWordParam || requestedWord !== restoredWord) {
-                        this.setRoute({
-                            view: 'activity',
-                            unitId: this.getCurrentVocabRouteId(),
-                            activityType: 'illustration',
-                            word: restoredWord
-                        }, { replace: true });
-                    }
-                }
             }
         } catch (error) {
+            if (!isCurrent()) return;
+            if (error.name === 'AbortError' || error.code === 'REQUEST_ABORTED') return;
             console.error('Could not apply student route:', error);
             notifications.error('This page could not load. Please try again.');
         }

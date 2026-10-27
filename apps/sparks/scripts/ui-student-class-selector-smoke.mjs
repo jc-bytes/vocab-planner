@@ -6,6 +6,7 @@ import { createClassroomRepository } from '../js/services/classroomRepository.js
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 import { AUDIT_PASSWORD, AUDIT_STUDENT_EMAIL, AUDIT_TEACHER_EMAIL, seedLocalAuditData, getBrowserSupabaseConfig } from './lib/local-supabase-audit.mjs';
 import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
+import { seedReturningStudentGuidePreferences } from './lib/student-guide-fixture.mjs';
 
 const port = 8074, baseUrl = `http://127.0.0.1:${port}`;
 const output = '/tmp/sparks-student-class-selector';
@@ -36,6 +37,7 @@ try {
     await context.routeWebSocket(url => url.host === `127.0.0.1:${port}`, socket => socket.close());
     await context.addInitScript(value => { window.SUPABASE_CONFIG = value; }, config);
     page = await context.newPage();
+    await seedReturningStudentGuidePreferences(page, seeded.users.student.id);
     await page.clock.setFixedTime(new Date('2026-10-15T15:00:00Z'));
     const errors = [], writes = [];
     let classReads = 0;
@@ -130,9 +132,18 @@ try {
         const options = root.querySelectorAll('.student-subject-option').length;
         repository.readAssignment = () => new Promise(resolve => { resolveOld = resolve; });
         const old = selection.load({forceRefresh:true});
-        while (!resolveOld) await new Promise(resolve => setTimeout(resolve, 0));
+        // Observe cancellation before reset so the intentional rejection cannot
+        // escape as an unhandled browser error. Other failures remain failures.
+        const cancelled = old.then(() => { throw new Error('Reset did not cancel the old class read.'); }, error => {
+            if (error.name !== 'AbortError' || error.message !== 'Class loading cancelled') throw error;
+        });
+        const deadline = performance.now() + 3000;
+        while (!resolveOld) {
+            if (performance.now() >= deadline) throw new Error('The held class assignment read was not reached.');
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
         manager.currentUser = { uid: 'two' }; selection.reset();
-        resolveOld({ id: 'b', kind: 'vocabulary', content: {}, title: 'Old unit' }); await old;
+        resolveOld({ id: 'b', kind: 'vocabulary', content: {}, title: 'Old unit' }); await cancelled;
         const isolated = !selection.vocabs.length && !selection.classes.length;
         classes = []; await selection.load(); selection.render(root);
         const empty = root.querySelector('.student-subject-trigger').disabled && !selection.selectedId;

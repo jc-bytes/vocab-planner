@@ -129,7 +129,7 @@ test('manager accessors preserve existing direct subject-state consumers', () =>
     assert.equal(manager.studentVocabularyAutoSelect, true);
 });
 
-test('subject selection resets drilldown, updates routing, and rerenders student views', () => {
+test('subject selection resets drilldown, updates routing, and rerenders only the current view', () => {
     localValues.clear();
     const calls = [];
     const manager = createManager();
@@ -151,8 +151,7 @@ test('subject selection resets drilldown, updates routing, and rerenders student
     assert.equal(localValues.get('student_selected_subject'), 'science');
     assert.deepEqual(calls, [
         ['route', { view: 'units' }, { replace: true }],
-        ['dashboard'],
-        ['home']
+        ['dashboard']
     ]);
 });
 

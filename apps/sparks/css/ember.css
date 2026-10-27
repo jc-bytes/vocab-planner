@@ -1,0 +1,34 @@
+/* Ember guidance. The activity's normal inline guide is replaced here. */
+
+.ember-spotlight { position: fixed; inset: 0; margin: 0; padding: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; border: 0; background: transparent; color: #eef3ff; overflow: hidden; }
+.ember-spotlight::backdrop { background: transparent; }
+.ember-spotlight-hole { position: absolute; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(3,8,20,.83); outline: 2px solid #fbbf24; pointer-events: none; }
+.ember-spotlight-popup { position: absolute; box-sizing: border-box; width: min(380px, calc(100vw - 24px)); padding: 16px; border: 1px solid #b78a38; border-radius: 16px; background: #172238; box-shadow: 0 12px 40px #0009; display: grid; grid-template-columns: 88px minmax(0,1fr); gap: 12px; }
+.ember-spotlight-popup img { object-fit: contain; }
+.ember-spotlight-popup h2 { font-size: 1.1rem; margin: 0 0 8px; }
+.ember-spotlight-popup p { margin: 0; line-height: 1.4; }
+.ember-spotlight-count { font-size: .75rem; color: #cbd5e1; margin-bottom: 5px !important; }
+.ember-spotlight-popup nav { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.ember-spotlight-popup button { min-height: 44px; padding: 8px 12px; }
+.ember-spotlight-popup button:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
+.ember-idle-prompt { max-width: 940px; margin: 0 auto 16px; padding: 12px; box-sizing: border-box; border: 1px solid #b78a38; border-radius: 12px; background: #172238; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ember-idle-prompt img { object-fit: contain; }
+.ember-idle-prompt p { flex: 1 1 180px; margin: 0; }
+.ember-idle-prompt button { min-height: 44px; }
+
+
+.ember-retry-offer { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px; padding:12px; }
+.activity-header-actions { flex-wrap:wrap; }
+.ember-context-help { min-height:44px; white-space:normal; }
+
+.student-top-bar .student-sidebar-context:has(.ember-context-help, .ember-help-button) { gap:12px; }
+.student-top-bar :is(.ember-context-help, .ember-help-button) { flex:0 0 auto; min-height:44px; padding:8px 12px; white-space:nowrap; }
+@media (max-width:1120px) {
+ .app-container:has(#student-tab-shell:not(.hidden)) > .student-top-bar:has(.ember-context-help, .ember-help-button) { display:flex; padding:8px 12px; }
+ .student-top-bar:has(.ember-context-help, .ember-help-button) > .student-sidebar-context { display:flex; align-items:center; gap:8px; width:100%; min-width:0; }
+ .student-top-bar .student-subject-picker { flex:1; min-width:0; }
+ .student-top-bar .student-class-picker { width:100%; min-width:0; }
+ .student-top-bar > .header-left { display:none; }
+}
+
+.app-container:has(.student-top-bar .ember-context-help, .student-top-bar .ember-help-button) :is(#vocab-subject-picker, #spark-subject-picker) { display:none !important; }

@@ -1,3 +1,4 @@
+import { schoolContext } from '../services/schoolContext.js';
 import { selectStudentAssignmentSchool, waitStudentSchoolReady } from './studentSchoolSession.js';
 import { weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
 import { $, createElement, escapeHtml } from '../main.js';
@@ -18,15 +19,58 @@ export class StudentActivityVocabularyData {
 
     }
 
-    async loadClassSelection(options) {
+    async loadClassSelection(options = {}) {
         if (this.sm.authDisabled) return;
-        const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
+        const user = this.sm.currentUser;
+        const owner = user?.uid || user?.id;
+        const cloud = this.sm.progress?.cloud;
+        const generation = cloud?.cloudGeneration;
+        const current = () => user === this.sm.currentUser && cloud === this.sm.progress?.cloud
+            && generation === cloud?.cloudGeneration && !options.signal?.aborted
+            && (options.isCurrent?.() ?? true);
         const { StudentClassSelection } = await import('./studentClassSelection.js');
-        if (!owner || owner !== (this.sm.currentUser?.uid || this.sm.currentUser?.id)) return false;
+        if (!owner || !current()) return false;
         this.classSelection ||= new StudentClassSelection(this.sm);
         await this.classSelection.load(options);
-        await waitStudentSchoolReady(this.sm);
-        return owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id);
+        if (!current()) return false;
+        await waitStudentSchoolReady(this.sm, options);
+        return current();
+    }
+
+    async prepareClassData(options = {}) {
+        const user = this.sm.currentUser;
+        const mode = this.sm.authDisabled;
+        const cloud = this.sm.progress?.cloud;
+        const generation = cloud?.cloudGeneration;
+        const current = () => this.sm.authDisabled === mode && this.sm.currentUser === user && this.sm.progress?.cloud === cloud
+            && cloud?.cloudGeneration === generation && !options.signal?.aborted && (options.isCurrent?.() ?? true);
+        if (!current()) return null;
+        if (!this.sm.authDisabled) {
+            let classRead;
+            let loaded;
+            try {
+                loaded = await requestWithTimeout(signal => this.loadClassSelection({
+                    ...options, signal, isCurrent: () => current() && !signal.aborted,
+                    onPending: (selection, read) => { classRead = { selection, read }; options.onPending?.(selection, read); }
+                }), { signal: options.signal, timeoutMs: options.timeoutMs || 10000, label: 'Loading class assignments' });
+            } catch (error) {
+                if (error.code === 'REQUEST_TIMEOUT') classRead?.selection.cancelRead(classRead.read);
+                throw error;
+            }
+            if (loaded === false || !current()) return null;
+            const selection = this.classSelection;
+            if (!selection?.ready || selection.owner !== (user?.uid || user?.id)
+                || selection.readySchoolGeneration !== schoolContext.getGeneration()) {
+                throw new Error('Class assignments are not ready. Please try again.');
+            }
+        }
+        if (!current()) return null;
+        const selection = this.classSelection;
+        const classGeneration = selection?.generation;
+        const schoolGeneration = schoolContext.getGeneration();
+        return { isCurrent: () => current() && schoolGeneration === schoolContext.getGeneration()
+            && (this.sm.authDisabled || selection === this.classSelection && selection.ready
+                && selection.generation === classGeneration) };
     }
 
     async loadManifest() {
@@ -168,7 +212,6 @@ export class StudentActivityVocabularyData {
             }
         }
 
-        this.activities.availableVocabs = vocabs;
         return { vocabs, message: '' };
     }
 
@@ -256,7 +299,13 @@ export class StudentActivityVocabularyData {
         const session = this.activities.session;
         const loadId = session.beginVocabularyLoad();
         const signal = session.vocabularyLoadController.signal;
-        const isCurrentLoad = () => session.isVocabularyLoadCurrent(loadId) && !signal.aborted;
+        const user = this.sm.currentUser, mode = this.sm.authDisabled;
+        const cloud = this.sm.progress?.cloud, cloudGeneration = cloud?.cloudGeneration;
+        let navigation = this.sm.routing?.arcadeReadController?.signal;
+        const isCurrentLoad = () => session.isVocabularyLoadCurrent(loadId) && !signal.aborted
+            && user === this.sm.currentUser && mode === this.sm.authDisabled
+            && cloud === this.sm.progress?.cloud && cloudGeneration === cloud?.cloudGeneration
+            && !navigation?.aborted && navigation === this.sm.routing?.arcadeReadController?.signal;
         this.renderVocabularyLoading(vocabMeta, options);
 
         if (vocabMeta.assignmentId) {
@@ -300,12 +349,16 @@ export class StudentActivityVocabularyData {
             const unitId = this.sm.getCurrentVocabRouteId();
             if (unitId) {
                 this.sm.setRoute({ view: 'unit', unitId });
+                // Only this current load's deliberate unit normalization renews
+                // its lease; an external away/back navigation never does.
+                navigation = this.sm.routing?.arcadeReadController?.signal;
             }
         }
 
         if (!options.deferActivityMenu) {
-            this.activities.menu.showActivityMenu(options);
+            await this.activities.menu.showActivityMenu(options);
         }
+        if (!isCurrentLoad()) return;
 
         const pendingOverride = overridePromise
             .then(async override => {
@@ -314,7 +367,7 @@ export class StudentActivityVocabularyData {
                     const merged = this.mergeVocabularyData({ meta: vocabMeta, fileData, override });
                     this.applyVocabularyData(merged);
                     if (!options.deferActivityMenu && !this.sm.currentActivityType) {
-                        this.activities.menu.showActivityMenu(options);
+                        await this.activities.menu.showActivityMenu(options);
                     }
                 }
                 await this.activities.wordHunt.migrateLegacyWordHuntImages();

@@ -94,6 +94,30 @@ export async function compressImageToWebp(fileOrBlob, options = {}) {
 }
 
 export async function dataUrlToBlob(dataUrl) {
-    const response = await fetch(dataUrl);
-    return response.blob();
+    // Decode locally: fetch(data:) is blocked by the student's connect-src policy.
+    const url = new URL(dataUrl);
+    if (url.protocol !== 'data:') throw new TypeError('An image data URL is required.');
+    const serialized = url.href.split('#', 1)[0];
+    const comma = serialized.indexOf(',');
+    if (comma < 0) throw new TypeError('Invalid data URL.');
+    let type = serialized.slice(5, comma).trim();
+    const base64 = /; *base64$/i.test(type);
+    if (base64) type = type.replace(/; *base64$/i, '');
+    // Browser data-URL fetches expose the MIME essence on their returned Blob.
+    type = type.split(';', 1)[0].trim();
+    if (!/^[!#$%&'*+.^_`|~0-9a-z-]+\/[!#$%&'*+.^_`|~0-9a-z-]+$/i.test(type)) type = 'text/plain';
+    const encoded = new TextEncoder().encode(serialized.slice(comma + 1));
+    const bytes = [];
+    const hex = value => (value >= 48 && value <= 57) || (value >= 65 && value <= 70) || (value >= 97 && value <= 102);
+    for (let i = 0; i < encoded.length; i++) {
+        if (encoded[i] === 37 && hex(encoded[i + 1]) && hex(encoded[i + 2])) {
+            bytes.push(parseInt(String.fromCharCode(encoded[++i], encoded[++i]), 16));
+        } else bytes.push(encoded[i]);
+    }
+    if (!base64) return new Blob([new Uint8Array(bytes)], { type });
+    // Percent decoding precedes forgiving-base64 decoding, including whitespace/unpadded input.
+    let text = '';
+    for (let i = 0; i < bytes.length; i += 16384) text += String.fromCharCode(...bytes.slice(i, i + 16384));
+    const decoded = atob(text);
+    return new Blob([Uint8Array.from(decoded, character => character.charCodeAt(0))], { type });
 }

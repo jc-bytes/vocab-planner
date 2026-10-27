@@ -197,6 +197,7 @@ export function normalizeSchoolCalendar(calendar, fallbackDate = new Date()) {
 
     return {
         schoolYear,
+        ...(source.academicYears ? { academicYears: source.academicYears } : {}),
         classSchedules: normalizeClassSchedules(source.classSchedules || source.class_schedules),
         trimesters: {
             IT: normalizeTrimesterRange(sourceTrimesters.IT, fallback.trimesters.IT),

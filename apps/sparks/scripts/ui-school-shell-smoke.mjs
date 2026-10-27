@@ -10,17 +10,27 @@ try{
   const {supabaseService}=await import('/js/supabaseService.js');window.schoolCalls=[];
   const user={uid:'platform-admin',id:'platform-admin',email:'admin@example.org',displayName:'Admin'};
   const client={auth:{onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},rpc(name,args){window.schoolCalls.push([name,args]);let data=name==='list_school_members_page_v1'?{members:[],total:0,limit:25,offset:0}:[];
+   if(name==='list_teaching_classes_v1')data=[{id:'test-class',school_id:'b',name:'Test class',school_year:2026,subject:{name:'Technology'},canTeach:(window.schoolRoles||[]).includes('teacher')}];
    if(name==='my_school_access_v1')data={platformAdmin:true,schools:['a','b'].map(id=>({id,name:`School ${id}`,timezone:'America/Panama',active:true,roles:window.schoolRoles||[]}))};
    const query={then(resolve){return Promise.resolve({data,error:null}).then(resolve);},abortSignal(){return query;}};return query;
   }};
+  client.from=()=>{const q={select(){return q;},eq(){return q;},order(){return q;},range(){return q;},abortSignal(){return q;},then(resolve){return Promise.resolve({data:[],error:null,count:0}).then(resolve);}};return q;};
   supabaseService.init=async()=>{};supabaseService.getCurrentUser=()=>user;supabaseService.getClient=()=>client;supabaseService.onAuthStateChanged=()=>()=>{};
   await import('/js/teacher.js');
  });
- await page.getByRole('heading',{name:'Schools and administration'}).waitFor();
+ await page.getByRole('heading',{name:'School settings',exact:true}).waitFor();
  assert.equal(await page.locator('#teacher-tabs [data-section="settings"]').isVisible(),false);
- await page.getByLabel('School',{exact:true}).selectOption('b');
+ assert.equal(await page.getByLabel('School',{exact:true}).count(),0);
+ assert.equal(await page.getByRole('heading',{name:'Create school and invite administrator',exact:true,includeHidden:true}).count(),0);
+ await page.locator('#tab-platform').click();
+ await page.getByRole('heading',{name:'Platform administration',exact:true}).waitFor();
+ assert.equal(await page.getByRole('heading',{name:'School members',exact:true}).isVisible(),false);
+ assert.equal(await page.evaluate(()=>window.location.hash),'#/teacher/platform');
+ await page.getByRole('button',{name:'Actions for School b',exact:true}).click();
+ await page.getByRole('menuitem',{name:'School settings for School b',exact:true}).click();
  await page.waitForFunction(()=>document.getElementById('teacher-school-name')?.textContent==='School b');
- await page.getByRole('heading',{name:'Create school and invite administrator',exact:true}).waitFor();
+
+ await page.getByRole('heading',{name:'School settings',exact:true}).waitFor();
  assert.equal(await page.locator('[data-publish-material]').isVisible(),false);
  assert.equal(await page.evaluate(()=>window.teacherApp.isAuthenticated),true);
  assert.equal(await page.evaluate(()=>window.schoolCalls.filter(([name])=>name==='my_school_access_v1').length),1);
@@ -49,11 +59,33 @@ try{
   await schoolContext.load('platform-admin');
  });
  assert.equal(await page.locator('[data-publish-material]').isVisible(),false);
+ await page.evaluate(()=>window.teacherApp.showTeacherSection('classes',{classId:'test-class',tab:'work'}));
+ await page.waitForFunction(()=>document.querySelector('#teacher-classes-view').getAttribute('aria-busy')==='false');
+ assert.equal(await page.locator('#teacher-classes-view').getByRole('button',{name:'Assign material',exact:true}).count(),0);
  await page.evaluate(async()=>{
   window.schoolRoles=['school_admin','teacher'];
   const {schoolContext}=await import('/js/services/schoolContext.js');
   await schoolContext.load('platform-admin');
  });
- assert.equal(await page.locator('[data-publish-material]').evaluate(button=>button.hidden||button.classList.contains('hidden')),false);
+ await page.evaluate(()=>window.teacherApp.showTeacherSection('overview'));
+ await page.locator('#teacher-overview-view').getByRole('button',{name:'Open class Test class',exact:true}).click();
+ await page.locator('#teacher-classes-view').getByRole('button',{name:'Assign material',exact:true}).waitFor();
+ assert.equal(await page.getByLabel('Current class',{exact:true}).inputValue(),'test-class');
+ await page.evaluate(async()=>{
+  const client=window.teacherApp.schoolAccess;
+  const {supabaseService}=await import('/js/supabaseService.js');
+  const original=supabaseService.getClient().rpc;
+  supabaseService.getClient().rpc=(name,args)=>{
+   if(name!=='my_school_access_v1')return original(name,args);
+   const query={then(resolve){return Promise.resolve({data:{platformAdmin:false,schools:[{id:'b',name:'School b',active:true,roles:['school_admin']}]},error:null}).then(resolve);},abortSignal(){return query;}};
+   return query;
+  };
+  await client.load('platform-admin');
+ });
+ await page.getByRole('heading',{name:'School settings',exact:true}).waitFor();
+ assert.equal(await page.locator('#tab-platform').isVisible(),false);
+ await page.evaluate(()=>window.teacherApp.applyRoute({view:'platform'}));
+ assert.equal(await page.locator('#teacher-platform-view').isVisible(),false);
+ assert.equal(await page.getByRole('heading',{name:'School settings',exact:true}).isVisible(),true);
  console.log('Actual teacher shell school switching and student assignment snapshot loading passed.');
 }finally{await browser?.close();server?.kill();}

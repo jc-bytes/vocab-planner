@@ -33,6 +33,7 @@ export function createTeacherSparksFeature({
     publishMaterial,
     isAuthenticationDisabled,
     getCurrentUser,
+    getSchoolCalendar,
     refreshIcons,
     queryService = serverStateQuery,
     repository = sparksRepository,
@@ -48,6 +49,7 @@ export function createTeacherSparksFeature({
         publishMaterial,
         isAuthenticationDisabled,
         getCurrentUser,
+        getSchoolCalendar,
         refreshIcons,
         queryService,
         repository,
@@ -75,6 +77,7 @@ export function createTeacherSparksFeature({
         void context.invalidateWeeklySparks().catch(error => {
             console.warn('Could not invalidate the Teacher Sparks query during cleanup:', error);
         });
+        context.sparkBrowserGeneration = (context.sparkBrowserGeneration || 0) + 1;
         context.weeklySparkItems = [];
         context.editingSparkId = null;
         context.sparkModalMode = 'create';

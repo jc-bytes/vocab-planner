@@ -51,21 +51,28 @@ export default defineConfig(({ command, mode }) => {
       outDir: 'dist-desktop',
       emptyOutDir: true,
       manifest: true,
+      // Compress shared startup code without moving required code outside the budget.
+      minify: 'terser',
+      terserOptions: { compress: { passes: 2 } },
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'index.html'),
           student: resolve(__dirname, 'student.html'),
+          studentPreview: resolve(__dirname, 'student-preview.html'),
           teacher: resolve(__dirname, 'teacher.html')
         },
         output: {
           // Keep shared helpers out of feature chunks so they do not pull the
           // entire feature into another entry point.
           manualChunks(id) {
+            if (id.includes('vite/preload-helper')) return 'preload-helper';
             if (id.endsWith('/js/randomUtils.js')) return 'random-utils';
             if (id.includes('node_modules/@supabase')) return 'supabase-vendor';
             if (id.includes('node_modules/chart.js')) return 'teacher-charts';
             if (id.includes('node_modules/focus-trap') || id.includes('node_modules/tabbable') || id.endsWith('/js/main.js') || id.endsWith('/js/notifications.js')) return 'app-shared';
-            if (id.includes('node_modules/idb/') || id.endsWith('/js/db.js')) return 'student-storage';
+            if (id.endsWith('/js/student/persistence/studentStorage.js') || id.endsWith('/js/services/syncQueuePolicy.js')) return 'student-storage-policy';
+            if (id.includes('node_modules/idb/')) return 'student-idb';
+            if (id.endsWith('/js/db.js')) return 'student-storage';
             if (id.endsWith('/js/quizMaker.js')) return 'teacher-quiz-maker';
           }
         }

@@ -57,7 +57,7 @@ class TeacherShellMethods {
     }
 
     switchView(viewId, options = {}) {
-        this.deactivateTeacherWorkspace?.();
+        this.deactivateTeacherWorkspace?.(viewId);
         const targetView = document.getElementById(viewId);
         TEACHER_VIEW_IDS.forEach(id => {
             const el = document.getElementById(id);
@@ -74,7 +74,11 @@ class TeacherShellMethods {
         $('#teacher-tab-shell')?.classList.toggle('hidden', !isTeacherView);
         this.setActiveTeacherTab(this.getSectionForView(viewId));
         this.closeTeacherMobileMenu();
+        document.dispatchEvent?.(new CustomEvent('teacher-shell-view', { detail: { viewId, authenticated: this.isAuthenticated } }));
         if (options.updateRoute !== false) this.updateTeacherRouteForView(viewId);
+        if (isTeacherView) this.getSelectedTeacherClassId?.();
+        this.updateTeacherClassSwitcher?.();
+        if (isTeacherView && !['administration', 'platform', 'settings'].includes(this.getSectionForView(viewId))) void this.refreshTeacherClassSelector?.();
         this.refreshIcons(targetView);
     }
 
@@ -177,7 +181,14 @@ class TeacherShellMethods {
 
     showTeacherSection(sectionId, options = {}) {
         if (!this.ensureAuthenticated(false)) return;
+        if (sectionId === 'review') {
+            sectionId = 'assignments';
+            options = { ...options, tab: options.tab || (options.assignmentId ? 'student-work' : 'needs-review') };
+        }
         if (!this.authDisabled && !canOpenSchoolSection(sectionId)) sectionId = 'administration';
+        const scoped = this.resolveTeacherClassRoute({ view: sectionId, ...options });
+        sectionId = scoped.view;
+        options = { ...options, ...scoped };
         this.closeTeacherMobileMenu();
         this.beginTeacherNavigation();
         const primaryPage = teacherPageRegistry.get(sectionId);
@@ -194,12 +205,15 @@ class TeacherShellMethods {
                         ? 'subjects'
                         : undefined;
                 this.setRoute(
-                    { view: primaryPage.id, classId: options.classId, assignmentId: options.assignmentId, tab: options.tab || defaultTab },
+                    { view: primaryPage.id, classId: options.classId, assignmentId: options.assignmentId, listTab: options.listTab, tab: options.tab || defaultTab },
                     { replace: options.replaceRoute === true }
                 );
             }
         }
         switch (sectionId) {
+            case 'platform':
+                this.showPlatformAdministration();
+                break;
             case 'administration':
                 this.showSchoolAdministration();
                 break;

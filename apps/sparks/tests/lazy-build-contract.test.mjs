@@ -12,7 +12,12 @@ function createValidManifest() {
     student: { name: 'student', file: 'student.js', imports: ['shared'], dynamicImports: [] },
     teacher: { name: 'teacher', file: 'teacher.js', imports: ['shared'], dynamicImports: [] },
     shared: { name: 'shared', file: 'shared.js' },
-    'js/student/studentFeatureStyles.js': { file: 'student-features.css' }
+    'js/services/classroomStudentWrites.js': { file: 'classroom-student-writes.js', isDynamicEntry: true },
+    'js/student/studentFeatureStyles.js': { file: 'student-features.css' },
+    'js/student/studentHomeRenderer.js': { file: 'student-home-renderer.js', isDynamicEntry: true },
+    'js/supabaseStudentWriteOperations.js': { file: 'student-write-operations.js', isDynamicEntry: true },
+    'js/supabaseTeacherProfileOperations.js': { file: 'teacher-profile-operations.js', isDynamicEntry: true },
+    'js/services/passwordChangeOperation.js': { file: 'password-change-operation.js', isDynamicEntry: true }
   };
   for (const { parent, children } of REQUIRED_LAZY_EDGES) {
     const parentKey = Object.keys(manifest).find(key => manifest[key].name === parent) || parent;
@@ -73,6 +78,25 @@ test('student and teacher initial graphs reject optional features, activities, a
   classrooms['js/services/classroomRepository.js'] = { file: 'classroomRepository.js' };
   classrooms.student.imports.push('js/services/classroomRepository.js');
   assert.throws(() => validateLazyBuildContracts(classrooms), /student loads the optional classroom repository eagerly/);
+
+  const home = createValidManifest();
+  home.student.imports.push('js/student/studentHomeRenderer.js');
+  assert.throws(() => validateLazyBuildContracts(home), /student loads deferred asset js\/student\/studentHomeRenderer\.js eagerly/);
+
+  for (const entry of ['student', 'teacher']) {
+    const classroomWrites = createValidManifest();
+    classroomWrites[entry].imports.push('js/services/classroomStudentWrites.js');
+    assert.throws(() => validateLazyBuildContracts(classroomWrites), /loads deferred asset js\/services\/classroomStudentWrites\.js eagerly/);
+    const writes = createValidManifest();
+    writes[entry].imports.push('js/supabaseStudentWriteOperations.js');
+    assert.throws(() => validateLazyBuildContracts(writes), /loads deferred asset js\/supabaseStudentWriteOperations\.js eagerly/);
+    const password = createValidManifest();
+    password[entry].imports.push('js/services/passwordChangeOperation.js');
+    assert.throws(() => validateLazyBuildContracts(password), /loads deferred asset js\/services\/passwordChangeOperation\.js eagerly/);
+    const profiles = createValidManifest();
+    profiles[entry].imports.push('js/supabaseTeacherProfileOperations.js');
+    assert.throws(() => validateLazyBuildContracts(profiles), /loads deferred asset js\/supabaseTeacherProfileOperations\.js eagerly/);
+  }
 });
 
 test('duplicate manifest names and broken static imports fail clearly', () => {

@@ -19,19 +19,21 @@ export function installTeacherRoutingMethods(TeacherManager) {
             const { parts, params } = location;
 
             if (parts[0] !== 'teacher') return null;
-            if (parts[1] === 'administration') return { view: 'administration' };
+            if (['administration', 'platform'].includes(parts[1])) return { view: parts[1] };
             if (!parts[1] || parts[1] === OVERVIEW_PAGE.id) return { view: OVERVIEW_PAGE.id };
             if (['classes', 'assignments', 'review'].includes(parts[1])) return {
-                view: parts[1], classId: params.get('class') || null,
-                assignmentId: params.get('assignment') || null, tab: params.get('tab') || undefined
+                view: parts[1] === 'review' ? 'assignments' : parts[1], classId: params.get('class') || null,
+                assignmentId: params.get('assignment') || null,
+                tab: params.get('tab') || (parts[1] === 'review' ? params.has('assignment') ? 'student-work' : 'needs-review' : undefined),
+                ...(params.has('listTab') ? { listTab: params.get('listTab') } : {})
             };
             if (parts[1] === STUDENTS_PAGE.id && parts[2]) {
                 const tab = ['overview', 'assigned', 'activity', 'account'].includes(params.get('tab'))
                     ? params.get('tab')
                     : 'overview';
-                return { view: 'student-profile', studentId: parts[2], tab };
+                return { view: 'student-profile', studentId: parts[2], tab, ...(params.has('class') ? { classId: params.get('class') } : {}) };
             }
-            if (parts[1] === STUDENTS_PAGE.id) return { view: STUDENTS_PAGE.id };
+            if (parts[1] === STUDENTS_PAGE.id) return { view: STUDENTS_PAGE.id, ...(params.has('class') ? { classId: params.get('class') } : {}) };
             if (parts[1] === GROUPS_PAGE.id) return { view: GROUPS_PAGE.id, ...(params.has('class') ? { classId: params.get('class') } : {}) };
             if (parts[1] === 'word-hunt') return { view: VOCABULARY_PAGE.id, mode: 'review' };
             if (parts[1] === SPARKS_PAGE.id && parts[2] === 'editor') return { view: 'spark-editor', materialId: parts[3] || null };
@@ -41,24 +43,25 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (parts[1] === 'quizzes') return { view: 'quizzes' };
             if (parts[1] === DATA_PAGE.id) {
                 const tab = params.get('tab') || 'dashboard';
-                if (tab === 'export') return { view: 'review' };
+                if (tab === 'export') return { view: 'assignments', tab: 'needs-review' };
                 if (['view', 'reset'].includes(tab)) return { view: SETTINGS_PAGE.id, tab: 'subjects' };
                 return { view: OVERVIEW_PAGE.id };
             }
             if (parts[1] === SETTINGS_PAGE.id) {
-                if (params.get('tab') === 'export') return { view: 'review' };
+                if (params.get('tab') === 'export') return { view: 'assignments', tab: 'needs-review' };
                 return { view: SETTINGS_PAGE.id, tab: ['view', 'reset'].includes(params.get('tab')) ? 'subjects' : params.get('tab') || undefined };
             }
             if (parts[1] === 'data-settings') {
                 const tab = params.get('tab') || undefined;
                 if (tab === 'dashboard') return { view: OVERVIEW_PAGE.id };
-                if (tab === 'export') return { view: 'review' };
+                if (tab === 'export') return { view: 'assignments', tab: 'needs-review' };
                 return { view: SETTINGS_PAGE.id, tab };
             }
             if (parts[1] === VOCABULARY_PAGE.id && parts[2] === 'editor') {
                 return {
                     view: 'editor',
-                    vocabularyId: parts[3] || params.get('id') || null
+                    vocabularyId: parts[3] || params.get('id') || null,
+                    ...((parts[3] || params.get('id')) && params.get('copy') === 'local' ? { localCopy: true } : {})
                 };
             }
             if (parts[1] === VOCABULARY_PAGE.id) {
@@ -76,7 +79,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
         },
 
         buildRoute(route) {
-            if (route?.view === 'administration') return '#/teacher/administration';
+            if (['administration', 'platform'].includes(route?.view)) return `#/teacher/${route.view}`;
             if (!route || !route.view) return `#/teacher/${OVERVIEW_PAGE.id}`;
             if (route.view === OVERVIEW_PAGE.id) return `#/teacher/${OVERVIEW_PAGE.id}`;
             if (['classes', 'assignments', 'review', GROUPS_PAGE.id].includes(route.view)) {
@@ -84,12 +87,15 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 if (route.classId) params.set('class', route.classId);
                 if (route.assignmentId) params.set('assignment', route.assignmentId);
                 if (route.tab) params.set('tab', route.tab);
-                return `#/teacher/${route.view}${params.size ? `?${params}` : ''}`;
+                if (route.listTab) params.set('listTab', route.listTab);
+                if (route.view === 'review' && !route.tab) params.set('tab', route.assignmentId ? 'student-work' : 'needs-review');
+                return `#/teacher/${route.view === 'review' ? 'assignments' : route.view}${params.size ? `?${params}` : ''}`;
             }
             if (route.view === STUDENTS_PAGE.id) return `#/teacher/${STUDENTS_PAGE.id}`;
             if (route.view === 'student-profile' && route.studentId) {
                 const params = new URLSearchParams();
                 if (route.tab && route.tab !== 'overview') params.set('tab', route.tab);
+                if (route.classId) params.set('class', route.classId);
                 const query = params.toString();
                 return `#/teacher/${STUDENTS_PAGE.id}/${encodeURIComponent(route.studentId)}${query ? `?${query}` : ''}`;
             }
@@ -101,7 +107,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (route.view === 'quiz-editor') return '#/teacher/quizzes/editor';
             if (route.view === 'editor') {
                 return route.vocabularyId
-                    ? `#/teacher/${VOCABULARY_PAGE.id}/editor/${encodeURIComponent(route.vocabularyId)}`
+                    ? `#/teacher/${VOCABULARY_PAGE.id}/editor/${encodeURIComponent(route.vocabularyId)}${route.localCopy === true ? '?copy=local' : ''}`
                     : `#/teacher/${VOCABULARY_PAGE.id}/editor`;
             }
             if (route.view === DATA_PAGE.id) {
@@ -150,14 +156,17 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (viewId === 'teacher-editor-view') {
                 return {
                     view: 'editor',
-                    vocabularyId: this.vocabSet?.id || null
+                    vocabularyId: this.vocabSet?.id || null,
+                    ...(this.vocabSet?.id && this.teacherVocabularyLocalCopyDocumentGeneration != null
+                        && this.teacherVocabularyLocalCopyDocumentGeneration === this.teacherVocabularyDocumentGeneration ? { localCopy: true } : {})
                 };
             }
             if (viewId === 'teacher-student-profile-view' && this.activeStudentId) {
                 return {
                     view: 'student-profile',
                     studentId: this.activeStudentId,
-                    tab: this.activeStudentProfileTab || 'overview'
+                    tab: this.activeStudentProfileTab || 'overview',
+                    ...(this.getSelectedTeacherClassId?.() ? { classId: this.getSelectedTeacherClassId() } : {})
                 };
             }
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
@@ -167,7 +176,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 return { view: SETTINGS_PAGE.id, tab: 'subjects' };
             }
             const page = teacherPageRegistry.pages.find(candidate => candidate.viewId === viewId);
-            return { view: page?.id || OVERVIEW_PAGE.id };
+            const route = this.parseRoute();
+            if (['classes', 'assignments', 'groups'].includes(page?.id) && route?.view === page.id) return route;
+            return { view: page?.id || OVERVIEW_PAGE.id, ...(['classes', 'assignments', 'groups'].includes(page?.id) && this.getSelectedTeacherClassId?.() ? { classId: this.getSelectedTeacherClassId() } : {}) };
         },
 
         setRoute(route, options = {}) {
@@ -240,6 +251,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
 
         async applyRoute(route, navigation = this.beginTeacherNavigation()) {
             if (!route) return;
+            const resolved = this.resolveTeacherClassRoute?.(route) || route;
+            if (this.buildRoute(resolved) !== this.buildRoute(route)) this.setRoute(resolved, { replace: true });
+            route = resolved;
             if (!this.authDisabled && !canOpenSchoolSection(route.view)) route = { view: 'administration' };
             if (this.isApplyingRoute) {
                 this.pendingTeacherRoute = route;
@@ -259,6 +273,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
                         continue;
                     }
                     switch (routeToApply.view) {
+                        case 'platform':
+                            await this.showPlatformAdministration();
+                            break;
                         case 'administration':
                             await this.showSchoolAdministration();
                             break;
@@ -283,21 +300,22 @@ export function installTeacherRoutingMethods(TeacherManager) {
                                 drilldown: routeDrilldown
                             });
                             if (this.vocabularyMode === 'assign') {
+                                const libraryNavigation = navigationToApply;
                                 await this.loadLibrary({
-                                    isCurrent: () => this.isTeacherNavigationCurrent(navigationToApply)
+                                    isCurrent: () => this.isTeacherNavigationCurrent(libraryNavigation)
                                 });
-                            } else if (this.vocabularyMode !== 'quizzes' && !this.libraryItems?.length) {
-                                this.getTeacherLibrary().then(({ items, stale }) => {
-                                    if (!stale && this.isTeacherNavigationCurrent(navigationToApply)) {
-                                        this.libraryItems = items;
-                                    }
-                                }).catch(error => console.warn('Could not warm vocabulary library cache:', error));
+                            } else if (this.vocabularyMode !== 'quizzes') {
+                                this.getTeacherLibrary().catch(error => console.warn('Could not warm vocabulary library cache:', error));
                             }
                             break;
                         case 'editor':
-                            if (routeToApply.vocabularyId && routeToApply.vocabularyId !== this.vocabSet?.id) {
+                            const editorNavigation = navigationToApply;
+                            const currentLocalCopy = this.teacherVocabularyLocalCopyDocumentGeneration != null
+                                && this.teacherVocabularyLocalCopyDocumentGeneration === this.teacherVocabularyDocumentGeneration;
+                            if (routeToApply.vocabularyId && (routeToApply.vocabularyId !== this.vocabSet?.id || (routeToApply.localCopy === true) !== currentLocalCopy)) {
                                 await this.loadVocabularyById(routeToApply.vocabularyId, {
-                                    isCurrent: () => this.isTeacherNavigationCurrent(navigationToApply)
+                                    isCurrent: () => this.isTeacherNavigationCurrent(editorNavigation),
+                                    ...(routeToApply.localCopy === true ? { localCopy: true } : {})
                                 });
                             } else {
                                 this.showEditor();
@@ -343,7 +361,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                         case OVERVIEW_PAGE.id:
                         default:
                             this.switchView(OVERVIEW_PAGE.viewId);
-                            this.loadTeacherOverview();
+                            await this.loadTeacherOverview();
                             break;
                     }
                     routeToApply = this.pendingTeacherRoute;

@@ -1,8 +1,8 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import http from 'node:http';
 import net from 'node:net';
 import process from 'node:process';
+import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_SMOKE_DIST_HOST || '127.0.0.1';
 const requestedPort = Number(process.env.UI_SMOKE_DIST_PORT || 4174);
@@ -24,29 +24,6 @@ function runCommand(command, args, options = {}) {
             reject(new Error(`${command} ${args.join(' ')} exited with code ${code}`));
         });
     });
-}
-
-function requestOk(url) {
-    return new Promise((resolve) => {
-        const request = http.get(url, (response) => {
-            response.resume();
-            resolve(response.statusCode >= 200 && response.statusCode < 500);
-        });
-        request.on('error', () => resolve(false));
-        request.setTimeout(1000, () => {
-            request.destroy();
-            resolve(false);
-        });
-    });
-}
-
-async function waitForServer(url, timeoutMs = 10000) {
-    const started = Date.now();
-    while (Date.now() - started < timeoutMs) {
-        if (await requestOk(url)) return true;
-        await new Promise(resolve => setTimeout(resolve, 250));
-    }
-    return false;
 }
 
 function isPortAvailable(port) {
@@ -76,15 +53,12 @@ async function main() {
     await ensureDist();
     const port = await findPort(requestedPort);
     const baseUrl = `http://${host}:${port}`;
-    const preview = spawn('npx', ['vite', 'preview', '--outDir', outDir, '--host', host, '--port', String(port), '--strictPort'], {
-        cwd: process.cwd(),
-        stdio: 'ignore'
+    const preview = await ensureViteServer({
+        baseUrl, probePath: '/teacher.html', host, port,
+        args: ['vite', 'preview', '--outDir', outDir, '--host', host, '--port', String(port), '--strictPort']
     });
 
     try {
-        if (!(await waitForServer(`${baseUrl}/teacher.html`, 10000))) {
-            throw new Error(`Could not start Vite preview at ${baseUrl}`);
-        }
         await runCommand('npm', ['run', 'test:ui:smoke'], {
             env: {
                 ...process.env,

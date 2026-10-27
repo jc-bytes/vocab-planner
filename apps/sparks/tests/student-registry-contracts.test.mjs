@@ -153,7 +153,7 @@ test('activity registry definition rejects malformed descriptors clearly', () =>
 test('activity policy consumers use descriptor metadata instead of ID lists', async () => {
     const sources = await Promise.all([
         'js/student/studentActivityAutoSave.js',
-        'js/student/studentActivityMenuMethods.js',
+        'js/student/studentUnitWorkspace.js',
         'js/student/studentActivityCoverageMethods.js',
         'js/student/studentActivityLauncherMethods.js'
     ].map(file => readFile(new URL(`../${file}`, import.meta.url), 'utf8')));

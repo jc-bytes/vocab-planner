@@ -9,7 +9,7 @@ import { StudentGameLifecycle } from './studentGameLifecycleMethods.js';
 import { STUDENT_GAME_REGISTRY } from './studentGameRegistry.js';
 import { StudentGameSettings } from './studentGameSettingsMethods.js';
 import { StudentGameAccess } from './studentGameAccessMethods.js';
-import { readLocalArcadeSession } from './studentArcadeTimeStorage.js';
+import { readLocalArcadeSession } from './studentArcadeSessionStorage.js';
 
 export class StudentGames {
     constructor(studentManager) {
@@ -19,6 +19,7 @@ export class StudentGames {
         this.currentGame = null;
         this.gameTimeRemaining = savedSession.remainingSeconds;
         this.savedGameId = savedSession.gameId;
+        this.arcadeSessionEventId = savedSession.lastAppliedEventId;
         this.gameTimerInterval = null;
         this.isHandlingGameMinute = false;
         this.isAddingGameTime = false;

@@ -181,6 +181,7 @@ export class StudentProgressCore {
 
     saveLocalProgress(skipCloud = false, options = {}) {
         try {
+            const canPersist = Boolean(globalThis.localStorage);
             this.sm.progressData ||= { studentProfile: {}, units: {} };
             this.sm.progressData.studentProfile = this.sm.studentProfile;
             this.sm.coinData = this.normalizeCoinData(this.sm.coinData);
@@ -200,8 +201,10 @@ export class StudentProgressCore {
             if (!skipCloud) {
                 this.sm.scheduleCloudSync();
             }
+            return canPersist;
         } catch (e) {
             console.error('Error saving progress:', e);
+            return false;
         }
     }
 
@@ -232,10 +235,16 @@ export class StudentProgressCore {
             ? this.sm.mergeStudentProfile(this.sm.studentProfile, progress.studentProfile || {})
             : (progress.studentProfile || this.sm.studentProfile || {});
 
+        const protectedUnit = options.preserveLocalStateForUnit;
+        let units = progress.units || {};
+        if (protectedUnit && this.sm.progressData.units?.[protectedUnit]) {
+            units = { ...units, [protectedUnit]: { ...units[protectedUnit],
+                states: options.preservedUnitStates ?? this.sm.progressData.units[protectedUnit].states ?? {} } };
+        }
         this.sm.studentProfile = mergedStudentProfile;
         this.sm.progressData = {
             studentProfile: mergedStudentProfile,
-            units: progress.units || {},
+            units,
             totalXp: Number(progress.totalXp) || 0,
             coins: migrated.coinData.balance,
             coinData: migrated.coinData,

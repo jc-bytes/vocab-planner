@@ -1,6 +1,44 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assignmentResultRows, assignmentResultsCsv, assignmentStatus } from '../js/teacherAssignmentResults.js';
+import { assignmentListTab, loadAssignmentReviewQueue } from '../js/teacherAssignmentReviewQueue.js';
+
+test('assignment views separate future, current and historical work', () => {
+    const assignment = { release_at: '2026-10-01', close_at: '2026-11-01' };
+    assert.equal(assignmentListTab(assignment, {}, Date.parse('2026-09-01')), 'scheduled');
+    assert.equal(assignmentListTab(assignment, {}, Date.parse('2026-10-19')), 'current');
+    assert.equal(assignmentListTab(assignment, {}, Date.parse('2026-12-01')), 'history');
+    assert.equal(assignmentListTab(assignment, { archived: true }, 0), 'history');
+    assert.equal(assignmentListTab({ ...assignment, withdrawn: true }, {}, 0), 'history');
+});
+
+test('review queue counts new revisions and omits reviewed, automatic and unrelated work', async () => {
+    const calls = [];
+    const queue = await loadAssignmentReviewQueue({
+        listReviewResponses: async ids => {
+            assert.deepEqual(ids, ['spark']);
+            return [
+                { assignment_id: 'spark', student_id: 'new', revision: 2 },
+                { assignment_id: 'spark', student_id: 'done', revision: 1 },
+                { assignment_id: 'spark', student_id: 'automatic', evaluation: { needsTeacherReview: false } },
+                { assignment_id: 'unrelated', student_id: 'secret' }
+            ];
+        },
+        assignmentFeedback: async id => { calls.push(id); return [
+            { student_id: 'new', activity_type: '', review_status: 'reviewed', response_revision: 1 },
+            { student_id: 'done', activity_type: '', review_status: 'needs_revision', response_revision: 1 }
+        ]; }
+    }, [{ id: 'spark', kind: 'spark' }, { id: 'vocab', kind: 'vocabulary' }]);
+    assert.deepEqual([...queue], [['spark', 1]]); assert.deepEqual(calls, ['spark']);
+});
+
+test('review queue propagates failed or aborted reads instead of claiming no work needs review', async () => {
+    const repository = { listReviewResponses: async () => [{ assignment_id: 'spark', student_id: 's' }],
+        assignmentFeedback: async () => { throw new Error('Review unavailable'); } };
+    await assert.rejects(loadAssignmentReviewQueue(repository, [{ id: 'spark', kind: 'spark' }]), /Review unavailable/);
+    const controller = new AbortController(); controller.abort();
+    await assert.rejects(loadAssignmentReviewQueue(repository, [{ id: 'spark', kind: 'spark' }], { signal: controller.signal }), { name: 'AbortError' });
+});
 
 test('review preserves zero results and represents absent work without an invented score', () => {
     const rows = assignmentResultRows('vocabulary', [{ studentId: 'a', name: 'A', activity: 'matching', score: 0, accuracy: 0, complete: false }], [{ studentId: 'a', name: 'A' }, { studentId: 'b', name: 'B' }]);

@@ -1,0 +1,56 @@
+/* Match the student skeleton colors, pulse timing, and surface shimmer. */
+.school-admin-loading { display: grid; gap: 1.5rem; min-width: 0; width: 100%; }
+.school-admin-loading-line {
+    display: block;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(173, 198, 255, .18);
+    animation: schoolAdminLoadingPulse 1.45s ease-in-out infinite;
+}
+.school-admin-loading-tabs { align-items: center; gap: 1.5rem; min-height: 48px; }
+.school-admin-loading-tab { flex: 0 0 90px; height: 16px; }
+.school-admin-loading-tab:nth-child(2) { flex-basis: 115px; }
+.school-admin-loading-tab:nth-child(3) { flex-basis: 125px; }
+.school-admin-loading-body { display: grid; gap: 1.25rem; min-width: 0; }
+.school-admin-loading-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.school-admin-loading-title { width: min(45%, 240px); height: 24px; border-radius: 9px; }
+.school-admin-loading-action { width: 125px; height: 44px; border-radius: 12px; }
+.school-admin-loading-filters { display: grid; grid-template-columns: minmax(0, 26rem) minmax(0, 16rem) 90px; gap: .75rem; }
+.school-admin-loading-control { width: 100%; height: 44px; border-radius: 12px; }
+.school-admin-loading-table { position: relative; overflow: hidden; min-width: 0; }
+.school-admin-loading-table::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 30%, rgba(173, 198, 255, .11) 48%, transparent 66%);
+    transform: translateX(-120%);
+    animation: schoolAdminLoadingShimmer 1.45s ease-in-out infinite;
+}
+.school-admin-loading-row { display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); align-items: center; gap: 1.5rem; min-height: 44px; padding: 0 .6rem; border-bottom: 1px solid rgba(173, 198, 255, .12); }
+.school-admin-loading-table--members .school-admin-loading-row { grid-template-columns: minmax(0, 2.5fr) repeat(5, minmax(0, 1fr)); }
+.school-admin-loading-name { width: 70%; }
+.school-admin-loading-cell { width: 60%; }
+.school-admin-loading-row--header { min-height: 36px; }
+.school-admin-loading-row--header .school-admin-loading-line { width: 50%; height: 9px; }
+.school-admin-loading-pagination { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.school-admin-loading-pagination .school-admin-loading-control { width: 180px; }
+.school-admin-loading-count { width: 110px; }
+.school-admin-table[aria-busy="true"] tbody { animation: schoolAdminLoadingPulse 1.45s ease-in-out infinite; pointer-events: none; }
+@keyframes schoolAdminLoadingPulse { 0%, 100% { opacity: .58; } 50% { opacity: .92; } }
+@keyframes schoolAdminLoadingShimmer { to { transform: translateX(120%); } }
+@media (max-width: 600px) {
+    .school-admin-loading-filters { grid-template-columns: minmax(0, 1fr) 90px; }
+    .school-admin-loading-filters .school-admin-loading-control:first-child { grid-column: 1 / -1; }
+    .school-admin-loading-row { gap: .6rem; padding-inline: .25rem; }
+    .school-admin-loading-table--members .school-admin-loading-row { grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); }
+    .school-admin-loading-table--members .school-admin-loading-row > :nth-child(n+5) { display: none; }
+    .school-admin-loading-cell { width: 75%; }
+    .school-admin-loading-pagination .school-admin-loading-control { width: 140px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .school-admin-loading-line,
+    .school-admin-loading-table::after,
+    .school-admin-table[aria-busy="true"] tbody { animation: none; }
+    .school-admin-loading-table::after { display: none; }
+}

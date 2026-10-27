@@ -19,6 +19,20 @@ export const DEV_TEACHER_USER = {
 };
 
 class TeacherAuthMethods {
+    ensureAuthenticated(showAlert = true) {
+        if (this.authDisabled) {
+            return true;
+        }
+        if (!this.isAuthenticated) {
+            if (showAlert) {
+                alert('Please sign in to use the teacher tools.');
+            }
+            this.showLoginView();
+            return false;
+        }
+        return true;
+    }
+
     clearCurrentTeacherServerState() {
         const accountId = this.currentUser?.uid || this.currentUser?.id;
         if (accountId) void serverStateQuery.clearAccount(accountId);
@@ -128,8 +142,10 @@ class TeacherAuthMethods {
             await this.bindSchoolSession(this);
             if (!context.isCurrent()) return false;
             if (!this.schoolAccess.hasRole('teacher') && !this.schoolAccess.hasRole('school_admin')) {
-                this.setRoute({ view: 'administration' }, { replace: true });
-                await this.showSchoolAdministration();
+                const platform = access.platformAdmin && this.parseRoute()?.view === 'platform';
+                this.setRoute({ view: platform ? 'platform' : 'administration' }, { replace: true });
+                if (platform) await this.showPlatformAdministration();
+                else await this.showSchoolAdministration();
                 return context.isCurrent();
             }
             const settingsResults = await Promise.allSettled([

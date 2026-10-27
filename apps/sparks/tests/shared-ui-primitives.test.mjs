@@ -71,18 +71,18 @@ test('the primitive supplies a stable default and does not require a feature cla
     assert.equal(state.textContent, 'Loading...');
 });
 
-test('the first migrated teacher consumers use the shared loading primitive', async () => {
-    const [quizCore, vocabularyData] = await Promise.all([
+test('teacher library consumers use the shared library loading primitive', async () => {
+    const [quizCore, vocabularyBrowser] = await Promise.all([
         read('js/teacherQuizCoreMethods.js'),
-        read('js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js')
+        read('js/teacherVocabularyBrowserFeature.js')
     ]);
 
-    for (const source of [quizCore, vocabularyData]) {
-        assert.match(source, /import \{ showLoadingState \} from/);
+    for (const source of [quizCore, vocabularyBrowser]) {
+        assert.match(source, /import \{[^}]*\bshowLibraryLoading\b[^}]*\} from '\.\/teacherLibraryControls\.js'/);
         assert.doesNotMatch(source, /innerHTML\s*=\s*'<div class="loading-spinner"/);
     }
-    assert.match(quizCore, /showLoadingState\(container, 'Loading vocabulary choices\.\.\.'\)/);
-    assert.match(vocabularyData, /showLoadingState\(list, 'Loading library\.\.\.'\)/);
+    assert.match(quizCore, /showLibraryLoading\(container, 'Loading vocabulary sets for quiz creation\.\.\.'\)/);
+    assert.match(vocabularyBrowser, /showLibraryLoading\(list, 'Loading vocabulary materials\.\.\.'\)/);
 });
 
 test('tab keyboard navigation wraps and supports list endpoints', () => {

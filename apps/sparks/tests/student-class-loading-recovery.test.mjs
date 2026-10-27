@@ -51,10 +51,11 @@ test('a class switch cancels an older class read before it can replace the selec
     manager.parseRoute = () => ({view:'units'});
     manager.navigateTo = () => {};
     const pending = selection.load({forceRefresh:true});
+    const cancelled = assert.rejects(pending, {name:'AbortError'});
     while (!release) await new Promise(resolve => setImmediate(resolve));
     selection.select('class-b');
     release([]);
-    assert.equal(await pending, false);
+    await cancelled;
     assert.equal(selection.selectedId, 'class-b');
     assert.equal(selection.hasSnapshot, false);
     assert.deepEqual(selection.vocabs, []);

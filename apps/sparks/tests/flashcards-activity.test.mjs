@@ -256,3 +256,26 @@ test('incomplete restored mastery resumes at the first unanswered card', () => {
     assert.equal(activity.currentIndex, 0);
     assert.equal(activity.isCurrentCardAnswered(), false);
 });
+
+
+test('reopening preserves guide choices separately from mastery', () => {
+    const activity = createFlashcards([{word:'Privacy',definition:'Keeping information protected.'}]);
+    activity.initialState = {masteryVersion:3, answeredCards:[], attemptsByCard:{0:2},
+        ember:{skipped:true,introduced:true,completed:false,clueCard:0}};
+    activity.restoreState();
+    assert.equal(activity.guideSkipped,true);
+    assert.equal(activity.introductionShown,true);
+    assert.equal(activity.lastAutoClueCard,0);
+    assert.equal(activity.getScore().score,0);
+    assert.equal(activity.isCurrentQuestionReady(),false);
+});
+
+
+test('newer local assignment snapshot survives a stale cloud restore', () => {
+    const activity = createFlashcards([{word:'Privacy',definition:'Keep information protected.'}]);
+    activity.initialState = {masteryVersion:3, savedAt:100, answeredCards:[], ember:{skipped:false}};
+    activity.loadLocalState = () => ({masteryVersion:3, savedAt:200, answeredCards:[0], ember:{skipped:true}});
+    activity.restoreState();
+    assert.equal(activity.getScore().score,100);
+    assert.equal(activity.guideSkipped,true);
+});

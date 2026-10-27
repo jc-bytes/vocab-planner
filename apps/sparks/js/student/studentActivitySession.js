@@ -1,5 +1,3 @@
-import { StudentActivityWorkTimer } from './studentActivityWorkTimer.js';
-
 export class StudentActivitySession {
     constructor(activities) {
         this.activities = activities;
@@ -16,13 +14,14 @@ export class StudentActivitySession {
         this.vocabularyLoadId = 0;
         this.vocabularyLoadController = null;
         this.pendingVocabularyOverride = null;
-        this.workTimer = new StudentActivityWorkTimer({
-            onReport: snapshot => this.activities.progressPersistence?.reportActiveTime(snapshot)
-        });
+    }
+
+    get workTimer() {
+        return this.activities.progressPersistence?.workTimer || null;
     }
 
     beginActivityLaunch() {
-        this.workTimer.destroy();
+        this.workTimer?.destroy();
         this.activityLaunchController?.abort();
         this.activityLaunchController = new AbortController();
         this.activityLaunchId += 1;
@@ -35,7 +34,7 @@ export class StudentActivitySession {
     }
 
     cancelActivityLaunch() {
-        this.workTimer.destroy();
+        this.workTimer?.destroy();
         this.activityLaunchController?.abort();
         this.activityLaunchController = null;
         this.activityLaunchId += 1;
@@ -76,7 +75,7 @@ export class StudentActivitySession {
     }
 
     destroyActivityInstance() {
-        this.workTimer.pause();
+        this.workTimer?.pause();
         const instance = this.activityInstance;
         this.activityInstance = null;
         if (!instance || typeof instance.destroy !== 'function') return;
@@ -89,14 +88,14 @@ export class StudentActivitySession {
     }
 
     startActivityTimer() {
-        return this.workTimer.start(this.activityAttempt || {});
+        return this.workTimer?.start(this.activityAttempt || {});
     }
 
     getActivityTimeSnapshot() {
-        return this.workTimer.getSnapshot();
+        return this.workTimer?.getSnapshot() || { attemptId: '', activeSeconds: 0, timeLimitSeconds: null, isLate: false };
     }
 
     finishActivityTimer() {
-        this.workTimer.markFinished();
+        this.workTimer?.markFinished();
     }
 }

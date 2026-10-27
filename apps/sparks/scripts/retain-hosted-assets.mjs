@@ -1,13 +1,38 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// Pages artifacts can expire before the next release. Recover the currently
-// published immutable graph so open tabs can still import their older chunks.
+const immutableName = /^[^/]+-[\w-]{8,}\.[a-z0-9]+$/i;
+
+// A validated artifact may already contain assets retained during validation.
+// Keep every emitted entry, lazy chunk and asset in its own build manifest first.
+export async function pruneCandidateAssets(outputDirectory) {
+  const manifest = JSON.parse(await readFile(resolve(outputDirectory, '.vite/manifest.json'), 'utf8'));
+  const keep = new Set();
+  for (const entry of Object.values(manifest)) {
+    for (const path of [entry.file, ...entry.css || [], ...entry.assets || []]) {
+      if (path) keep.add(path);
+    }
+  }
+  if (!Object.keys(manifest).length || ![...keep].some(path => path.startsWith('assets/'))) {
+    throw new Error('Candidate build manifest contains no immutable assets.');
+  }
+  let removed = 0;
+  for (const entry of await readdir(resolve(outputDirectory, 'assets'), { withFileTypes: true })) {
+    if (!entry.isFile() || !immutableName.test(entry.name) || keep.has(`assets/${entry.name}`)) continue;
+    await rm(resolve(outputDirectory, 'assets', entry.name));
+    removed++;
+  }
+  return { removed };
+}
+
+// Always recover the actual currently published graph, never a workflow artifact
+// that may have passed validation without being deployed.
 export async function retainHostedAssets(siteUrl, outputDirectory = 'dist-desktop') {
   const base = new URL(siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`);
   const assetPrefix = `${base.pathname}assets/`;
-  const pending = ['index.html', 'student.html', 'teacher.html', 'student-sw.js'].map(path => new URL(path, base));
+  const preview = new URL('student-preview.html', base).href;
+  const pending = ['index.html', 'student.html', 'teacher.html', 'student-preview.html', 'student-sw.js'].map(path => new URL(path, base));
   const seen = new Set();
   let copied = 0;
   while (pending.length) {
@@ -26,6 +51,8 @@ export async function retainHostedAssets(siteUrl, outputDirectory = 'dist-deskto
       }
       if (!contents) {
         const response = await fetch(url, { headers: { 'Cache-Control': 'no-cache' }, signal: AbortSignal.timeout(30000) });
+        // Older releases did not publish a separate preview entry.
+        if (url.href === preview && response.status === 404) return;
         if (!response.ok) throw new Error(`Could not retain published asset ${url.pathname}: HTTP ${response.status}`);
         contents = Buffer.from(await response.arrayBuffer());
         if (asset) {
@@ -45,7 +72,7 @@ export async function retainHostedAssets(siteUrl, outputDirectory = 'dist-deskto
         // Only Vite's immutable assets belong here, never app data, external URLs,
         // or arbitrary paths found in a JavaScript string.
         if (dependency.origin !== base.origin || !dependency.pathname.startsWith(assetPrefix)
-          || !/^[^/]+-[\w-]{8,}\.[a-z0-9]+$/i.test(dependency.pathname.slice(assetPrefix.length))) continue;
+          || !immutableName.test(dependency.pathname.slice(assetPrefix.length))) continue;
         dependency.search = ''; dependency.hash = '';
         if (!seen.has(dependency.href)) pending.push(dependency);
       }
@@ -58,5 +85,6 @@ export async function retainHostedAssets(siteUrl, outputDirectory = 'dist-deskto
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await pruneCandidateAssets(process.argv[3] || 'dist-desktop');
   await retainHostedAssets(process.argv[2], process.argv[3]);
 }

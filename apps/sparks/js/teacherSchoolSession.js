@@ -20,8 +20,10 @@ export function bindTeacherSchoolSession(manager) {
         clearTeacherSchoolState(manager);
         updateSchoolNavigation(manager);
         if (manager.isAuthenticated) {
-            manager.setRoute({ view: 'administration' }, { replace: true });
-            void manager.showSchoolAdministration();
+            const platform = manager.parseRoute()?.view === 'platform' && schoolContext.getAccess().platformAdmin;
+            manager.setRoute({ view: platform ? 'platform' : 'administration' }, { replace: true });
+            if (platform) void manager.showPlatformAdministration();
+            else void manager.showSchoolAdministration();
             const generation = schoolContext.getGeneration();
             const isCurrent = () => generation === schoolContext.getGeneration();
             if (schoolContext.hasRole('teacher') || schoolContext.hasRole('school_admin')) {
@@ -36,7 +38,8 @@ export function updateSchoolNavigation(manager) {
     const staff = schoolContext.hasRole('teacher') || schoolContext.hasRole('school_admin');
     document.querySelectorAll('#teacher-tabs [data-section]').forEach(button => {
         const section = button.dataset.section;
-        button.hidden = section !== 'administration' && (!staff || (section === 'settings' && !schoolContext.hasRole('school_admin')));
+        button.hidden = section === 'platform' ? !schoolContext.getAccess().platformAdmin
+            : section !== 'administration' && (!staff || (section === 'settings' && !schoolContext.hasRole('school_admin')));
     });
     document.querySelectorAll('[data-publish-material]').forEach(button => { button.hidden = !schoolContext.hasRole('teacher'); button.classList.toggle('hidden', button.hidden); });
     const label = document.getElementById('teacher-school-name');

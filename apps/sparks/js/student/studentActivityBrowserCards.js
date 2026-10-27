@@ -1,3 +1,6 @@
+import { formatVocabularyPurpose, getVocabularyPurposeClass, scheduleFirstVocabularyPreload } from './studentVocabularyPresentation.js';
+import { createLibraryChoiceCard, createLibraryRowList, createLibraryRow } from '../learningLibraryView.js';
+import { createVocabularyCard, formatVocabularyCardTitle, formatVocabularyCardDescription } from '../vocabularyCardView.js';
 import { createElement, escapeHtml, refreshIcons } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '../services/vocabularyApi.js';
 
@@ -11,51 +14,9 @@ export class StudentActivityBrowserCards {
         this.vocabularyData = browser.vocabularyData;
     }
 
-    createStudentLibraryChoiceCard({ title, count, meta, icon }) {
-        const card = createElement('button', 'teacher-library-choice-card');
-        card.type = 'button';
-
-        const text = createElement('span', 'teacher-library-choice-text');
-        text.appendChild(createElement('strong', null, title));
-        text.appendChild(createElement('span', 'teacher-library-choice-count', count));
-        if (meta) text.appendChild(createElement('small', null, meta));
-        card.appendChild(text);
-
-        if (icon) {
-            const iconEl = createElement('i');
-            iconEl.setAttribute('data-lucide', icon);
-            card.appendChild(iconEl);
-        }
-
-        return card;
-    }
-
-    createStudentVocabRowList(headers = []) {
-        const list = createElement('div', 'student-vocab-row-list');
-        if (headers.length >= 5) list.classList.add('student-vocab-row-list-six-columns');
-        const header = createElement('div', 'student-vocab-row student-vocab-row-header');
-        headers.forEach(label => header.appendChild(createElement('span', null, label)));
-        while (header.children.length < Math.max(4, headers.length)) {
-            header.appendChild(createElement('span', null, ''));
-        }
-        header.appendChild(createElement('span', null, ''));
-        list.appendChild(header);
-        return list;
-    }
-
-    createStudentVocabRow({ primary, cells = [], icon = 'chevron-right' }) {
-        const row = createElement('button', 'student-vocab-row');
-        row.type = 'button';
-        row.appendChild(createElement('strong', null, primary));
-        cells.forEach(cell => row.appendChild(createElement('span', null, cell)));
-        while (row.children.length < 4) {
-            row.appendChild(createElement('span', null, ''));
-        }
-        const iconEl = createElement('i');
-        iconEl.setAttribute('data-lucide', icon);
-        row.appendChild(iconEl);
-        return row;
-    }
+    createStudentLibraryChoiceCard(options) { return createLibraryChoiceCard(options); }
+    createStudentVocabRowList(headers = []) { return createLibraryRowList(headers); }
+    createStudentVocabRow(options) { return createLibraryRow(options); }
 
     refreshIcons(root = document) {
         refreshIcons(root);
@@ -111,54 +72,8 @@ export class StudentActivityBrowserCards {
     }
 
     createVocabularyCard(vocab) {
-        const card = createElement('button', 'card option-card student-vocab-card');
-        card.type = 'button';
-        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
-        const title = this.formatVocabularyCardTitle(vocab);
-        const purposeLabel = this.formatVocabularyPurpose(vocab.purpose);
-        const scheduleLabel = this.formatVocabularyScheduleLabel(vocab);
-        const description = this.formatVocabularyCardDescription(vocab, title);
-        const progress = this.getVocabularyRequiredProgress(vocab);
-        const iconName = String(vocab.purpose || '').toLowerCase() === 'summative'
-            ? 'clipboard-check'
-            : 'book-open';
-
-        card.style.setProperty('--subject-color', subject.color);
-        card.classList.add(this.getVocabularyPurposeClass(vocab.purpose));
-        card.classList.toggle('has-progress', progress.percent > 0);
-        card.classList.toggle('is-required-complete', progress.isComplete);
-        card.setAttribute('aria-label', `${title}. ${purposeLabel}. ${progress.ariaLabel}. Open unit.`);
-
-        card.innerHTML = `
-            <div class="student-vocab-card-head">
-                <span class="student-vocab-icon" aria-hidden="true"><i data-lucide="${iconName}"></i></span>
-                <span class="student-vocab-card-meta">
-                    <span class="student-vocab-schedule">${escapeHtml(scheduleLabel)}</span>
-                    <strong class="student-vocab-progress-percent">${progress.percent}%</strong>
-                </span>
-            </div>
-            <div class="student-vocab-copy">
-                <h3>${escapeHtml(title)}</h3>
-                <span class="student-vocab-purpose ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
-                <p data-vocab-description>${escapeHtml(description)}</p>
-            </div>
-            <span class="student-vocab-required-progress" aria-label="${escapeHtml(progress.ariaLabel)}">
-                <span class="student-vocab-required-progress-copy">
-                    <span>Required activities</span>
-                    <strong>${progress.completed} of ${progress.total}</strong>
-                </span>
-                <span class="student-vocab-required-progress-track" aria-hidden="true">
-                    <span style="width: ${progress.percent}%"></span>
-                </span>
-            </span>
-        `;
-        if (vocab.path) {
-            card.dataset.vocabPath = vocab.path;
-            const preload = () => preloadVocabularyFile(vocab.path);
-            card.addEventListener('pointerenter', preload, { once: true });
-            card.addEventListener('focus', preload, { once: true });
-        }
-        card.addEventListener('click', () => this.vocabularyData.loadVocabulary(vocab));
+        const card = createVocabularyCard.call(this, vocab);
+        this.markEmberUnit(card, vocab);
         return card;
     }
 
@@ -199,7 +114,15 @@ export class StudentActivityBrowserCards {
             row.addEventListener('focus', preload, { once: true });
         }
         row.addEventListener('click', () => this.vocabularyData.loadVocabulary(vocab));
+        this.markEmberUnit(row, vocab);
         return row;
+    }
+
+    markEmberUnit(element, vocab) {
+        const progress = this.getVocabularyRequiredProgress(vocab);
+        element.dataset.emberUnit = String(vocab.id);
+        element.dataset.emberRequiredTotal = String(progress.total);
+        element.dataset.emberRequiredCompleted = String(progress.completed);
     }
 
     getVocabularyRequiredProgress(vocab) {
@@ -222,59 +145,20 @@ export class StudentActivityBrowserCards {
         };
     }
 
-    formatVocabularyCardTitle(vocab) {
-        let title = String(vocab?.name || 'Vocabulary Unit').trim();
-        title = title.replace(/^Grade\s+\d+\s+(?:I{1,3}T|T\d)\s+/i, '');
-        title = title.replace(/^(Practice|Summative)\s*:\s*/i, '');
-        title = title.replace(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+Week\s+\d{1,2}\s*[-:]\s*/i, '');
-        return title || 'Vocabulary Unit';
-    }
+    formatVocabularyCardTitle(vocab) { return formatVocabularyCardTitle(vocab); }
 
-    formatVocabularyPurpose(purpose) {
-        const normalized = String(purpose || '').trim().toLowerCase();
-        if (normalized === 'summative') return 'Summative';
-        if (normalized === 'practice') return 'Practice';
-        return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : 'Unit';
-    }
+    formatVocabularyPurpose(purpose) { return formatVocabularyPurpose(purpose); }
 
-    getVocabularyPurposeClass(purpose) {
-        const normalized = String(purpose || 'unit')
-            .trim()
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-        return `is-${normalized || 'unit'}`;
-    }
+    getVocabularyPurposeClass(purpose) { return getVocabularyPurposeClass(purpose); }
 
     formatVocabularyScheduleLabel(vocab) {
         const schedule = this.schedule.getVocabSchedule(vocab);
         return schedule.label || this.schedule.getTrimesterLabel(this.schedule.getVocabTrimesterKey(vocab));
     }
 
-    formatVocabularyCardDescription(vocab, title) {
-        const raw = String(vocab?.description || '').trim();
-        if (!raw) {
-            return `Practice the key terms for ${title.toLowerCase()}.`;
-        }
-
-        if (/^practice words for grade \d+ second-trimester python and data work\.?$/i.test(raw)) {
-            return `Practice the terms you need for ${title.toLowerCase()} activities.`;
-        }
-
-        if (/^ten core second-trimester words for the grade \d+ python and data vocabulary table\.?$/i.test(raw)) {
-            return 'Review the core Python and data terms for the second-trimester vocabulary check.';
-        }
-
-        return raw;
-    }
+    formatVocabularyCardDescription(vocab, title) { return formatVocabularyCardDescription(vocab, title); }
 
     scheduleFirstVocabularyPreload(container) {
-        const firstRepoCard = container.querySelector('[data-vocab-path]');
-        const path = firstRepoCard?.dataset?.vocabPath;
-        if (!path) return;
-
-        this.calendar.scheduleIdleTask(() => {
-            preloadVocabularyFile(path);
-        }, 1200);
+        return scheduleFirstVocabularyPreload(container, this.calendar);
     }
 }

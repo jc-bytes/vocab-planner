@@ -92,6 +92,22 @@ function createManager() {
     };
 }
 
+test('real teacher settings save passes its UI actor and rejects an invalidated settings incarnation', async t => {
+    elements.set('#global-exchange-rate', createElement('10'));
+    const manager = createManager();
+    const pending = deferred();
+    let received;
+    t.mock.method(settingsRepository, 'save', (_key, _values, options) => { received = options; return pending.promise; });
+    const saving = manager.saveGamificationSettings();
+    assert.equal(received.ownerUserId, 'teacher-a');
+    assert.equal(received.isCurrent(), true);
+    manager.currentUser = { uid: 'teacher-a', email: 'new-session@example.test' };
+    clearTeacherSettingsSessionState(manager);
+    assert.equal(received.isCurrent(), false);
+    pending.resolve();
+    assert.equal(await saving, false);
+});
+
 test('account cleanup invalidates late settings loads and preserves the next account', async () => {
     const exchangeRate = createElement('10');
     elements.set('#global-exchange-rate', exchangeRate);
@@ -279,6 +295,23 @@ test('all auth exit paths clear account-owned settings state', async () => {
     assert.match(listenersSource, /clearTeacherSettingsSessionState\?\.\(\)[\s\S]*currentUser = null/);
 });
 
+test('normal teacher calendar save forwards its actor, view guard, and cancellation signal', async t => {
+    const manager = createManager();
+    manager.validateClassScheduleRows = () => '';
+    manager.readSchoolCalendarFromUI = () => calendarFor('2026');
+    manager.validateSchoolCalendar = () => [];
+    manager.recalculateCloudVocabularyPlacements = async () => ({ updated: 0, skipped: 0 });
+    elements.set('#school-calendar-save-status', createElement());
+    elements.set('#save-school-calendar-btn', createElement());
+    let received;
+    t.mock.method(settingsRepository, 'save', async (_key, _value, options) => { received = options; });
+    const controller = new AbortController();
+    assert.equal(await manager.saveSchoolCalendarSettings({ signal: controller.signal }), true);
+    assert.equal(received.ownerUserId, 'teacher-a');
+    assert.equal(received.isCurrent(), true);
+    assert.equal(received.signal, controller.signal);
+});
+
 const { schoolContext } = await import('../js/services/schoolContext.js');
 const { saveTeacherSubjects } = await import('../js/services/teacherSubjectWrites.js');
 
@@ -308,6 +341,23 @@ async function subjectWriteFixture(t) {
     ];
     return { manager, requests };
 }
+
+test('actual teacher UI A cannot dispatch its settings through service B', async t => {
+    await subjectWriteFixture(t);
+    const previous = supabaseService.currentUser;
+    t.after(() => { supabaseService.currentUser = previous; });
+    supabaseService.currentUser = { uid: 'teacher-b' };
+    t.mock.method(supabaseService, 'init', async () => assert.fail('stale UI actor must reject before initialization'));
+    t.mock.method(console, 'error', () => {});
+    const { notifications } = await import('../js/notifications.js');
+    t.mock.method(notifications, 'error', () => {});
+    const manager = createManager();
+    elements.set('#global-exchange-rate', createElement('10'));
+    elements.set('#save-gamification-btn', createElement());
+    elements.set('#gamification-save-status', createElement());
+    assert.equal(await manager.saveGamificationSettings(), false);
+    assert.equal(manager.gamificationSettingsLoaded, false);
+});
 
 async function waitForSubjectRequest(requests, count = 1) {
     for (let attempt = 0; attempt < 20 && requests.length < count; attempt++) await new Promise(resolve => setImmediate(resolve));

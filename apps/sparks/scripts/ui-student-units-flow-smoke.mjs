@@ -32,7 +32,7 @@ try {
     const state = await page.evaluate(() => ({ assignment: studentApp.currentVocab.assignmentId, type: studentApp.currentActivityType,
         words: studentApp.currentVocab.words.length, unitKey: studentApp.activities.getUnitProgressKey(studentApp.currentVocab) }));
     assert.deepEqual(state, { assignment: fixture.ids.assignment, type: 'matching', words: 10, unitKey: `assignment:${fixture.ids.assignment}` });
-    assert.ok(fixture.calls.some(call => call.name === 'start_student_activity_attempt'));
+    assert.ok(fixture.calls.some(call => call.name === 'start_student_activity_attempt_owned_v1'));
     assert.deepEqual(fixture.errors, []);
     const barePage = await browser.newPage(); const bare = await installStudentAssignedFlowFixture(barePage);
     await barePage.goto(`${baseUrl}/student.html#/units`);
@@ -41,7 +41,9 @@ try {
     assert.equal(await barePage.locator('#vocab-selection-view').getAttribute('aria-busy'), 'false');
     assert.deepEqual(bare.errors, []);
     await barePage.close();
-    const racePage = await browser.newPage(); const delayed = await installStudentAssignedFlowFixture(racePage);
+    // This navigation race needs a student eligible for Arcade; the ordinary
+    // Units fixture above deliberately retains unfinished required activities.
+    const racePage = await browser.newPage(); const delayed = await installStudentAssignedFlowFixture(racePage, { completeRequiredActivities: true });
     delayed.holdReads();
     await racePage.goto(`${baseUrl}/student.html#/units`);
     await racePage.waitForFunction(() => window.studentApp?.currentUser);

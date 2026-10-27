@@ -1,4 +1,5 @@
 import { schoolSessionKey } from '../services/schoolScope.js';
+import { showLibraryLoading } from '../teacherLibraryControls.js';
 import { getPanamaDateValue } from '../services/dateUtils.js';
 import { DEFAULT_SUBJECT_SLUG } from '../services/vocabularyApi.js';
 import { SPARK_CHECK_MODES } from '../sparkCheckModel.js';
@@ -81,7 +82,7 @@ async showSparksView() {
         const current = () => generation === this.weeklySparkLoadGeneration && scope === schoolSessionKey(getWeeklySparkAccountId(this));
         const keepContent = this.weeklySparkLoadedScope === scope;
         if (!keepContent) {
-            list.innerHTML = '<div class="loading-spinner">Loading Sparks...</div>';
+            showLibraryLoading(list, 'Loading Spark materials...');
         } else {
             list.setAttribute('aria-busy', 'true');
         }
@@ -91,7 +92,7 @@ async showSparksView() {
             if (!current()) return;
             this.weeklySparkLoadedScope = scope;
             this.weeklySparkItems = sparks;
-            this.renderSparkLibrary();
+            await this.renderSparkLibrary();
         } catch (error) {
             if (!current()) return;
             const { showSectionLoadError } = await import('../ui/sectionRecovery.js');

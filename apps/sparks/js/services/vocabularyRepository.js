@@ -74,10 +74,7 @@ export const vocabularyRepository = {
         const schoolId = requireSchoolId();
         await supabaseService.init();
         let query = supabaseService.getClient().from('vocabularies').select('*').eq('school_id', schoolId).eq('id', id).maybeSingle();
-        if (options.signal && typeof query.abortSignal === 'function') {
-            query = query.abortSignal(options.signal);
-        }
-        const { data, error } = await query;
+        const { data, error } = await readSectionQuery(query, options);
         if (error) throw error;
         return mapVocabularyRow(data);
     },

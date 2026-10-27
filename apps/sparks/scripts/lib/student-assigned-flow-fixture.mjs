@@ -1,9 +1,12 @@
+import { seedReturningStudentGuidePreferences } from './student-guide-fixture.mjs';
+
 export const studentFlowIds = { user: '11111111-1111-4111-8111-111111111111', school: '22222222-2222-4222-8222-222222222222',
     class: '33333333-3333-4333-8333-333333333333', assignment: '44444444-4444-4444-8444-444444444444', vocabulary: '55555555-5555-4555-8555-555555555555' };
 
 // Only the network boundary is synthetic. The real HTML, auth, manager and activity modules run unchanged.
-export async function installStudentAssignedFlowFixture(page, { startEnrolled = true } = {}) {
+export async function installStudentAssignedFlowFixture(page, { startEnrolled = true, completeRequiredActivities = false } = {}) {
     const ids = studentFlowIds, calls = [], errors = [];
+    await seedReturningStudentGuidePreferences(page, ids.user);
     const user = { id: ids.user, aud: 'authenticated', role: 'authenticated', email: 'student@fixture.invalid', app_metadata: {}, user_metadata: {} };
     const words = ['Source', 'Hoax', 'Evidence', 'Verify', 'Claim', 'Author', 'Fact', 'Opinion', 'Reliable', 'Bias'].map(word => ({ word, definition: `Meaning of ${word.toLowerCase()}`, emoji: '📘' }));
     const detail = { id: ids.assignment, kind: 'vocabulary', school_id: ids.school, materialId: ids.vocabulary,
@@ -12,7 +15,9 @@ export async function installStudentAssignedFlowFixture(page, { startEnrolled = 
     const assignment = { id: ids.assignment, class_id: ids.class, kind: 'vocabulary', title: detail.title, release_at: '2026-10-01T12:00:00Z', due_at: null, close_at: null };
     const progress = { user_id: ids.user, coins: 0, coinData: { balance: 0, giftCoins: 0, totalEarned: 0, totalSpent: 0, totalGifted: 0 }, coinHistory: [],
         studentProfile: { firstName: 'Fixture', lastName: 'Student', grade: '9', group: 'A' },
-        units: { [`assignment:${ids.assignment}`]: { scores: { flashcards: { score: 100, isComplete: true, verified: true } }, states: {}, images: {}, wordHunt: {} } } };
+        units: { [`assignment:${ids.assignment}`]: { scores: Object.fromEntries(
+            (completeRequiredActivities ? ['flashcards', 'matching', 'fill-in-blank'] : ['flashcards'])
+                .map(type => [type, { score: 100, isComplete: true, verified: true }])), states: {}, images: {}, wordHunt: {} } } };
     await page.addInitScript(({ user, ids }) => {
         window.SUPABASE_CONFIG = { url: 'https://fixture.supabase.co', publishableKey: 'sb_publishable_fixture' };
         const encode = value => btoa(JSON.stringify(value)).replaceAll('=', '').replaceAll('+', '-').replaceAll('/', '_');
@@ -36,7 +41,7 @@ export async function installStudentAssignedFlowFixture(page, { startEnrolled = 
         else if (name === 'read_class_assignment_v1') { if (holdRead) await new Promise(resolve => { releaseRead = resolve; }); data = detail; }
         else if (name === 'get_own_student_progress_v2' || name === 'get_own_student_progress_summary_v2') data = progress;
         else if (name === 'get_own_arcade_time_v1') data = { seconds: 0, balance: 0 };
-        else if (name === 'start_student_activity_attempt') data = { attemptId: '66666666-6666-4666-8666-666666666666', minimumSeconds: 0 };
+        else if (name === 'start_student_activity_attempt_owned_v1') data = { attemptId: '66666666-6666-4666-8666-666666666666', minimumSeconds: 0 };
         else if (/invitations/.test(name)) data = [];
         else if (name === 'get_school_settings_v1') data = { schoolCalendar: { schoolYear: 2026 } };
         else if (name === 'vocabularies' || name === 'subjects' || name === 'teacher_subjects' || name === 'weekly_sparks' || name === 'class_assignment_responses') data = [];

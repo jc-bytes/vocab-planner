@@ -22,7 +22,14 @@ const OPTIONAL_FEATURE_NAMES = Object.freeze([
 ]);
 
 const REQUIRED_DEFERRED_KEYS = Object.freeze([
-  'js/student/studentFeatureStyles.js'
+  'js/student/studentFeatureStyles.js',
+  'js/student/studentHomeRenderer.js'
+]);
+const SHARED_DEFERRED_KEYS = Object.freeze([
+  'js/services/classroomStudentWrites.js',
+  'js/supabaseStudentWriteOperations.js',
+  'js/supabaseTeacherProfileOperations.js',
+  'js/services/passwordChangeOperation.js'
 ]);
 
 function indexManifestByName(manifest) {
@@ -64,6 +71,14 @@ export function validateLazyBuildContracts(manifest, { precacheFiles = null } = 
     const entryRecord = byName.get(entryName);
     if (!entryRecord) throw new Error(`Production manifest is missing ${entryName}.`);
     const staticKeys = collectStaticImportKeys(manifest, entryRecord.key);
+    for (const deferredKey of SHARED_DEFERRED_KEYS) {
+      if (!manifest[deferredKey]?.file) {
+        throw new Error(`Production manifest is missing deferred asset ${deferredKey}.`);
+      }
+      if (staticKeys.has(deferredKey)) {
+        throw new Error(`${entryName} loads deferred asset ${deferredKey} eagerly.`);
+      }
+    }
     const staticNames = new Set(
       [...staticKeys].map(key => manifest[key]?.name).filter(Boolean)
     );

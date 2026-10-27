@@ -202,6 +202,7 @@ test('forced Spark refresh is latest-wins and suppresses stale failures', async 
     let renderCount = 0;
     const list = {
         innerHTML: '',
+        replaceChildren() {}, append() {},
         setAttribute() {},
         removeAttribute() {}
     };
@@ -230,7 +231,7 @@ test('an overlapping library refresh does not suppress a successful Spark save',
     let listCalls = 0;
     let closeCalls = 0;
     const successes = [];
-    const list = { innerHTML: '', setAttribute() {}, removeAttribute() {} };
+    const list = { innerHTML: '', replaceChildren() {}, append() {}, setAttribute() {}, removeAttribute() {} };
     manager.query = selector => selector === '#spark-library-list' ? list : null;
     manager.readSparkForm = () => ({ id: 'spark-1', status: 'draft' });
     manager.setSparkModalStatus = () => {};
@@ -283,6 +284,7 @@ test('Spark feature destroy removes owned listeners and suppresses late loads', 
         ['#spark-form', new ListenerTarget()],
         ['#spark-library-list', Object.assign(new ListenerTarget(), {
             innerHTML: '',
+        replaceChildren() {}, append() {},
             setAttribute() {},
             removeAttribute() {}
         })]

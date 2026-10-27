@@ -2,61 +2,15 @@ import { $ } from '../main.js';
 import { serverStateQuery } from '../services/serverStateQuery.js';
 import { teacherPageRegistry } from '../teacherPageRegistry.js';
 import { TEACHER_VOCABULARY_CLOUD_QUERY_KEY } from './teacherVocabularyDataMethods.js';
-
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
-
 export const teacherVocabularyWorkflowMethods = {
-getTeacherVocabularyViewDepth(drilldown = this.libraryDrilldown || {}) {
-        if (drilldown.month) return 'month';
-        if (drilldown.trimester) return 'trimester';
-        if (drilldown.grade) return 'grade';
-        if (drilldown.subject) return 'subject';
-        return 'root';
-    },
-
-getDefaultTeacherVocabularyViewMode(depth = this.getTeacherVocabularyViewDepth()) {
-        return ['trimester', 'month'].includes(depth) ? 'rows' : 'cards';
-    },
-
-getTeacherVocabularyViewMode(drilldown = this.libraryDrilldown || {}) {
-        const depth = this.getTeacherVocabularyViewDepth(drilldown);
-        const savedMode = this.teacherVocabularyViewModes?.[depth];
-        return savedMode === 'rows' || savedMode === 'cards'
-            ? savedMode
-            : this.getDefaultTeacherVocabularyViewMode(depth);
-    },
-
-setTeacherVocabularyViewMode(mode) {
-        const depth = this.getTeacherVocabularyViewDepth();
-        this.teacherVocabularyViewModes = {
-            ...(this.teacherVocabularyViewModes || {}),
-            [depth]: mode === 'rows' ? 'rows' : 'cards'
-        };
-        localStorage.setItem('teacher_vocabulary_view_modes', JSON.stringify(this.teacherVocabularyViewModes));
-        this.renderLibraryBrowser();
-        this.refreshIcons();
-    },
-
-renderTeacherVocabularyViewControls() {
-        const container = $('#teacher-vocab-view-toggle');
-        if (!container) return;
-        const currentMode = this.getTeacherVocabularyViewMode();
-        container.innerHTML = `
-            <button class="vocab-view-toggle-btn ${currentMode === 'cards' ? 'is-active' : ''}" type="button" data-teacher-vocab-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
-                <i data-lucide="layout-grid"></i><span>Cards</span>
-            </button>
-            <button class="vocab-view-toggle-btn ${currentMode === 'rows' ? 'is-active' : ''}" type="button" data-teacher-vocab-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
-                <i data-lucide="list"></i><span>Rows</span>
-            </button>
-        `;
-        container.querySelectorAll('[data-teacher-vocab-view-mode]').forEach(button => {
-            button.addEventListener('click', () => this.setTeacherVocabularyViewMode(button.dataset.teacherVocabViewMode));
-        });
-    },
-
 setVocabularyWorkflowTab(mode = 'assign', options = {}) {
         const nextMode = ['review', 'quizzes'].includes(mode) ? mode : 'assign';
         this.vocabularyMode = nextMode;
+        if (nextMode !== 'assign') this.deactivateTeacherVocabularyBrowser?.();
+        const scopeLabel = document.querySelector('#teacher-dashboard-view .teacher-library-scope');
+        if (scopeLabel) scopeLabel.textContent = nextMode === 'review'
+            ? 'Word Hunt evidence for the selected class.' : 'Reusable material for all your classes.';
         if (options.updateRoute !== false) {
             this.beginTeacherNavigation();
             if (nextMode === 'quizzes') {
@@ -104,7 +58,6 @@ setVocabularyWorkflowTab(mode = 'assign', options = {}) {
 
         this.refreshIcons();
     },
-
 showVocabularyLibrary() {
         if (!this.ensureAuthenticated(false)) return;
         this.vocabularyMode = 'assign';
@@ -116,21 +69,6 @@ showVocabularyLibrary() {
             isCurrent: () => this.isTeacherNavigationCurrent(navigation)
         });
     },
-
-ensureAuthenticated(showAlert = true) {
-        if (this.authDisabled) {
-            return true;
-        }
-        if (!this.isAuthenticated) {
-            if (showAlert) {
-                alert('Please sign in to use the teacher tools.');
-            }
-            this.showLoginView();
-            return false;
-        }
-        return true;
-    },
-
 invalidateTeacherLibraryCache() {
         const accountId = this.currentUser?.uid || this.currentUser?.id;
         if (!accountId) return Promise.resolve();
@@ -139,5 +77,13 @@ invalidateTeacherLibraryCache() {
             key: TEACHER_VOCABULARY_CLOUD_QUERY_KEY,
             exact: true
         });
+    },
+resetLibraryDrilldown() {
+        this.libraryDrilldown = {
+            subject: null,
+            grade: null,
+            trimester: null,
+            month: null
+        };
     }
 };

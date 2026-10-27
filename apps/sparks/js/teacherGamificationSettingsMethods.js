@@ -69,6 +69,7 @@ export const teacherGamificationSettingsMethods = {
     },
 
     async saveGamificationSettings(options = {}) {
+        const ownerUserId = this.currentUser?.uid;
         const isCurrent = createTeacherSettingsOperationGuard(this, options);
         if (!isCurrent()) return false;
         clearTimeout(this.gamificationStatusTimer);
@@ -110,7 +111,7 @@ export const teacherGamificationSettingsMethods = {
                 exchangeRate,
                 updatedAt: new Date().toISOString(),
                 updatedBy: this.currentUser?.email || 'unknown'
-            });
+            }, { ownerUserId, isCurrent, signal: options.signal });
             if (!isCurrent()) return false;
 
             this.gamificationSettingsLoaded = true;

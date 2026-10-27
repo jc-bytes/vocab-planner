@@ -7,7 +7,6 @@ import { StudentRouting } from './studentRoutingMethods.js';
 import { StudentShell } from './studentShellMethods.js';
 import { StudentListeners } from './studentListenerMethods.js';
 import { StudentSubjects } from './studentSubjectMethods.js';
-import { renderStudentActivityCards } from './student/studentActivityRegistry.js';
 
 const DEV_AUTH_DISABLED = false;
 
@@ -46,7 +45,6 @@ export class StudentManager {
         this.routing = new StudentRouting(this);
         this.shell = new StudentShell(this);
         this.listeners = new StudentListeners(this);
-        renderStudentActivityCards(document.querySelector('#activity-menu-view .activities-grid'));
         this.init();
     }
 
@@ -333,7 +331,6 @@ export class StudentManager {
             await this.activities.loadSchoolCalendar();
             this.progress.loadLocalProgress();
             this.auth.updateHeader();
-            this.activities.renderDashboard();
             await this.restoreRouteOrDefault();
             return;
         }
@@ -360,7 +357,7 @@ if (document.readyState === 'loading') {
     startStudentApp();
 }
 
-if (import.meta.env?.PROD === true && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+if (import.meta.env?.PROD === true && typeof navigator !== 'undefined') {
     if (document.readyState === 'complete') installStudentAppUpdates();
     else window.addEventListener('load', () => installStudentAppUpdates(), { once: true });
 }

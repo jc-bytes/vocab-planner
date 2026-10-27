@@ -1,3 +1,4 @@
+import { StudentSyncDrainScheduler } from './studentSyncDrainScheduler.js';
 import { notifications } from '../notifications.js';
 import { imageDB } from '../db.js';
 import { studentApi } from '../services/studentApi.js';
@@ -5,6 +6,7 @@ import { mapSparkResponseRow } from '../services/sparkResponsesRepository.js';
 import { classifySyncError } from '../services/syncQueuePolicy.js';
 import { getActiveStudentStorageOwner } from './persistence/studentStorage.js';
 import { createUniqueId } from '../randomUtils.js';
+import { requireActivityProgressResult } from './studentActivityProgressResult.js';
 
 export class StudentProgressSyncQueue {
     constructor(cloud) {
@@ -18,12 +20,69 @@ export class StudentProgressSyncQueue {
         };
         this.retryTimer = null;
         this.latestUnitSnapshots = new Map();
+        this.durableUnitSnapshots = new Map();
         this.snapshotClock = 0;
         this.unitWriteLanes = new Map();
+        this.drainScheduler = new StudentSyncDrainScheduler((owner, generation) =>
+            this.cloud.isCurrentOwner(owner)
+            && (generation === undefined || generation === this.cloud.cloudGeneration));
+    }
+
+    hasUnpersistedUnitDraft(ownerUserId, unitKey) {
+        return (this.latestUnitSnapshots.get(unitKey) || 0)
+            > (this.durableUnitSnapshots.get(`${ownerUserId}:${unitKey}`) || 0);
+    }
+
+    async restorePendingUnitWork(units, options) {
+        const pending = await imageDB.getPendingSyncActions({ ...options, includeDeferred: true });
+        if (!this.cloud.isCurrentOwner(options.ownerUserId, options)
+            || options.generation !== this.cloud.cloudGeneration) return units;
+        const restored = { ...units };
+        const pendingOrders = new Map();
+        const project = (key, source, context) => {
+            if (!source || typeof source !== 'object' || Array.isArray(source)) return;
+            // Match unit-work RPC semantics: educational fields merge shallowly,
+            // only an object state map replaces states, and rewards stay remote.
+            const { scores: _scores, states, coins: _coins, coinData: _coinData,
+                coinHistory: _coinHistory, ...work } = source;
+            const previous = restored[key] || {};
+            const next = { ...previous, ...work, scores: previous.scores || {} };
+            if (states && typeof states === 'object' && !Array.isArray(states)) next.states = states;
+            for (const [field, length] of Object.entries({ unitId: 160, unitName: 240,
+                subjectSlug: 80, trimester: 80, schoolYear: 20, grade: 20 })) {
+                const value = String(context?.[field] ?? '').slice(0, length);
+                next[field] = value || previous[field];
+            }
+            restored[key] = next;
+        };
+        for (const record of pending) {
+            if (record.type !== 'student-unit-work' || !record.payload?.unitKey) continue;
+            const key = record.payload.unitKey;
+            pendingOrders.set(key, Math.max(pendingOrders.get(key) || 0,
+                Number(record.payload.snapshotOrder) || 0));
+            project(key, record.payload.workPatch, record.payload.unitContext);
+        }
+        // A successful concurrent replay may retire the queued row while this
+        // read is held. A captured newer RAM intent still must survive hydration.
+        for (const key of this.latestUnitSnapshots.keys()) {
+            // A committed distinct event wins an equal snapshot-order tie.
+            // The pending records already carry their durable enqueue order.
+            if (this.hasUnpersistedUnitDraft(options.ownerUserId, key)
+                && (!pendingOrders.has(key)
+                    || this.latestUnitSnapshots.get(key) > pendingOrders.get(key))) {
+                const unit = this.sm.progressData.units?.[key];
+                project(key, unit, unit);
+            }
+        }
+        return restored;
     }
 
     getAuthStatus(fallback = 'Synced') {
         const state = this.queueStatus;
+        if (state?.message === 'Newer work is not synced. Keep this page open.'
+            && ![...this.latestUnitSnapshots.keys()].some(key => this.hasUnpersistedUnitDraft(state.ownerUserId, key))) {
+            return fallback;
+        }
         return state && state.ownerUserId === this.sm.currentUser?.uid
             && state.generation === this.cloud.cloudGeneration ? state.message : fallback;
     }
@@ -52,7 +111,9 @@ export class StudentProgressSyncQueue {
             void this.cloud.flushLocalSyncQueue({ silent: true, ownerUserId, generation }).catch(error => {
                 if (!this.cloud.isCurrentOwner(ownerUserId, options)
                     || generation !== this.cloud.cloudGeneration) return;
-                this.setQueueStatus('Local sync needs attention', ownerUserId, generation);
+                try {
+                    this.setQueueStatus('Local sync needs attention', ownerUserId, generation);
+                } catch { /* A disposed status observer cannot reject the background retry. */ }
                 console.warn('Could not retry saved local changes:', error);
             });
         }, Math.max(1000, Math.min(2147483647, delay)));
@@ -61,7 +122,9 @@ export class StudentProgressSyncQueue {
 
     resetUnitSnapshots() {
         this.latestUnitSnapshots.clear();
+        this.durableUnitSnapshots.clear();
         this.snapshotClock = 0;
+        this.drainScheduler.cancelObsolete();
     }
 
     isLatestUnitSnapshot(payload = {}) {
@@ -115,7 +178,16 @@ export class StudentProgressSyncQueue {
             const progress = await studentApi.syncStudentUnitWork(payload, { ...options, ownerUserId });
             if (!this.cloud.isCurrentOwner(ownerUserId, options)
                 || generation !== this.cloud.cloudGeneration) return { skipped: true };
+            if (!progress || typeof progress !== 'object' || Array.isArray(progress) || !Object.keys(progress).length) {
+                const error = new Error('The unit server returned an empty response.');
+                error.code = 'EMPTY_UNIT_RESPONSE';
+                throw error;
+            }
             await imageDB.retireUnitSyncActions(payload, { ownerUserId });
+            if (this.cloud.isCurrentOwner(ownerUserId, options) && generation === this.cloud.cloudGeneration) {
+                this.durableUnitSnapshots.set(key, Math.max(this.durableUnitSnapshots.get(key) || 0,
+                    Number(payload.snapshotOrder) || 0));
+            }
             return { progress };
         };
         const request = previous ? previous.catch(() => {}).then(run) : run();
@@ -134,6 +206,11 @@ export class StudentProgressSyncQueue {
         if (!payload) return null;
         if (!this.isLatestUnitSnapshot(payload)) return { skipped: true };
         const queued = await imageDB.enqueueSyncAction('student-unit-work', payload, { ownerUserId });
+        const key = `${ownerUserId}:${payload.unitKey}`;
+        if (this.cloud.isCurrentOwner(ownerUserId, options) && generation === this.cloud.cloudGeneration) {
+            this.durableUnitSnapshots.set(key, Math.max(this.durableUnitSnapshots.get(key) || 0,
+                Number(queued?.payload?.snapshotOrder ?? payload.snapshotOrder) || 0));
+        }
         this.scheduleRetry({ ownerUserId, generation });
         return queued;
     }
@@ -141,14 +218,8 @@ export class StudentProgressSyncQueue {
     async flushLocalSyncQueue(options = {}, syncRecord = this.syncQueuedRecord.bind(this)) {
         const owner = options.ownerUserId || this.sm.currentUser?.uid;
         const generation = options.generation ?? this.cloud.cloudGeneration;
-        const key = `${owner}:${generation}`;
-        this.activeFlushes ||= new Map();
-        if (this.activeFlushes.has(key)) return this.activeFlushes.get(key);
-        const flush = this.runLocalSyncQueue(options, syncRecord).finally(() => {
-            if (this.activeFlushes.get(key) === flush) this.activeFlushes.delete(key);
-        });
-        this.activeFlushes.set(key, flush);
-        return flush;
+        return this.drainScheduler.run(owner, generation, signal =>
+            this.runLocalSyncQueue({ ...options, ownerUserId: owner, generation, signal }, syncRecord));
     }
 
     async runLocalSyncQueue(options, syncRecord) {
@@ -161,31 +232,42 @@ export class StudentProgressSyncQueue {
         this.cancelRetry();
         let pending = [];
         try {
+            await imageDB.reviveRetryableSyncActions({ ownerUserId });
+        } catch (error) {
+            // Existing pending records can still sync and free storage even if
+            // recovery of an older retired record could not commit locally.
+            if (!options.silent) console.warn('Could not recover older local changes:', error);
+        }
+        try {
             pending = await imageDB.getPendingSyncActions({ ownerUserId, includeDeferred: true });
         } catch (error) {
             if (!options.silent) console.warn('Could not read local sync queue:', error);
             return;
         }
 
+        if (!this.cloud.isCurrentOwner(ownerUserId, options)
+            || generation !== this.cloud.cloudGeneration) return;
         if (pending.length > 0) this.sm.setAuthStatus('Syncing local changes...');
 
         let retryableFailures = 0;
         let terminalFailures = 0;
-        let deferred = 0;
 
-        for (const record of pending) {
+        const cycle = this.drainScheduler.cycle(ownerUserId, pending, {
+            now: () => this.scheduler.now(),
+            maxAttempts: this.maxDrainAttempts,
+            maxDurationMs: this.maxDrainDurationMs
+        });
+        let record;
+        while ((record = cycle.next(pending))) {
             if (!this.cloud.isCurrentOwner(ownerUserId, options)
                 || generation !== this.cloud.cloudGeneration) return;
-            if (Math.max(Date.parse(record.nextAttemptAt) || 0,
-                Number(record.payload?.retryNotBefore) || 0) > this.scheduler.now()) {
-                deferred += 1;
-                continue;
-            }
             try {
                 await syncRecord(record, { ...options, ownerUserId, generation });
                 if (!this.cloud.isCurrentOwner(ownerUserId, options)
                     || generation !== this.cloud.cloudGeneration) return;
-                await imageDB.completeSyncAction(record.id, { ownerUserId, expectedRevision: record.revision || 0 });
+                const completed = await imageDB.completeSyncAction(record.id, { ownerUserId, expectedRevision: record.revision || 0 });
+                if (!completed) cycle.block(record);
+                pending = pending.filter(row => row.id !== record.id);
             } catch (error) {
                 if (!this.cloud.isCurrentOwner(ownerUserId, options)
                     || generation !== this.cloud.cloudGeneration) return;
@@ -195,6 +277,9 @@ export class StudentProgressSyncQueue {
                     terminal: !failure.retryable,
                     reason: failure.reason
                 });
+                cycle.block(record);
+                pending = updated.skipped ? pending.filter(row => row.id !== record.id)
+                    : pending.map(row => row.id === record.id ? updated : row);
                 if (updated.skipped) continue;
                 if (updated.status === 'failed') terminalFailures += 1;
                 else retryableFailures += 1;
@@ -217,18 +302,18 @@ export class StudentProgressSyncQueue {
         if (!this.cloud.isCurrentOwner(ownerUserId, options)
             || generation !== this.cloud.cloudGeneration) return;
         if (remaining.length > 0) {
-            const next = Math.min(...remaining.map(record => Math.max(
-                Date.parse(record.nextAttemptAt) || 0,
-                Number(record.payload?.retryNotBefore) || 0
-            )));
+            const next = cycle.finish(remaining);
             this.scheduleRetry({ ownerUserId, generation }, next - this.scheduler.now());
         }
-        if (terminalFailures > 0 || failed.length > 0) {
+        if ([...this.latestUnitSnapshots.keys()].some(key => this.hasUnpersistedUnitDraft(ownerUserId, key))
+            || remaining.some(record => record.failureReason === 'unit_work_newer_draft')) {
+            this.setQueueStatus('Newer work is not synced. Keep this page open.', ownerUserId, generation);
+        } else if (terminalFailures > 0 || failed.length > 0) {
             this.setQueueStatus('Some local changes need attention', ownerUserId, generation);
             if (!options.silent) {
                 notifications.warning('Some saved changes were rejected, but other work continued syncing.');
             }
-        } else if (deferred > 0 || remaining.length > 0) {
+        } else if (remaining.length > 0) {
             this.setQueueStatus('Saved locally - checking in background', ownerUserId, generation);
         } else if (retryableFailures > 0) {
             this.setQueueStatus('Sync paused - saved locally', ownerUserId, generation);
@@ -250,7 +335,18 @@ export class StudentProgressSyncQueue {
             const result = await this.executeUnitWork(record.payload || {}, {
                 ...options, ownerUserId, verifyOwner: true
             });
-            if (result.skipped) return;
+            if (result.skipped) {
+                const durableOrder = this.durableUnitSnapshots.get(`${ownerUserId}:${record.payload?.unitKey}`) || 0;
+                if (isCurrent() && !this.isLatestUnitSnapshot(record.payload)
+                    && durableOrder <= (Number(record.payload?.snapshotOrder) || 0)) {
+                    // A newer RAM snapshot may have failed both transport and
+                    // storage. Refusing old work is not its acknowledgement.
+                    const error = new Error('Newer work is not synced. Keep this page open.');
+                    error.code = 'UNIT_WORK_NEWER_DRAFT';
+                    throw error;
+                }
+                return;
+            }
             const progress = result.progress;
             if (!isCurrent()) return;
             if (this.isLatestUnitSnapshot(record.payload)) {
@@ -261,24 +357,47 @@ export class StudentProgressSyncQueue {
         if (record.type === 'student-activity-progress'
             && typeof studentApi.submitStudentActivityProgress === 'function') {
             const progress = await studentApi.submitStudentActivityProgress(record.payload || {}, {
+                ...options,
                 ownerUserId,
                 verifyOwner: true
             });
             if (!isCurrent()) return;
+            requireActivityProgressResult(progress);
+            // An older receipt can acknowledge its score without replacing a
+            // newer draft that neither the server nor local queue has accepted.
+            const unitKey = record.payload?.unitKey;
+            const successor = await imageDB.getNewerUnitSyncAction(record, { ownerUserId });
+            if (!isCurrent()) return;
+            const successorStates = successor?.payload?.workPatch?.states;
+            const hasSuccessorStates = Boolean(successorStates && typeof successorStates === 'object'
+                && !Array.isArray(successorStates));
+            const preserveLocalState = this.hasUnpersistedUnitDraft(ownerUserId, unitKey) || hasSuccessorStates;
+            const localStates = successor && (this.latestUnitSnapshots.get(unitKey) || 0)
+                <= (Number(successor.payload.snapshotOrder) || 0)
+                && hasSuccessorStates
+                ? successorStates : undefined;
             if (this.sm.activities?.progressPersistence?.applyActivityProgressResult) {
-                this.sm.activities.progressPersistence.applyActivityProgressResult(progress, record.payload || {});
+                this.sm.activities.progressPersistence.applyActivityProgressResult(progress, record.payload || {}, { preserveLocalState, localStates });
             } else {
-                this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+                this.progress.applyProgressSnapshot(progress, { saveLocal: true,
+                    preserveLocalStateForUnit: preserveLocalState ? unitKey : undefined,
+                    preservedUnitStates: localStates });
             }
             return;
         }
         if (record.type === 'student-spark-response'
             && typeof studentApi.submitStudentSparkResponse === 'function') {
             const saved = await studentApi.submitStudentSparkResponse(record.payload || {}, {
+                ...options,
                 ownerUserId,
                 verifyOwner: true
             });
             if (!isCurrent()) return;
+            if (!saved || typeof saved !== 'object' || Array.isArray(saved) || !Object.keys(saved).length) {
+                const error = new Error('The Spark server returned an empty response.');
+                error.code = 'EMPTY_SPARK_RESPONSE';
+                throw error;
+            }
             const storageKey = String(record.payload?.storageKey || '');
             const sparkId = String(record.payload?.sparkId || '');
             if (storageKey && sparkId) {

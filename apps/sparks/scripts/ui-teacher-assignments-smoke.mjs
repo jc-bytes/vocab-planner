@@ -1,22 +1,26 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
+import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 const host = '127.0.0.1', port = Number(process.env.UI_TEACHER_ASSIGNMENTS_PORT || 8042), baseUrl = `http://${host}:${port}`;
 let server, browser;
 try {
     server = await ensureViteServer({ baseUrl, probePath: '/', host, port });
-    browser = await chromium.launch(); const page = await browser.newPage({ acceptDownloads: true, timezoneId: 'America/Panama' });
+    browser = await chromium.launch(); const context = await browser.newContext({ acceptDownloads: true, timezoneId: 'America/Panama' }); const page = await context.newPage();
     const errors = []; page.on('pageerror', error => errors.push(error.message));
-    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 'utf8');
+    const styles = [...teacherHtml.matchAll(/<link[^>]+rel="stylesheet"[^>]*>/g)].map(match => match[0]).join('');
+    await page.route('**/assignment-workspace-fixture', route => route.fulfill({ contentType: 'text/html', body: `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Assignments fixture</title>${styles}</head><body class="teacher-site"><div class="app-container"><main class="teacher-main"></main></div></body></html>` }));
+    await page.goto(`${baseUrl}/assignment-workspace-fixture`, { waitUntil: 'networkidle' });
     await page.evaluate(async () => {
-        document.body.replaceChildren();
-        const root = document.createElement('main'); document.body.append(root);
+        const root = document.createElement('section'); root.id = 'teacher-assignments-view'; root.className = 'view active'; document.querySelector('main').append(root);
         const state = window.assignmentSmoke = { owner: 'teacher-a', calls: [], fail: true, navigation: [], published: [], root };
         const classes = [{ id: 'class-a', canTeach: true, name: '6A', school_year: 2026, subject: { name: 'Technology' } }, { id: 'class-b', canTeach: true, name: '6A', school_year: 2026, subject: { name: 'Science' } }, { id: 'archived', name: 'Old class', archived: true }];
         state.classes = classes;
-        const assignments = [{ id: 'vocab-a', class_id: 'class-a', kind: 'vocabulary', title: 'Vocabulary A', release_at: '2026-09-01T12:00:00Z' }, { id: 'spark-b', class_id: 'class-b', kind: 'spark', title: 'Spark B', release_at: '2026-09-01T12:00:00Z' }];
+        const assignments = [{ id: 'future', class_id: 'class-a', kind: 'vocabulary', title: 'Future vocabulary', release_at: '2099-01-01T00:00:00Z' }, { id: 'historical', class_id: 'class-a', kind: 'spark', title: 'Historical Spark', withdrawn: true, release_at: '2020-01-01T00:00:00Z' }, { id: 'vocab-a', class_id: 'class-a', kind: 'vocabulary', title: 'Vocabulary A', release_at: '2026-09-01T12:00:00Z' }, { id: 'spark-b', class_id: 'class-b', kind: 'spark', title: 'Spark B', release_at: '2026-09-01T12:00:00Z' }];
         state.repository = {
+            listReviewResponses: async ids => ids.includes('spark-b') ? [{ assignment_id: 'spark-b', student_id: 'c', revision: 1, evaluation: { needsTeacherReview: true } }] : [],
             listClasses: async () => classes,
             listOwnMaterials: async () => [{ id: 'vocab', kind: 'vocabulary', title: 'Saved vocabulary' }, { id: 'spark', kind: 'spark', title: 'Saved Spark' }],
             publishMaterial: async payload => { state.calls.push(structuredClone(payload)); if (state.fail) { state.fail = false; throw new Error('Network interrupted'); } return ['new-a', 'new-b']; },
@@ -67,19 +71,39 @@ try {
     assert.equal(await page.getByRole('button', { name: 'Assign material', exact: true }).evaluate(e => e === document.activeElement), true);
     // Cancelling an in-flight withdrawal must not close a new dialog or redraw its old view.
     await page.evaluate(() => { const s = window.assignmentSmoke; s.repository.withdrawAssignment = () => new Promise(resolve => { s.resolveWithdrawal = resolve; }); });
+    await page.getByRole('button',{name:'Open Vocabulary A · 6A',exact:true}).click();
+    await page.getByRole('tab', {name:'Details',exact:true}).click();
     await page.getByRole('button', { name: 'Withdraw assignment', exact: true }).first().click();
     await page.getByRole('dialog').getByRole('button', { name: 'Withdraw assignment', exact: true }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('button', { name: 'Back to assignments', exact: true }).click();
     await page.getByRole('button', { name: 'Assign material', exact: true }).click();
     await page.evaluate(async () => { window.assignmentSmoke.resolveWithdrawal(); await new Promise(resolve => setTimeout(resolve, 0)); });
     assert.equal(await page.getByRole('dialog', { name: 'Assign material', exact: true }).count(), 1);
     await page.keyboard.press('Escape');
-    // Return to the original list mode and retain its status filter.
-    await page.getByLabel('Status').selectOption('Available');
-    await page.getByRole('button', { name: 'Review work', exact: true }).first().click();
+    // Preserve the library filters when opening work and returning.
+    await page.getByRole('button',{name:'Filter assignments',exact:true}).click();
+    await page.getByLabel('Type',{exact:true}).selectOption('vocabulary');
+    await page.getByRole('button',{name:'Done',exact:true}).click();
+    await page.getByRole('button',{name:'Open Vocabulary A · 6A',exact:true}).click();
     await page.getByRole('button', { name: 'Back to assignments', exact: true }).click();
-    assert.equal(await page.getByLabel('Status').inputValue(), 'Available');
+    await page.getByRole('button',{name:'Filter assignments',exact:true}).click();
+    assert.equal(await page.getByLabel('Type',{exact:true}).inputValue(), 'vocabulary');
+    await page.getByLabel('Type',{exact:true}).selectOption('all');
+    await page.getByRole('button',{name:'Done',exact:true}).click();
     assert.equal(await page.evaluate(() => window.assignmentSmoke.navigation.at(-1).mode), 'assignments');
+    await page.getByRole('tab',{name:'Scheduled',exact:true}).click();
+    await page.getByRole('button',{name:'Open Future vocabulary · 6A',exact:true}).waitFor();
+    await page.getByRole('tab',{name:'History',exact:true}).click();
+    await page.getByRole('button',{name:'Open Historical Spark · 6A',exact:true}).waitFor();
+    await page.getByRole('tab',{name:'Needs review',exact:true}).click();
+    await assertNoAccessibilityViolations(page, 'Needs review', {include:['#teacher-assignments-view']});
+    assert.equal(await page.getByRole('button',{name:'Open Spark B · 6A',exact:true}).count(),1);
+    assert.equal(await page.getByRole('button',{name:'Open Vocabulary A · 6A',exact:true}).count(),0);
+    await page.getByRole('button',{name:'Open Spark B · 6A',exact:true}).click();
+    assert.equal(await page.getByLabel('Show work',{exact:true}).inputValue(),'needs-review');
+    await page.getByRole('button',{name:'Back to assignments',exact:true}).click();
+    await page.getByRole('tab',{name:'Current',exact:true}).click();
     // Scope comes from assignment/class IDs, even when two classes share a name.
     await page.evaluate(() => window.assignmentSmoke.workspace.show({ mode: 'review', classId: 'class-a', assignmentId: 'vocab-a' }));
     assert.equal(await page.getByRole('cell', { name: 'No work submitted', exact: true }).count(), 1);
@@ -142,7 +166,10 @@ try {
         const s = window.assignmentSmoke; s.classes[0].canTeach = true;
         await s.workspace.show();
     });
-    assert.equal(await page.getByRole('button', { name: 'Withdraw assignment', exact: true }).count(), 1);
+    await page.getByRole('button',{name:'Open Vocabulary A · 6A',exact:true}).click();
+    await page.getByRole('tab', {name:'Details',exact:true}).click();
+    assert.equal(await page.getByRole('button',{name:'Withdraw assignment',exact:true}).count(),1);
+    await page.getByRole('button',{name:'Back to assignments',exact:true}).click();
     await page.getByRole('button', { name: 'Assign material', exact: true }).click();
     assert.equal(await page.getByRole('dialog').getByLabel('Technology · 6A · 2026', { exact: true }).count(), 1);
     assert.equal(await page.getByRole('dialog').getByLabel('Science · 6A · 2026', { exact: true }).count(), 0);
@@ -184,6 +211,59 @@ try {
     assert.equal(feedbackFilters.otherDraft, 'Ben unsaved draft'); assert.equal(feedbackFilters.preservedOther, true);
     assert.equal(feedbackFilters.newerDraft, 'Ana newer unsaved draft'); assert.equal(feedbackFilters.savedDraft, 'Ana newer unsaved draft');
     assert.ok(feedbackFilters.advancedRevision >= 2); assert.equal(feedbackFilters.detachedSave, true);
+    await page.evaluate(async () => {
+        const s = window.assignmentSmoke; s.originalAssignments = s.repository.listAssignments;
+        s.repository.listAssignments = async () => Array.from({length:23},(_,i)=>({id:`compact-${i}`,title:`Assignment ${String(i+1).padStart(2,'0')}`,class_id:i%2?'class-b':'class-a',kind:i%2?'spark':'vocabulary',release_at:'2026-09-01T12:00:00Z',due_at:i===22?null:'2026-10-20T12:00:00Z',withdrawn:i===22}));
+        await s.workspace.show();
+    });
+    const compact = page.locator('.assignment-library-rows');
+    assert.equal(await compact.locator('article').count(),10);
+    await page.getByRole('button',{name:'Next assignments page'}).click();
+    await page.getByText('Assignments 11–20 of 22',{exact:true}).waitFor();
+    assert.equal(await compact.getByText('Assignment 01',{exact:true}).count(),0);
+    await page.getByRole('button',{name:'Next assignments page'}).click();
+    assert.equal(await compact.locator('article').count(),2);
+    await page.getByRole('button',{name:'Filter assignments',exact:true}).click();
+    await page.getByLabel('Type',{exact:true}).selectOption('spark');
+    await page.getByText('Assignments 1–10 of 11',{exact:true}).waitFor();
+    await page.getByLabel('Sort',{exact:true}).selectOption('title-desc');
+    assert.equal(await compact.locator('article strong').first().textContent(),'Assignment 22');
+    assert.equal(await page.getByRole('button',{name:'Filter assignments',exact:true}).textContent(),'Filters (1)');
+    await page.getByRole('button',{name:'Done',exact:true}).click();
+    await page.getByRole('button',{name:'More actions for Assignment 22 · 6A',exact:true}).click();
+    await page.getByRole('menuitem',{name:'Assignment details',exact:true}).click();
+    await page.locator('.assignment-details-metadata').getByText('Spark',{exact:true}).waitFor();
+    await page.getByRole('button',{name:'Back to assignments',exact:true}).click();
+    assert.equal(await compact.locator('article strong').first().textContent(),'Assignment 22');
+    await page.getByRole('searchbox',{name:'Search assignments'}).fill('Assignment 02');
+    await page.getByText('Assignments 1–1 of 1',{exact:true}).waitFor();
+    await page.getByRole('searchbox',{name:'Search assignments'}).fill('missing');
+    await page.getByText('No assignments match this view.').waitFor();
+    await page.getByRole('searchbox',{name:'Search assignments'}).fill('');
+    await assertNoAccessibilityViolations(page, 'Unified assignments', {include:['#teacher-assignments-view']});
+    await page.evaluate(() => { document.querySelector('.assignment-library-item strong').textContent = 'A long assignment title with several words to check narrow screens and keep its actions visible'; });
+    await mkdir('/tmp/sparks-unified-assignments', {recursive:true});
+    for(const width of [1440,768,390,320]) {
+        await page.setViewportSize({width,height:900});
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Assignments fit ${width}`);
+        assert.equal(await page.locator('.assignment-library-item').first().evaluate(item => { const title = item.querySelector('strong').getBoundingClientRect(), menu = item.querySelector('.floating-action-menu-trigger').getBoundingClientRect(); return title.right <= menu.left; }), true, `Title clears its actions at ${width}`);
+        await page.screenshot({path:`/tmp/sparks-unified-assignments/assignments-${width}.png`,fullPage:true});
+    }
+    await page.evaluate(()=>{
+        const s=window.assignmentSmoke;
+        s.repository.listAssignments=()=>new Promise((resolve,reject)=>{s.resolveList=resolve;s.rejectList=reject;});
+        s.workspace.show();
+    });
+    await page.getByText('Loading assignments…',{exact:true}).waitFor();
+    assert.equal(await page.locator('#teacher-assignments-view').getAttribute('aria-busy'),'true');
+    await page.evaluate(()=>window.assignmentSmoke.rejectList(new Error('Assignments unavailable')));
+    await page.getByText('Assignments unavailable',{exact:true}).waitFor();
+    await page.getByRole('button',{name:'Try again',exact:true}).click();
+    await page.getByText('Loading assignments…',{exact:true}).waitFor();
+    await page.evaluate(()=>window.assignmentSmoke.resolveList([]));
+    await page.getByText('No assignments match this view.').waitFor();
+    assert.equal(await page.locator('#teacher-assignments-view').getAttribute('aria-busy'),'false');
+    await page.evaluate(()=>{const s=window.assignmentSmoke;s.repository.listAssignments=s.originalAssignments;});
     // A replaced account must not receive a delayed load from the previous account.
     await page.evaluate(() => {
         const s = window.assignmentSmoke; s.owner = 'teacher-a'; s.publisher.destroy(); s.publisher = s.makePublisher();

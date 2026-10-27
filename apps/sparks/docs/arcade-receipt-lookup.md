@@ -1,0 +1,11 @@
+# Recovering a paid Arcade receipt
+
+Apply `20261025145937_recover_paid_arcade_minute_without_purchase.sql` before publishing the matching client. It adds authenticated-only `recover_student_arcade_minute_owned_v1(expected user, event, game, client)`. The public invoker checks `auth.uid()` before the private receipt lookup. Existing purchase endpoints, grants, prices, duration, and assessment rules remain unchanged.
+
+The lookup never calls a purchase or wallet-creation function. It takes the original purchase's user/event advisory lock, reads an existing receipt, and validates its operation, original captured price, game, and client hash. No receipt returns `{receiptFound:false}`. A paid receipt returns `{receiptFound:true,purchase:...}` with the original minute/price and freshly read wallets. An original purchase already holding the lock must commit or roll back before the lookup decides.
+
+The client uses receipt lookup before deciding how to handle a persisted unknown purchase. A confirmed paid minute can be credited once even if current work requirements block another purchase. An explicit missing receipt permits a spend only after the current eligibility check, using the original event and client. Transport failures, empty or malformed responses, and ownership mismatches retain the unresolved intent. The API cannot fall back to spending or allocate a replacement event ID.
+
+Run `node scripts/rehearse-arcade-receipt-lookup.mjs` against the local Supabase stack. It uses a disposable schema clone and isolated PostgREST gateway. Controls cover funded absent intents, paid recovery with exhausted allowance, original pricing after a rate change, fresh balances, changed metadata, anonymous access, a real SDK replacement-token race, and a concurrent original commit. Lookup also runs successfully inside PostgreSQL `READ ONLY` transactions; complete balance, ledger, and receipt snapshots must remain identical. The script removes all disposable resources and makes no hosted calls.
+
+`test:arcade-purchase:database` runs both the existing purchase rehearsal and this lookup rehearsal. Deployment readiness now requires eight owned RPCs. Default local schema application and hosted release are separate steps; source tests and disposable rehearsal alone do not establish rollout readiness.

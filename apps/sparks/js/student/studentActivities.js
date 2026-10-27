@@ -3,11 +3,12 @@
  * Handles vocabulary loading, activity management, and progress tracking
  */
 
-import { StudentActivityBrowser } from './studentActivityBrowserMethods.js';
+import { renderStudentUnits } from './lazyStudentUnits.js';
+import { formatVocabularyCardTitle, formatVocabularyCardDescription, formatVocabularyPurpose, getVocabularyPurposeClass, scheduleFirstVocabularyPreload } from './studentVocabularyPresentation.js';
 import { StudentActivityCalendar } from './studentActivityCalendarMethods.js';
 import { StudentActivityCoverage } from './studentActivityCoverageMethods.js';
 import { StudentActivityHome } from './studentActivityHomeMethods.js';
-import { StudentActivityLauncher } from './studentActivityLauncherMethods.js';
+import { LazyStudentActivityLauncher } from './lazyStudentActivityLauncher.js';
 import { StudentActivityMenu } from './studentActivityMenuMethods.js';
 import { StudentActivityModuleLoader } from './studentActivityModuleLoaderMethods.js';
 import { StudentActivityProgressFlow } from './studentActivityProgressFlowMethods.js';
@@ -22,8 +23,14 @@ export class StudentActivities {
     constructor(studentManager) {
         this.sm = studentManager; // Reference to StudentManager instance
         this.manifest = null;
-        this.availableVocabs = [];
-        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
+        this.studentVocabularyViewMode = 'cards';
+        try {
+            if (localStorage.getItem('student_vocabulary_view_mode') === 'rows') {
+                this.studentVocabularyViewMode = 'rows';
+            }
+        } catch {
+            // Display preferences are optional when browser storage is unavailable.
+        }
         this.activityRouteTypes = getStudentActivityIds();
         this.session = new StudentActivitySession(this);
         this.calendar = new StudentActivityCalendar(this);
@@ -31,11 +38,11 @@ export class StudentActivities {
         this.coverage = new StudentActivityCoverage(this);
         this.progressFlow = new StudentActivityProgressFlow(this);
         this.vocabularyData = new StudentActivityVocabularyData(this);
-        this.browser = new StudentActivityBrowser(this);
+        this.browser = null;
         this.home = new StudentActivityHome(this);
         this.menu = new StudentActivityMenu(this);
         this.moduleLoader = new StudentActivityModuleLoader(this);
-        this.launcher = new StudentActivityLauncher(this);
+        this.launcher = new LazyStudentActivityLauncher(this);
         this.progressPersistence = new StudentActivityProgressPersistence(this);
         this.wordHunt = new StudentActivityWordHunt(this);
     }
@@ -162,6 +169,10 @@ export class StudentActivities {
 
     startVerifiedActivityAttempt(activityType, options = {}) {
         return this.progressPersistence.startVerifiedActivityAttempt(activityType, options);
+    }
+
+    prepareActiveRuntime(options = {}) {
+        return this.progressPersistence.prepareActiveRuntime(options);
     }
 
     markWordsPracticed(activityType, words) {
@@ -297,121 +308,35 @@ export class StudentActivities {
     }
 
     renderDashboard(options) {
-        return this.browser.renderDashboard(options);
-    }
-
-    renderVocabularyBrowser(container, vocabs = null) {
-        return this.browser.renderVocabularyBrowser(container, vocabs);
-    }
-
-    getAutomaticStudentVocabularyLocation(trimesterGroups) {
-        return this.browser.getAutomaticStudentVocabularyLocation(trimesterGroups);
-    }
-
-    isCurrentAcademicMonth(monthKey) {
-        return this.browser.isCurrentAcademicMonth(monthKey);
-    }
-
-    appendCurrentMonthBadge(target, monthKey) {
-        return this.browser.appendCurrentMonthBadge(target, monthKey);
-    }
-
-    renderStudentLibraryBreadcrumb(container, selectedTrimester = null, selectedMonth = null) {
-        return this.browser.renderStudentLibraryBreadcrumb(container, selectedTrimester, selectedMonth);
-    }
-
-    createStudentBreadcrumbButton(label, onClick) {
-        return this.browser.createStudentBreadcrumbButton(label, onClick);
+        return renderStudentUnits(this, options);
     }
 
     getStudentVocabularyViewMode() {
-        return this.browser.getStudentVocabularyViewMode();
-    }
-
-    setStudentVocabularyViewMode(mode) {
-        return this.browser.setStudentVocabularyViewMode(mode);
-    }
-
-    renderStudentVocabularyViewControls() {
-        return this.browser.renderStudentVocabularyViewControls();
-    }
-
-    renderStudentTrimesterPicker(container, trimesterGroups) {
-        return this.browser.renderStudentTrimesterPicker(container, trimesterGroups);
-    }
-
-    renderStudentMonthPicker(container, selectedTrimester, monthGroups) {
-        return this.browser.renderStudentMonthPicker(container, selectedTrimester, monthGroups);
-    }
-
-    renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups) {
-        return this.browser.renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups);
-    }
-
-    renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthVocabs, monthGroups) {
-        return this.browser.renderStudentAssignmentPicker(
-            container,
-            selectedTrimester,
-            selectedMonth,
-            monthVocabs,
-            monthGroups
-        );
-    }
-
-    createStudentLibraryChoiceCard(options) {
-        return this.browser.createStudentLibraryChoiceCard(options);
-    }
-
-    createStudentVocabRowList(headers = []) {
-        return this.browser.createStudentVocabRowList(headers);
-    }
-
-    createStudentVocabRow(options) {
-        return this.browser.createStudentVocabRow(options);
-    }
-
-    refreshIcons(root = document) {
-        return this.browser.refreshIcons(root);
-    }
-
-    renderVocabularyGroups(container, vocabs) {
-        return this.browser.renderVocabularyGroups(container, vocabs);
-    }
-
-    createVocabularyCard(vocab) {
-        return this.browser.createVocabularyCard(vocab);
-    }
-
-    createVocabularyRow(vocab) {
-        return this.browser.createVocabularyRow(vocab);
+        return this.studentVocabularyViewMode === 'rows' ? 'rows' : 'cards';
     }
 
     formatVocabularyCardTitle(vocab) {
-        return this.browser.formatVocabularyCardTitle(vocab);
+        return formatVocabularyCardTitle(vocab);
     }
 
     formatVocabularyPurpose(purpose) {
-        return this.browser.formatVocabularyPurpose(purpose);
+        return formatVocabularyPurpose(purpose);
     }
 
     getVocabularyPurposeClass(purpose) {
-        return this.browser.getVocabularyPurposeClass(purpose);
+        return getVocabularyPurposeClass(purpose);
     }
 
     formatVocabularyScheduleLabel(vocab) {
-        return this.browser.formatVocabularyScheduleLabel(vocab);
+        return this.schedule.getVocabSchedule(vocab).label || this.schedule.getTrimesterLabel(this.schedule.getVocabTrimesterKey(vocab));
     }
 
     formatVocabularyCardDescription(vocab, title) {
-        return this.browser.formatVocabularyCardDescription(vocab, title);
+        return formatVocabularyCardDescription(vocab, title);
     }
 
     scheduleFirstVocabularyPreload(container) {
-        return this.browser.scheduleFirstVocabularyPreload(container);
-    }
-
-    getUnitProgressSummary(vocab) {
-        return this.home.getUnitProgressSummary(vocab);
+        return scheduleFirstVocabularyPreload(container, this.calendar);
     }
 
     renderStudentHome(options) {
@@ -420,22 +345,6 @@ export class StudentActivities {
 
     renderSparkLibrary() {
         return this.home.renderSparkLibrary();
-    }
-
-    createContinueLearningHero(item, emptyText = '', context = {}) {
-        return this.home.createContinueLearningHero(item, emptyText, context);
-    }
-
-    getContinueLearningPercent(progress = {}) {
-        return this.home.getContinueLearningPercent(progress);
-    }
-
-    isVocabScheduleInCurrentWeek(schedule = {}, date = new Date()) {
-        return this.home.isVocabScheduleInCurrentWeek(schedule, date);
-    }
-
-    getHomeCurrentWeekBounds(date = new Date()) {
-        return this.home.getHomeCurrentWeekBounds(date);
     }
 
     normalizeSpark(spark = {}) {
@@ -460,38 +369,6 @@ export class StudentActivities {
 
     loadAndRenderCurrentSpark(host) {
         return this.home.loadAndRenderCurrentSpark(host);
-    }
-
-    getStudentSparkQuestion(spark) {
-        return this.home.getStudentSparkQuestion(spark);
-    }
-
-    createStudentSparkCard(spark) {
-        return this.home.createStudentSparkCard(spark);
-    }
-
-    removeSparkHomePanel(host) {
-        return this.home.removeSparkHomePanel(host);
-    }
-
-    createSparkHomePanel(title, subtitle, active = false) {
-        return this.home.createSparkHomePanel(title, subtitle, active);
-    }
-
-    bindHomePanelTabs(container) {
-        return this.home.bindHomePanelTabs(container);
-    }
-
-    createHomePanel(key, title, subtitle, items, emptyText, active = false) {
-        return this.home.createHomePanel(key, title, subtitle, items, emptyText, active);
-    }
-
-    createHomeWorkCard(item) {
-        return this.home.createHomeWorkCard(item);
-    }
-
-    createHomeUnitCard(item) {
-        return this.home.createHomeUnitCard(item);
     }
 
     showActivityMenu(options = {}) {

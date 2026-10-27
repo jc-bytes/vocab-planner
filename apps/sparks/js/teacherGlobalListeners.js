@@ -1,3 +1,4 @@
+import { bindFloatingActionMenu } from './ui/floatingActionMenu.js';
 import { $, $$, setupModal } from './main.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 import { getKeyboardNavigatedTab } from './ui/tabNavigation.js';
@@ -5,9 +6,6 @@ import { getKeyboardNavigatedTab } from './ui/tabNavigation.js';
 const TEACHER_RESIZE_DEBOUNCE_MS = 120;
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
-const STUDENTS_PAGE = teacherPageRegistry.get('students');
-const GROUPS_PAGE = teacherPageRegistry.get('groups');
-const SETTINGS_PAGE = teacherPageRegistry.get('settings');
 
 function debounceTeacherResize(callback) {
     let timer = null;
@@ -20,7 +18,7 @@ function debounceTeacherResize(callback) {
 function bindTeacherTabs(manager) {
     $$('.teacher-tab').forEach(tab => {
         tab.addEventListener('click', () => {
-            manager.showTeacherSection(tab.dataset.section);
+            manager.showTeacherSection(tab.dataset.section, { tab: tab.dataset.tab });
         });
         tab.addEventListener('keydown', (event) => {
             const tabs = Array.from($$('.teacher-tab')).filter(candidate => !candidate.hidden);
@@ -28,7 +26,7 @@ function bindTeacherTabs(manager) {
             if (!nextTab) return;
             event.preventDefault();
             nextTab.focus();
-            manager.showTeacherSection(nextTab.dataset.section);
+            manager.showTeacherSection(nextTab.dataset.section, { tab: nextTab.dataset.tab });
         });
     });
 }
@@ -81,21 +79,25 @@ function bindTeacherMobileMenu(manager) {
     });
 }
 
-function bindOverviewListeners(manager) {
-    $('#overview-create-vocab-btn')?.addEventListener('click', () => manager.startNewVocab());
-    $('#overview-groups-btn')?.addEventListener('click', () => manager.showTeacherSection(GROUPS_PAGE.id));
-    $('#overview-groups-action-btn')?.addEventListener('click', () => manager.showTeacherSection(GROUPS_PAGE.id));
-    $('#overview-students-btn')?.addEventListener('click', () => manager.showTeacherSection(STUDENTS_PAGE.id));
-    $('#overview-vocabulary-btn')?.addEventListener('click', () => manager.showTeacherSection(VOCABULARY_PAGE.id));
-    $('#overview-quiz-btn')?.addEventListener('click', () => manager.showTeacherSection('quizzes'));
-    $('#overview-sparks-btn')?.addEventListener('click', () => manager.showTeacherSection(SPARKS_PAGE.id));
-    $('#overview-settings-btn')?.addEventListener('click', () => manager.showTeacherSection(SETTINGS_PAGE.id));
-    $('#overview-export-btn')?.addEventListener('click', () => {
-        manager.showTeacherSection('review');
-    });
-}
-
 function bindContentNavigation(manager) {
+    $$('.activity-workflow-tabs[aria-label="Library tools"]').forEach(list => {
+        const tabs = () => [...list.querySelectorAll('[role="tab"]')].filter(tab => !tab.hidden && !tab.classList.contains('hidden'));
+        tabs().forEach(tab => {
+            tab.tabIndex = tab.getAttribute('aria-selected') === 'true' ? 0 : -1;
+            tab.addEventListener('keydown', event => {
+                const next = getKeyboardNavigatedTab(tabs(), tab, event.key);
+                if (!next) return;
+                event.preventDefault();
+                next.focus();
+                if (next.dataset.contentDestination) {
+                    document.addEventListener('teacher-shell-view', () => requestAnimationFrame(() => {
+                        document.querySelector('.view.active .activity-workflow-tabs [aria-selected="true"]')?.focus();
+                    }), { once: true });
+                }
+                next.click();
+            });
+        });
+    });
     $$('[data-content-destination]').forEach(button => {
         button.addEventListener('click', () => {
             const destination = button.dataset.contentDestination;
@@ -121,8 +123,15 @@ export function initTeacherGlobalListeners(manager) {
     bindTeacherAuthListeners(manager);
     bindTeacherMobileMenu(manager);
     bindTeacherTabs(manager);
-    bindOverviewListeners(manager);
+    $('#teacher-class-select')?.addEventListener('change', event => manager.changeTeacherClass(event.target.value));
     bindContentNavigation(manager);
+    const createTrigger = $('#teacher-library-create-btn');
+    const createMenu = $('#teacher-library-create-menu');
+    if (createTrigger && createMenu) {
+        bindFloatingActionMenu({ trigger: createTrigger, menu: createMenu });
+        createTrigger.innerHTML = '<i data-lucide="plus" aria-hidden="true"></i><span>Create</span><i data-lucide="chevron-down" aria-hidden="true"></i>';
+        manager.refreshIcons(createTrigger);
+    }
     document.querySelectorAll('[data-publish-material]').forEach(button => {
         button.addEventListener('click', () => manager.openAssignmentPublisher());
     });

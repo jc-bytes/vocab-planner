@@ -4,7 +4,7 @@ import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_SMOKE_HOST || '127.0.0.1';
-const port = Number(process.env.UI_SMOKE_PORT || 8000);
+const port = Number(process.env.UI_SMOKE_PORT || 8560);
 const baseUrl = (process.env.UI_SMOKE_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 const sourceFixturesAvailable = process.env.UI_SMOKE_SOURCE_FIXTURES !== '0';
 const routes = [

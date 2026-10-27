@@ -1,5 +1,6 @@
 import { cp, mkdir, stat } from 'node:fs/promises';
 import { basename, dirname, extname, join, relative, sep } from 'node:path';
+import { copyVocabularyCatalog } from './lib/vocabularyCatalogDelivery.mjs';
 import { STUDENT_GAME_REGISTRY } from '../js/student/studentGameRegistry.js';
 
 const root = process.cwd();
@@ -70,5 +71,8 @@ for (const entry of entries) {
 for (const entry of htmlGameEntries) {
   await copyEntry(entry);
 }
+
+const catalog = await copyVocabularyCatalog(root, outDir);
+console.log(`Copied ${catalog.files} validated catalog files (${catalog.bytes} bytes).`);
 
 console.log(`Desktop assets copied to ${outDir}`);

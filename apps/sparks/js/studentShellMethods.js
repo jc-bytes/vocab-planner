@@ -58,6 +58,16 @@ export class StudentShell {
     }
 
     switchView(viewId) {
+        this.sm.screenEmber?.destroy();
+        this.sm.screenEmber = null;
+        const emberGeneration = this.emberGeneration = (this.emberGeneration || 0) + 1;
+        if (this.sm.currentUser && !['activity-view', 'login-view', 'loading-view'].includes(viewId)) {
+            import('./student/studentEmber.js').then(({ attachScreenEmber }) => {
+                if (this.emberGeneration === emberGeneration && document.getElementById(viewId)?.classList.contains('active')) {
+                    this.sm.screenEmber = attachScreenEmber(this.sm, viewId);
+                }
+            }).catch(error => console.warn('Could not load activity help', error));
+        }
         this.cancelStudentScrollRestore();
         const currentViewId = $('.view.active')?.id || '';
         const currentSection = this.getStudentSectionForView(currentViewId);
@@ -387,6 +397,7 @@ export class StudentShell {
     }
 
     cleanupActivity() {
+        this.sm.activities?.launcher?.cancelActivityLaunch?.();
         const session = this.sm.activities?.session;
         session?.cancelActivityLaunch();
         session?.cancelVocabularyLoad?.();

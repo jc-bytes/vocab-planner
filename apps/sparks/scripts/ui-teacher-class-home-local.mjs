@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import { mkdir } from 'node:fs/promises';
+import { chromium } from 'playwright';
+import { ensureViteServer } from './lib/local-vite-server.mjs';
+import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
+import { AUDIT_PASSWORD, AUDIT_TEACHER_EMAIL, readLocalSupabaseStatus, getBrowserSupabaseConfig } from './lib/local-supabase-audit.mjs';
+const port=18313,baseUrl=`http://127.0.0.1:${port}`,output='/tmp/sparks-class-home-authenticated';
+let server,browser,page;
+const errors=[],mutations=[];
+try{
+ const config=getBrowserSupabaseConfig(await readLocalSupabaseStatus({startIfStopped:false}));
+ await mkdir(output,{recursive:true});server=await ensureViteServer({baseUrl,probePath:'/teacher.html',host:'127.0.0.1',port});
+ browser=await chromium.launch();const context=await browser.newContext({viewport:{width:1440,height:1000}});
+ await context.addInitScript(value=>window.SUPABASE_CONFIG=value,config);page=await context.newPage();page.setDefaultTimeout(20000);
+ page.on('pageerror',e=>errors.push(e.message));
+ page.on('request',r=>{if(/\/rpc\/(publish_|invite_|remove_|withdraw_|save_|create_|set_)/.test(r.url()))mutations.push(new URL(r.url()).pathname);});
+ await page.goto(`${baseUrl}/teacher.html`);
+ await page.locator('#teacher-email').fill(AUDIT_TEACHER_EMAIL);await page.locator('#teacher-password').fill(AUDIT_PASSWORD);
+ await page.locator('#teacher-login-form button[type=submit]').click();
+ const home=page.locator('#teacher-overview-view'),classes=page.locator('#teacher-classes-view');
+ await home.getByRole('button',{name:/^Open class /}).first().waitFor({timeout:30000});
+ await page.waitForFunction(()=>document.querySelector('main.teacher-main').getBoundingClientRect().left>=document.querySelector('#teacher-tab-shell').getBoundingClientRect().right-1);
+ await assertNoAccessibilityViolations(page,'Authenticated class home',{include:['#teacher-overview-view','#teacher-class-switcher','#teacher-tab-shell']});
+ await page.screenshot({path:`${output}/home-desktop.png`,fullPage:true});
+ await home.getByRole('button',{name:/^Open class /}).first().click();
+ await classes.getByRole('tab',{name:'Classwork',exact:true}).waitFor();
+ await page.waitForFunction(()=>document.querySelector('#teacher-classes-view').getAttribute('aria-busy')==='false');
+ const classId=await page.getByLabel('Current class',{exact:true}).inputValue();assert.ok(classId);
+ await classes.getByRole('tab',{name:'Students',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('#teacher-classes-view').getAttribute('aria-busy')==='false');
+ await page.screenshot({path:`${output}/students-desktop.png`,fullPage:true});
+ await page.locator('#tab-assignments').click();await page.waitForFunction(()=>document.querySelector('#teacher-assignments-view').getAttribute('aria-busy')==='false');
+ assert.match(await page.evaluate(()=>location.hash),new RegExp(`class=${classId}`));
+ await page.locator('#tab-vocabulary').click();await page.locator('#teacher-dashboard-view:not(.hidden)').waitFor();
+ assert.equal(await page.getByLabel('Current class',{exact:true}).inputValue(),classId);
+ await page.locator('#tab-classes').click();await page.waitForFunction(()=>document.querySelector('#teacher-classes-view').getAttribute('aria-busy')==='false');
+ assert.equal(await page.getByLabel('Current class',{exact:true}).inputValue(),classId);
+ await page.reload();await classes.getByRole('tab',{name:'Classwork',exact:true}).waitFor();
+ assert.equal(await page.getByLabel('Current class',{exact:true}).inputValue(),classId);
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`Class fits ${width}px`);
+ }
+ await page.screenshot({path:`${output}/classwork-mobile.png`,fullPage:true});
+ await page.locator('#teacher-mobile-menu-toggle').click();await page.locator('#tab-overview').click();
+ await home.getByRole('button',{name:/^Open class /}).first().waitFor();
+ await page.screenshot({path:`${output}/home-mobile.png`,fullPage:true});
+ await assertNoAccessibilityViolations(page,'Authenticated mobile home',{include:['#teacher-overview-view','#teacher-class-switcher']});
+ assert.deepEqual(mutations,[]);assert.deepEqual(errors,[]);
+ console.log(JSON.stringify({passed:'Local password login, class home, classwork, students, scoped review, shared library, refresh, four viewport widths, accessibility',dataMutations:0,screenshots:output},null,2));
+}catch(e){if(page)await page.screenshot({path:`${output}/failure.png`,fullPage:true});console.error(errors);throw e;}finally{await browser?.close();server?.kill();}

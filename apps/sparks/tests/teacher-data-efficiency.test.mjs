@@ -21,7 +21,7 @@ const placementBatchMigration = await readFile(new URL(
     '../supabase/migrations/20260819202524_batch_vocabulary_placement_updates.sql',
     import.meta.url
 ), 'utf8');
-const authProfileMethods = await readFile(new URL('../js/supabaseAuthProfileMethods.js', import.meta.url), 'utf8');
+const teacherProfileOperations = await readFile(new URL('../js/supabaseTeacherProfileOperations.js', import.meta.url), 'utf8');
 const exportMethods = await readFile(new URL('../js/teacherDataExportDataMethods.js', import.meta.url), 'utf8');
 const progressPageMethods = await readFile(new URL(
     '../js/teacherStudentProgress/teacherProgressPageMethods.js', import.meta.url
@@ -73,9 +73,9 @@ test('teacher roster uses a bounded paginated summary without full activity snap
     assert.match(progressPageMethods, /grade: query\.grade/);
     assert.match(progressPageMethods, /section: query\.section/);
     assert.match(progressPageMethods, /search: query\.search/);
-    assert.doesNotMatch(authProfileMethods, /getStudentsWithProgress|while \(offset < total\)/);
-    assert.match(authProfileMethods, /list_student_progress_summaries_school_v1/);
-    assert.match(authProfileMethods, /p_school_id: schoolId/);
+    assert.doesNotMatch(teacherProfileOperations, /getStudentsWithProgress|while \(offset < total\)/);
+    assert.match(teacherProfileOperations, /list_student_progress_summaries_school_v1/);
+    assert.match(teacherProfileOperations, /p_school_id: schoolId/);
 });
 
 test('teacher analytics use a server aggregate instead of expanding every student snapshot', () => {

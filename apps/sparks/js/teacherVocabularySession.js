@@ -1,4 +1,5 @@
 import { schoolContext } from './services/schoolContext.js';
+import { resetTeacherVocabularySaves } from './teacherVocabularySaves.js';
 import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
 import { serverStateQuery } from './services/serverStateQuery.js';
 
@@ -29,6 +30,7 @@ export function createTeacherVocabularyOperationGuard(owner, options = {}) {
 }
 
 export function beginTeacherVocabularyDocument(owner) {
+    delete owner.teacherVocabularyLocalCopyDocumentGeneration;
     owner.teacherVocabularyDocumentGeneration = (owner.teacherVocabularyDocumentGeneration || 0) + 1;
     return owner.teacherVocabularyDocumentGeneration;
 }
@@ -39,15 +41,8 @@ export function clearTeacherVocabularySessionState(owner) {
     owner.teacherVocabularySessionGeneration = (owner.teacherVocabularySessionGeneration || 0) + 1;
     owner.teacherVocabularyDocumentGeneration = (owner.teacherVocabularyDocumentGeneration || 0) + 1;
     owner.teacherVocabularyLibraryLoadGeneration = (owner.teacherVocabularyLibraryLoadGeneration || 0) + 1;
-    globalThis.clearTimeout(owner.teacherVocabularyStatusTimer);
-    owner.teacherVocabularySaveDebounces?.forEach(timeoutId => globalThis.clearTimeout(timeoutId));
-    owner.teacherVocabularySaveDebounces?.clear();
-    owner.teacherVocabularyLatestSaveByDocument?.clear();
-    // A request that has already reached the repository may still settle later,
-    // but it must not serialize saves started by the next signed-in teacher.
-    owner.teacherVocabularySaveQueue = null;
-    owner.teacherVocabularyStatusTimer = null;
-    owner.libraryItems = [];
+    delete owner.teacherVocabularyLocalCopyDocumentGeneration;
+    resetTeacherVocabularySaves(owner);
     owner.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
     owner.lastVocabularyRoute = null;
     owner.vocabularyMode = 'assign';
@@ -67,7 +62,7 @@ export function clearTeacherVocabularySessionState(owner) {
     if (difficulty) difficulty.value = '1';
     const wordHunt = document.querySelector('#word-hunt-input');
     if (wordHunt) wordHunt.checked = false;
-    ['#library-list', '#teacher-vocab-breadcrumb', '#words-container', '#activity-flow-settings', '#vocab-data-readiness'].forEach(selector => {
+    ['#library-list', '#teacher-library-filters', '#teacher-library-result-count', '#teacher-vocab-breadcrumb', '#words-container', '#activity-flow-settings', '#vocab-data-readiness'].forEach(selector => {
         document.querySelector(selector)?.replaceChildren();
     });
     const legacyImagePreview = document.querySelector('#image-preview');

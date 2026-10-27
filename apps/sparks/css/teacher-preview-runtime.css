@@ -1,0 +1,29 @@
+body.teacher-unit-preview-runtime { min-height: 100dvh; }
+.teacher-unit-preview-runtime .app-container { display: block; }
+.teacher-unit-preview-runtime main { width: 100%; max-width: none; margin: 0; padding: 20px; box-sizing: border-box; }
+@media (max-width: 600px) { .teacher-unit-preview-runtime main { padding: 12px; } }
+
+.teacher-unit-preview-runtime .student-top-bar { position: static; display: block; width: auto; height: auto; min-height: 0; margin: 0; padding: 12px 20px 0; background: transparent; border: 0; box-shadow: none; }
+.teacher-unit-preview-runtime .student-top-bar:has(.student-sidebar-context:empty) { display: none; }
+
+/* The teacher shell can leave a preview narrower than a student phone viewport. */
+.teacher-unit-preview-runtime #activity-menu-view .activity-flow-section .activities-grid-inner {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+@media (max-width: 260px) {
+    .teacher-unit-preview-runtime #activity-menu-view .required-activity-card,
+    .teacher-unit-preview-runtime #activity-menu-view .required-activity-card.next-activity-card {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px 8px;
+    }
+    .teacher-unit-preview-runtime .student-export-menu-panel {
+        min-width: 0;
+        box-sizing: border-box;
+    }
+    .teacher-unit-preview-runtime .student-export-menu-item {
+        min-width: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}

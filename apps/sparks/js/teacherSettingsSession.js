@@ -7,8 +7,9 @@ function getElement(selector) {
 
 export function createTeacherSettingsOperationGuard(owner, options = {}) {
     const generation = owner.teacherSettingsSessionGeneration || 0;
+    const user = owner.currentUser;
     const externalGuard = typeof options.isCurrent === 'function' ? options.isCurrent : () => true;
-    return () => generation === (owner.teacherSettingsSessionGeneration || 0) && externalGuard();
+    return () => user?.uid === owner.currentUser?.uid && generation === (owner.teacherSettingsSessionGeneration || 0) && externalGuard();
 }
 
 export function resetTeacherSettingsView(refreshIcons = () => {}) {

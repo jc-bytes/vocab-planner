@@ -25,8 +25,17 @@ export function installSupabaseStorageMethods(supabaseService) {
 
     },
 
-    async uploadWordHuntImage({ path, blob }) {
+    async uploadWordHuntImage({ path, blob }, options = {}) {
+        const owner = options.ownerUserId || this.currentUser?.uid;
+        const assertCurrent = () => {
+            options.signal?.throwIfAborted();
+            if ((options.ownerUserId && owner !== this.currentUser?.uid) || (options.isCurrent && !options.isCurrent())) {
+                throw new DOMException('Image owner changed.', 'AbortError');
+            }
+        };
+        assertCurrent();
         await this.init();
+        assertCurrent();
         if (!this.currentUser) {
             throw new Error('You must be signed in to upload a Word Hunt image.');
         }
@@ -47,18 +56,25 @@ export function installSupabaseStorageMethods(supabaseService) {
             });
 
         if (error) throw error;
-        return data?.path || path;
+        assertCurrent();
+        if (!data?.path) throw new Error('Word Hunt image upload was not confirmed.');
+        return data.path;
     },
 
-    async downloadWordHuntImage(path) {
+    async downloadWordHuntImage(path, options = {}) {
+        options.signal?.throwIfAborted();
         await this.init();
+        options.signal?.throwIfAborted();
+        if (options.isCurrent && !options.isCurrent()) throw new DOMException('Image owner changed.', 'AbortError');
         if (!path) return null;
 
         const { data, error } = await this.client
             .storage
             .from(WORD_HUNT_IMAGE_BUCKET)
-            .download(path);
+            .download(path, {}, { signal: options.signal });
 
+        options.signal?.throwIfAborted();
+        if (options.isCurrent && !options.isCurrent()) throw new DOMException('Image owner changed.', 'AbortError');
         if (error) {
             const message = String(error.message || '').toLowerCase();
             if (error.statusCode === 404 || message.includes('not found')) {

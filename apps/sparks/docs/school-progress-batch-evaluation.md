@@ -1,0 +1,11 @@
+# School progress batch evaluation
+
+`private.get_students_progress_by_ids_school_v1(uuid,uuid[])` used the school snapshot expression in both its output and its NULL filter. An actual 30-student call evaluated the snapshot 60 times. Each snapshot performs assignment authorization and constructs educational JSON, so this repeated the expensive work.
+
+Migration `20261025180705_materialize_school_progress_batch_once.sql` puts the existing eligible-profile projection and snapshot expression in a `MATERIALIZED` CTE. The outer aggregation retains the exact ordering and NULL filter. The existing school authorization, 200-ID limit, duplicate-ID handling, empty selection behavior, result shape, owner, grants and function properties remain unchanged. The snapshot function itself is unchanged. No RLS policy changes are included.
+
+Run `node scripts/rehearse-school-progress-batch.mjs` against local Supabase. It creates a disposable schema clone and synthetic fixtures, restores the historical batch body inside that clone, and compares SQL and actual SDK/PostgREST results before and after applying the candidate twice. It verifies 13 role contexts, reversed/full/duplicate selections, NULLs, missing summaries, nested educational fields and the 200/201-ID boundary. Every other function definition, owner and ACL is protected by a hash. Gateway success and denial results must also match the SQL oracle.
+
+The executed `EXPLAIN ANALYZE` and transaction-local function statistics must show 60 baseline and 30 candidate snapshot calls. This checks the actual mechanism, and fails if the candidate is a no-op. These correctness probes do not establish latency, throughput or production capacity.
+
+An optional `SPARKS_REHEARSAL_ISOLATED_MANIFEST` points to the exact-name-guarded temporary scalability cluster. This mode reads its synthetic gateway credentials without logging them, creates a separate disposable database and capped gateway, and retains the original cluster. The normal mode creates its own temporary gateway role. Both modes remove the database, gateway and temporary environment in `finally`; evidence remains under `/tmp/sparks-school-batch-evidence-*`. Neither mode applies definitions or fixtures to the source database.

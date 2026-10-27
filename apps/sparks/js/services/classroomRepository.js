@@ -1,28 +1,12 @@
 import { readSectionQuery } from './sectionRead.js';
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
+import { readCollection } from './readCollection.js';
+import { requestWithTimeout } from './requestReliability.js';
 
 // RLS/RPCs derive the owner from auth.uid(). Callers never supply a teacher ID.
 export function createClassroomRepository(getClient, getSchoolId = requireSchoolId) {
-    // Count the first page so a server row cap below our page size cannot truncate a collection.
-    async function collection(build, signal, client) {
-        signal?.throwIfAborted();
-        client ||= await getClient();
-        signal?.throwIfAborted();
-        const rows = [];
-        let total = null;
-        do {
-            signal?.throwIfAborted();
-            let query = build(client, rows.length ? undefined : { count: 'exact' }).range(rows.length, rows.length + 499);
-            const { data, error, count } = await readSectionQuery(query, { signal });
-            signal?.throwIfAborted();
-            if (error) throw error;
-            if (count != null) total = count;
-            if (!data?.length) break;
-            rows.push(...data);
-        } while (total === null || rows.length < total);
-        return rows;
-    }
+    const collection = (build, signal, client) => readCollection(getClient, build, signal, client);
     async function result(query, signal) {
         const { data, error } = await (signal ? query.abortSignal(signal) : query);
         if (error) throw error;
@@ -32,6 +16,16 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
         const query = (await getClient()).rpc(name, args);
         const readOnly = /^(list_|my_|get_|read_|class_roster_|assignment_results_|assignment_student_feedback_|teacher_student_)/.test(name);
         return result(readOnly ? readSectionQuery(query, options) : query, readOnly ? null : options.signal);
+    }
+    function studentWrite(name, args, options = {}) {
+        // UI callers provide their captured owner. CLI/custom repositories resolve
+        // identity from their own client, never the application's mutable singleton.
+        const ownerUserId = String(options.ownerUserId || '').trim();
+        return requestWithTimeout(async signal => {
+            const { ownedClassroomWrite } = await import('./classroomStudentWrites.js');
+            signal.throwIfAborted();
+            return ownedClassroomWrite(getClient, name, args, ownerUserId, signal);
+        }, { signal: options.signal, timeoutMs: options.timeoutMs || 30000, label: 'Saving student work' });
     }
     return Object.freeze({
         assignmentFeedback: (assignmentId, options) => rpc('assignment_student_feedback_v1', {
@@ -115,12 +109,22 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
             return collection((client, count) => client.from('class_assignment_responses').select('*', count)
                 .eq('assignment_id', assignmentId).order('submitted_at').order('student_id'), options.signal);
         },
-        checkSpark: (assignmentId, answers, expectedRevision) => rpc('check_class_spark_v1', {
+        async listReviewResponses(assignmentIds, options = {}) {
+            const rows = [], ids = [...new Set(assignmentIds)];
+            for (let offset = 0; offset < ids.length; offset += 50) {
+                rows.push(...await collection((client, count) => client.from('class_assignment_responses')
+                    .select('assignment_id,student_id,revision,evaluation', count)
+                    .in('assignment_id', ids.slice(offset, offset + 50))
+                    .order('assignment_id').order('student_id'), options.signal));
+            }
+            return rows;
+        },
+        checkSpark: (assignmentId, answers, expectedRevision, options = {}) => studentWrite('check_class_spark_owned_v1', {
             p_assignment_id: assignmentId, p_answers: answers, p_expected_revision: expectedRevision
-        }),
-        saveResponse: (assignmentId, response, expectedRevision) => rpc('save_class_response_v1', {
+        }, options),
+        saveResponse: (assignmentId, response, expectedRevision, options = {}) => studentWrite('save_class_response_owned_v1', {
             p_assignment_id: assignmentId, p_response: response, p_expected_revision: expectedRevision
-        }),
+        }, options),
         readAssignment: (assignmentId, options) => rpc('read_class_assignment_v1', { p_assignment_id: assignmentId }, options),
         publishMaterial: ({ classIds, kind, materialId, releaseAt, publicationKey, dueAt = null, closeAt = null }) =>
             rpc('publish_class_material_v1', { p_class_ids: classIds, p_kind: kind, p_material_id: materialId,

@@ -52,6 +52,7 @@ async loadWordHuntReview(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
         this.initWordHuntReview();
         const generation = ++this.wordHuntReviewLoadGeneration;
+        const classScope = this.getClassScope?.();
 
         const content = this.query('#word-hunt-review-content');
         if (content) content.innerHTML = '<div class="loading-spinner">Loading Word Hunt work...</div>';
@@ -60,17 +61,17 @@ async loadWordHuntReview(options = {}) {
             const forceRefresh = options.forceRefresh === true;
             const query = {
                 accountId: getReviewAccountId(this),
-                key: WORD_HUNT_REVIEW_QUERY_KEY,
+                key: classScope ? [...WORD_HUNT_REVIEW_QUERY_KEY, classScope] : WORD_HUNT_REVIEW_QUERY_KEY,
                 queryFn: () => this.repository.loadReviewData()
             };
             const students = await (forceRefresh
                 ? this.queryService.refresh(query)
                 : this.queryService.ensure(query));
-            if (generation !== this.wordHuntReviewLoadGeneration) return;
+            if (generation !== this.wordHuntReviewLoadGeneration || this.getClassScope?.() !== classScope) return;
             this.wordHuntReviewRows = this.buildWordHuntReviewRows(students);
             this.renderWordHuntReviewBrowser({ preserveSelection: true });
         } catch (error) {
-            if (generation !== this.wordHuntReviewLoadGeneration) return;
+            if (generation !== this.wordHuntReviewLoadGeneration || this.getClassScope?.() !== classScope) return;
             console.error('Failed to load Word Hunt review:', error);
             if (content) content.innerHTML = '<p class="teacher-empty-state">Could not load Word Hunt responses.</p>';
             this.feedback.error('Could not load Word Hunt review.');

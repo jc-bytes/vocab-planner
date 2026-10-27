@@ -1,5 +1,9 @@
-import { $, createElement, escapeHtml } from './main.js';
+import { createVocabularyCard, formatVocabularyCardTitle, formatVocabularyCardDescription } from './vocabularyCardView.js';
+import { renderLibraryViewToggle, createLibraryRowList, createLibraryRow } from './learningLibraryView.js';
+import { filterLibraryItems, renderLibraryControls, renderLibraryEmpty } from './teacherLibraryControls.js';
+import { $, createElement } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
+import { bindFloatingActionMenu } from './ui/floatingActionMenu.js';
 import { resolveQuizVocabularyItem } from './teacherQuizVocabularyResolver.js';
 
 function installMethods(TeacherManager, MethodsClass) {
@@ -59,35 +63,46 @@ class TeacherQuizBrowserMethods {
     renderQuizVocabularyViewControls() {
         const container = $('#quiz-vocab-view-toggle');
         if (!container) return;
-        const currentMode = this.getQuizVocabularyViewMode();
-        container.innerHTML = `
-            <button class="vocab-view-toggle-btn ${currentMode === 'cards' ? 'is-active' : ''}" type="button" data-quiz-vocab-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
-                <i data-lucide="layout-grid"></i><span>Cards</span>
-            </button>
-            <button class="vocab-view-toggle-btn ${currentMode === 'rows' ? 'is-active' : ''}" type="button" data-quiz-vocab-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
-                <i data-lucide="list"></i><span>Rows</span>
-            </button>
-        `;
-        container.querySelectorAll('[data-quiz-vocab-view-mode]').forEach(button => {
-            button.addEventListener('click', () => this.setQuizVocabularyViewMode(button.dataset.quizVocabViewMode));
-        });
+        renderLibraryViewToggle(container, this.getQuizVocabularyViewMode(), mode => this.setQuizVocabularyViewMode(mode), 'data-quiz-vocab-view-mode');
     }
 
     renderQuizVocabularyBrowser(container = $('#quiz-vocab-picker')) {
         if (!container) return;
+        this.vocabularyBrowser.beginRender();
         this.renderQuizVocabularyViewControls();
         container.classList.remove('vocab-grid', 'compact-vocab-grid');
-        container.classList.add('teacher-library-browser');
+        void import('../css/teacher-student-library.css');
+        container.classList.add('teacher-library-browser', 'teacher-student-library');
         container.innerHTML = '';
 
+        const state = this.quizSearchState ||= { status: 'current', query: '', grade: '', trimester: '' };
+        renderLibraryControls($('#quiz-library-filters'), { state, onChange: () => {
+            this.renderQuizVocabularyBrowser();
+        } });
+        const scoped = this.vocabularyBrowser.filterItems(this.vocabularyBrowser.filterItems(this.quizLibraryItems || [], this.quizDrilldown), { grade: state.grade, trimester: state.trimester });
+        const items = filterLibraryItems(scoped, { ...state, grade: '', trimester: '' }, {
+            getGrades: () => [], getTrimester: () => ''
+        });
+        container.classList.toggle('teacher-library-folders-rows', this.getQuizVocabularyViewMode() === 'rows');
+        const onNavigate = drilldown => {
+            this.quizDrilldown = drilldown; this.updateQuizRoute(); this.renderQuizVocabularyBrowser(); this.refreshIcons();
+        };
+        const breadcrumbHost = $('#quiz-vocab-breadcrumb') || container;
+        this.vocabularyBrowser.renderBreadcrumb({ container, breadcrumbHost, drilldown: this.quizDrilldown, onNavigate });
+        const count = $('#quiz-library-result-count');
+        if (count) count.textContent = `${items.length} vocabulary ${items.length === 1 ? 'set' : 'sets'}`;
+        if (!items.length) {
+            renderLibraryEmpty(container, 'No vocabulary sets match these filters. Clear filters to see more materials.');
+            return;
+        }
         this.vocabularyBrowser.renderHierarchy({
             container,
-            breadcrumbHost: container,
-            items: this.quizLibraryItems || [],
+            breadcrumbHost,
+            items,
             drilldown: this.quizDrilldown,
             getViewMode: drilldown => this.getQuizVocabularyViewMode(drilldown),
             resetDrilldown: () => this.resetQuizDrilldown(),
-            filterItems: drilldown => this.getQuizVocabularyItemsForDrilldown(drilldown),
+            filterItems: drilldown => this.vocabularyBrowser.filterItems(items, drilldown),
             onNavigate: drilldown => {
                 this.quizDrilldown = drilldown;
                 this.updateQuizRoute();
@@ -117,37 +132,23 @@ class TeacherQuizBrowserMethods {
     }
 
     createQuizVocabularyRowList(columns = [], depthClass = this.vocabularyBrowser.getRowLayout(this.quizDrilldown).depthClass) {
-        const list = createElement('div', 'student-vocab-row-list teacher-vocab-row-list quiz-vocab-row-list');
-        const header = createElement('div', 'student-vocab-row student-vocab-row-header teacher-vocab-row quiz-vocab-row');
-        header.classList.add(depthClass);
-        header.setAttribute('aria-hidden', 'true');
-        header.appendChild(createElement('strong', null, 'Name'));
-        columns.forEach(column => header.appendChild(createElement('span', null, column.label)));
-        header.appendChild(createElement('span', null, 'Action'));
-        header.appendChild(createElement('i'));
-        list.appendChild(header);
-        return list;
+        const list = createLibraryRowList(['Name', 'Month', 'Week', 'Type', 'Words']);
+        list.classList.add('quiz-vocab-row-list'); return list;
     }
 
     createQuizVocabularyRow(item, columns, depthClass) {
         const { vocab, type } = item;
         const presentation = this.vocabularyBrowser.getRowPresentation(item);
-        const row = createElement('button', 'student-vocab-row teacher-vocab-row quiz-vocab-row');
-        row.classList.add(depthClass);
-        row.type = 'button';
-        const values = {
-            grade: `<span>${escapeHtml(presentation.grades || 'Other')}</span>`,
-            trimester: `<span>${escapeHtml(presentation.trimester)}</span>`,
-            month: `<span>${escapeHtml(presentation.month)}</span>`,
-            week: `<span>${escapeHtml(presentation.week ? `Week ${presentation.week}` : 'No week')}</span>`,
-            purpose: `<span class="student-vocab-purpose">${escapeHtml(presentation.purpose || 'Unit')}</span>`,
-            words: `<span data-vocab-word-count>${escapeHtml(presentation.wordCount ? `${presentation.wordCount}` : '...')}</span>`
-        };
-        row.innerHTML = `<strong>${escapeHtml(vocab.name || 'Untitled')}</strong>${columns.map(column => values[column.key]).join('')}<span class="quiz-vocab-row-action"><i data-lucide="file-plus"></i> Build</span><i data-lucide="chevron-right"></i>`;
+        const purpose = createElement('span', 'student-vocab-purpose student-vocab-row-type', presentation.purpose || 'Unit');
+        const words = createElement('span', 'student-vocab-row-progress', `${presentation.wordCount} ${presentation.wordCount === 1 ? 'word' : 'words'}`);
+        words.setAttribute('data-vocab-word-count','');
+        const row = createLibraryRow({ primary: formatVocabularyCardTitle(vocab), cells: [presentation.month, presentation.week ? `Week ${presentation.week}` : 'No week', purpose, words], icon: 'file-plus' });
+        row.classList.add('student-vocab-unit-row', 'quiz-vocab-row');
+        row.setAttribute('aria-label', `Build quiz from ${vocab.name || 'Untitled'}`);
         const countNode = row.querySelector('[data-vocab-word-count]');
         if (!presentation.wordCount && vocab?.path) countNode.dataset.vocabWordCountPath = vocab.path;
         row.addEventListener('click', () => this.openQuizVocabularyItem(vocab, type));
-        return row;
+        return this.createQuizMaterialItem(row, vocab, type, true);
     }
 
     renderQuizVocabularyRows(container, vocabItems = []) {
@@ -177,7 +178,7 @@ class TeacherQuizBrowserMethods {
             countNodes
                 .filter(node => node.dataset.vocabWordCountPath === path && container.contains(node))
                 .forEach(node => {
-                    node.textContent = String(count);
+                    node.textContent = `${count} ${count === 1 ? 'word' : 'words'}`;
                     delete node.dataset.vocabWordCountPath;
                 });
         });
@@ -209,19 +210,43 @@ class TeacherQuizBrowserMethods {
     }
 
     createQuizPickerCard(container, vocab, type) {
-        const card = createElement('button', 'teacher-vocab-pick-card');
-        card.type = 'button';
-        const { badge, grades, subject, placement } = this.vocabularyBrowser.getPickerPresentation(vocab, type);
-        card.innerHTML = `
-            <span class="teacher-source-badge">${badge}</span>
-            <span class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</span>
-            <strong>${escapeHtml(vocab.name || 'Untitled')}</strong>
-            <small>${escapeHtml(vocab.id || '')}${grades ? ` · Grade ${escapeHtml(grades)}` : ''}</small>
-            ${placement ? `<small>${escapeHtml(placement)}</small>` : ''}
-            <span class="teacher-pick-action"><i data-lucide="file-plus"></i> Build quiz</span>
-        `;
-        card.addEventListener('click', () => this.openQuizVocabularyItem(vocab, type));
-        container.appendChild(card);
+        const presentation = this.vocabularyBrowser.getRowPresentation({ vocab, type });
+        const { placement } = this.vocabularyBrowser.getPickerPresentation(vocab, type);
+        const card = createVocabularyCard.call({
+            sm: { subjects: this.getSubjects?.() || [] },
+            vocabularyData: { loadVocabulary: () => this.openQuizVocabularyItem(vocab, type) },
+            formatVocabularyCardTitle, formatVocabularyCardDescription,
+            formatVocabularyPurpose: () => presentation.purpose || 'Unit',
+            getVocabularyPurposeClass: () => `is-${String(vocab.purpose || 'unit').toLowerCase().replace(/[^a-z-]/g, '')}`,
+            formatVocabularyScheduleLabel: () => placement || '',
+            getVocabularyRequiredProgress: () => ({ percent: 0, completed: 0, total: 0, ariaLabel: 'Quiz vocabulary' })
+        }, vocab);
+        card.classList.add('teacher-vocab-pick-card');
+        card.querySelector('.student-vocab-progress-percent').textContent = '';
+        card.querySelector('.student-vocab-required-progress').replaceChildren(createElement('span', '', `${presentation.wordCount} ${presentation.wordCount === 1 ? 'word' : 'words'} · ${{remote:'Repository material',local:'Draft',cloud:'Saved material'}[type] || 'Unit'}`));
+        card.setAttribute('aria-label', `Build quiz from ${vocab.name || 'Untitled'}`);
+        container.appendChild(this.createQuizMaterialItem(card, vocab, type));
+    }
+
+    createQuizMaterialItem(face, vocab, type, isRow = false) {
+        const wrapper = createElement('article', `teacher-material-item${isRow ? ' teacher-material-row' : ''}`);
+        const actions = createElement('div', 'teacher-material-actions');
+        const trigger = createElement('button', 'btn secondary-btn');
+        trigger.setAttribute('aria-label', `More actions for ${vocab.name || 'Untitled'}`);
+        const menu = createElement('div'); menu.setAttribute('aria-label', `Actions for ${vocab.name || 'Untitled'}`);
+        const add = (label, handler) => {
+            const button = createElement('button', 'btn secondary-btn', label); button.type = 'button';
+            button.setAttribute('role', 'menuitem'); button.addEventListener('click', handler); menu.append(button);
+        };
+        add('Student preview', async () => {
+            const generation = this.lifecycleGeneration;
+            const current = () => !this.destroyed && generation === this.lifecycleGeneration;
+            const { previewTeacherQuiz } = await import('./teacherStudentPreview.js');
+            if (current()) previewTeacherQuiz(this, vocab, type, current);
+        });
+        add('Build quiz', () => this.openQuizVocabularyItem(vocab, type));
+        actions.append(trigger, menu); bindFloatingActionMenu({ trigger, menu });
+        wrapper.append(face, actions); return wrapper;
     }
 }
 

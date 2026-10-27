@@ -12,7 +12,7 @@ test('student-controlled leaderboard, activity, and export values are HTML-escap
     const [leaderboard, activity, overview, viewer, preview] = await Promise.all([
         read('js/student/studentGameLeaderboardMethods.js'),
         read('js/teacherDataDashboardRecentActivityMethods.js'),
-        read('js/teacherOverview.js'),
+        read('js/teacherClassWorkspace.js'),
         read('js/teacherDataViewer.js'),
         read('js/teacherDataExportPreviewRenderer.js')
     ]);
@@ -22,9 +22,9 @@ test('student-controlled leaderboard, activity, and export values are HTML-escap
     for (const field of ['student', 'unit', 'activity', 'score', 'dateStr']) {
         assert.match(activity, new RegExp(`escapeHtml\\(activity\\.${field}\\)`));
     }
-    assert.match(overview, /escapeHtml\(name\)/);
-    assert.match(overview, /escapeHtml\(label\)/);
-    assert.match(overview, /escapeHtml\(date\)/);
+    assert.match(overview, /node\.textContent = text/);
+    assert.match(overview, /element\('h3', c\.name\)/);
+    assert.doesNotMatch(overview, /innerHTML/);
     for (const source of [viewer, preview]) {
         assert.match(source, /escapeHtml\(name\)/);
         assert.match(source, /escapeHtml\(item\.gameId \|\| '-'\)/);
@@ -34,7 +34,7 @@ test('student-controlled leaderboard, activity, and export values are HTML-escap
 test('notifications render messages as text and Spark links require safe protocols', async () => {
     const [notifications, sparks] = await Promise.all([
         read('js/notifications.js'),
-        read('js/student/studentActivityHomeSpark.js')
+        read('js/student/studentHomePresentation.js')
     ]);
     assert.match(notifications, /messageText\.textContent = String\(message/);
     assert.doesNotMatch(notifications, /toast\.innerHTML[\s\S]*\$\{message\}/);
@@ -115,8 +115,8 @@ test('CI runs the complete tests and fails on meaningful database findings', asy
     const workflow = await readWorkspace('.github/workflows/static.yml');
     assert.match(workflow, /run: npm test/);
     assert.match(workflow, /run: npm run test:acceptance:supabase/);
-    assert.match(workflow, /supabase db lint --local --fail-on error/);
-    assert.match(workflow, /supabase db advisors --local --level warn --fail-on error/);
+    assert.match(workflow, /supabase db lint --local --fail-on warning/);
+    assert.match(workflow, /supabase db advisors --local --level warn --fail-on warn --type all/);
     assert.doesNotMatch(workflow, /--fail-on none/);
     assert.match(workflow, /validate:[\s\S]*?deploy:[\s\S]*?needs: validate/);
     assert.match(workflow, /deploy:[\s\S]*?pages: write[\s\S]*?id-token: write/);

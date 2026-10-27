@@ -6,8 +6,10 @@ const studentHtmlSource = readFileSync(new URL('../student.html', import.meta.ur
 const studentCssSource = readFileSync(new URL('../css/student.css', import.meta.url), 'utf8');
 const feedbackCssSource = readFileSync(new URL('../css/feedback.css', import.meta.url), 'utf8');
 const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8');
+const studentHomeRendererSource = readFileSync(new URL('../js/student/studentHomeRenderer.js', import.meta.url), 'utf8');
 const studentLoadingSource = readFileSync(new URL('../js/student/studentLoadingSkeletons.js', import.meta.url), 'utf8');
-const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8');
+const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8')
+    + readFileSync(new URL('../js/student/studentSparkLibraryMethods.js', import.meta.url), 'utf8');
 const studentLauncherSource = readFileSync(new URL('../js/student/studentActivityLauncherMethods.js', import.meta.url), 'utf8');
 const studentEarlyShellSource = readFileSync(new URL('../js/studentEarlyShell.js', import.meta.url), 'utf8');
 
@@ -199,7 +201,9 @@ test('student dashboard loading state hides real copy and resolves accessibly', 
     assert.doesNotMatch(studentHtmlSource, /class="loading-spinner">Loading dashboard/);
     assert.match(studentHomeSource, /classList\.remove\('student-home-loading'\)/);
     assert.match(studentHomeSource, /setAttribute\('aria-busy', 'false'\)/);
-    assert.match(studentHomeSource, /removeAttribute\('hidden'\)/);
+    assert.match(studentHomeRendererSource, /classList\.remove\('student-home-loading'\)/);
+    assert.match(studentHomeRendererSource, /setAttribute\('aria-busy', 'false'\)/);
+    assert.match(studentHomeRendererSource, /removeAttribute\('hidden'\)/);
 });
 
 test('student sections use page-shaped loading states without exposing real headings', () => {

@@ -1,3 +1,4 @@
+import { classroomRepository } from './services/classroomRepository.js';
 import { schoolSessionKey } from './services/schoolScope.js';
 import { createTeacherClassWorkspace } from './teacherClassWorkspace.js';
 import { createTeacherAssignmentsWorkspace } from './teacherAssignmentsWorkspace.js';
@@ -6,56 +7,99 @@ import { createTeacherAssignmentPublisher } from './teacherAssignmentPublisher.j
 // This adapter is the only workspace module that knows about the teacher shell.
 export function createTeacherWorkspaceFeature(manager) {
     const getUserId = () => manager.currentUser ? schoolSessionKey(manager.currentUser.uid || manager.currentUser.id) : null;
-    const repository = manager.classroomRepository;
+    const repository = manager.classroomRepository || classroomRepository;
     const navigate = (view, context = {}) => manager.showTeacherSection(view, context);
     const publisher = createTeacherAssignmentPublisher({
         getUserId, repository,
-        onPublished: () => navigate('assignments')
+        onPublished: ({ assignments, classIds }) => navigate('assignments', {
+            classId: classIds.length === 1 ? classIds[0] : undefined,
+            assignmentId: assignments.length === 1 ? assignments[0]?.id || assignments[0] : undefined
+        })
     });
-    const publish = context => {
+    const publish = (context = {}) => {
         if (!manager.ensureAuthenticated()) return;
-        return publisher.open(context);
+        return publisher.open({ classId: manager.getSelectedTeacherClassId(), ...context });
     };
+    const getSchoolCalendar = async ({ signal } = {}) => {
+        await manager.loadSchoolCalendarSettings({ signal });
+        return manager.schoolCalendarSettingsLoaded ? manager.schoolCalendar : null;
+    };
+    const home = createTeacherClassWorkspace({
+        root: document.getElementById('teacher-overview-view'), getUserId, repository,
+        onNavigate: context => navigate('classes', context),
+        onClassesLoaded: classes => manager.updateTeacherClassOptions(classes)
+    });
     const classes = createTeacherClassWorkspace({
         root: document.getElementById('teacher-classes-view'), getUserId, repository,
-        onNavigate: context => navigate('classes', context),
+        getSchoolCalendar,
+        onClassesLoaded: classes => manager.updateTeacherClassOptions(classes),
+        onNavigate: context => navigate(context.classId ? 'classes' : 'overview', context),
         onPublish: publish,
-        onReview: context => navigate('review', context),
-        onGroups: context => navigate('groups', context)
+        onReview: context => navigate('assignments', context),
+        onGroups: context => navigate('groups', context),
+        onStudent: context => {
+            if (!manager.ensureAuthenticated()) return;
+            const route = { view: 'student-profile', ...context };
+            manager.setRoute(route);
+            return manager.applyRoute(route);
+        }
     });
-    const workspaces = new Map();
-    function assignmentWorkspace(mode) {
-        if (!workspaces.has(mode)) workspaces.set(mode, createTeacherAssignmentsWorkspace({
-            root: document.getElementById(`teacher-${mode}-view`), getUserId, repository,
-            onNavigate: ({ mode: destination = mode, ...context }) => navigate(destination, context),
+    let assignments;
+    function assignmentWorkspace() {
+        assignments ||= createTeacherAssignmentsWorkspace({
+            root: document.getElementById('teacher-assignments-view'), getUserId, repository, getSchoolCalendar,
+            onNavigate: ({ mode, ...context }) => navigate('assignments', context),
             onPublish: publish,
             onWordHuntReview: () => navigate('word-hunt-review')
-        }));
-        return workspaces.get(mode);
+        });
+        return assignments;
     }
+    let selectorRequest, selectorLoadedAt = 0, selectorOwner, destroyed = false;
     return {
+        showHome() {
+            if (!manager.ensureAuthenticated()) return;
+            return home.show();
+        },
+        async refreshClassSelector() {
+            const owner = getUserId();
+            if (selectorOwner === owner && Date.now() - selectorLoadedAt < 60000) return;
+            if (!selectorRequest || selectorOwner !== owner) {
+                selectorOwner = owner;
+                selectorRequest = repository.listClasses();
+            }
+            const request = selectorRequest;
+            try {
+                const classes = await request;
+                if (!destroyed && owner === getUserId()) { manager.updateTeacherClassOptions(classes); selectorLoadedAt = Date.now(); }
+            } finally { if (selectorRequest === request) selectorRequest = null; }
+        },
         showClasses(context = {}) {
             if (!manager.ensureAuthenticated()) return;
-            manager.switchView('teacher-classes-view', { updateRoute: false });
+            const root = document.getElementById('teacher-classes-view');
+            if (!root.classList.contains('active') || root.classList.contains('hidden')) {
+                manager.switchView('teacher-classes-view', { updateRoute: false });
+            }
             return classes.show(context);
         },
         showAssignments({ mode = 'assignments', ...context } = {}) {
             if (!manager.ensureAuthenticated()) return;
-            const destination = mode === 'review' ? 'review' : 'assignments';
-            manager.switchView(`teacher-${destination}-view`, { updateRoute: false });
-            return assignmentWorkspace(destination).show({ ...context, mode: destination });
+            manager.switchView('teacher-assignments-view', { updateRoute: false });
+            return assignmentWorkspace().show({ ...context, mode: 'assignments',
+                tab: context.tab || (mode === 'review' && !context.assignmentId ? 'needs-review' : undefined) });
         },
         publish,
         deactivate() {
             publisher.hide();
             classes.hide();
-            for (const workspace of workspaces.values()) workspace.hide();
+            home.hide();
+            assignments?.hide();
         },
         destroy() {
+            destroyed = true;
             publisher.destroy();
             classes.destroy();
-            for (const workspace of workspaces.values()) workspace.destroy();
-            workspaces.clear();
+            home.destroy();
+            assignments?.destroy();
         }
     };
 }

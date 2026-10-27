@@ -25,11 +25,26 @@ try {
     await startPage.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
     const starts = await startPage.evaluate(async () => {
         const { StudentGames } = await import('/js/student/studentGames.js');
+        const { StudentClassSelection } = await import('/js/student/studentClassSelection.js');
+        const { schoolContext } = await import('/js/services/schoolContext.js');
+        const waitFor = async (condition, label) => {
+            const deadline = performance.now() + 3000;
+            while (!condition()) {
+                if (performance.now() >= deadline) throw new Error(`Sandbox start fixture did not reach ${label}.`);
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+        };
         document.body.innerHTML = '<main><div id="current-game-card"></div><div id="game-selection"></div><div id="game-stage"><canvas id="game-canvas"></canvas></div><div id="game-timer"></div><button id="add-time-btn"></button></main>';
         let gate, releasePurchase, purchases = 0; const launches = [];
-        const manager = { currentUser: { uid: 'arcade-start-smoke' }, coins: 100,
+        const manager = { currentUser: { uid: 'arcade-start-smoke' }, authDisabled: false, coins: 100,
+            progress: { cloud: { cloudGeneration: 1 } }, routing: { arcadeReadController: new AbortController() },
             activities: { refreshCurrentSparkGate: () => new Promise(resolve => { gate = resolve; }), getPendingRequiredWork: () => ({ isBlocked: false }) },
             addListener: (selector, event, listener) => document.querySelector(selector).addEventListener(event, listener) };
+        // Exercise real confirmed-empty class readiness, not an unloaded list.
+        // Only the repository boundary is synthetic; the eligibility gate stays real.
+        let classReads = 0;
+        const selection = new StudentClassSelection(manager, { async listMyClasses() { classReads++; return []; } });
+        manager.activities.vocabularyData = { classSelection: selection, loadClassSelection: options => selection.load(options) };
         const games = new StudentGames(manager); games.gameTimeRemaining = 0;
         games.settings.loadGlobalSettings = async () => { games.settings.globalSettings = { exchangeRate: 10 }; };
         games.loadArcadeTime = async () => {}; games.getAvailableArcadeSeconds = () => 300;
@@ -40,12 +55,17 @@ try {
         const disabledOnClick = document.querySelector('#play-current-game-btn').disabled;
         const duplicateRejected = await games.startGame('snake') === false;
         await games.updateGameSelectionUI(); const disabledAfterRerender = document.querySelector('#play-current-game-btn').disabled;
-        gate(); while (games.isStartingGame) await new Promise(resolve => setTimeout(resolve, 0));
+        await waitFor(() => typeof gate === 'function', 'the held Spark gate after class readiness');
+        if (!selection.ready || selection.owner !== manager.currentUser.uid
+            || selection.readySchoolGeneration !== schoolContext.getGeneration() || classReads !== 1) {
+            throw new Error('Sandbox start fixture did not confirm the current owner/school class read.');
+        }
+        gate(); await waitFor(() => !games.isStartingGame, 'the first purchase and launch');
         const onePurchase = purchases === 1 && launches.length === 1 && games.gameTimeRemaining === 60;
         const unlocked = !document.querySelector('#play-current-game-btn').disabled;
         games.gameTimeRemaining = 0; manager.activities.refreshCurrentSparkGate = async () => {};
         games.startArcadeMinute = () => { purchases++; return new Promise(resolve => { releasePurchase = resolve; }); };
-        const pending = games.startGame('snake'); while (!releasePurchase) await new Promise(resolve => setTimeout(resolve, 0));
+        const pending = games.startGame('snake'); await waitFor(() => typeof releasePurchase === 'function', 'the held purchase');
         games.stopCurrentGame(); const stoppedDuplicateRejected = await games.startGame('pong') === false;
         releasePurchase({ minuteSeconds: 60 }); const stopped = await pending === false && launches.length === 1 && games.gameTimeRemaining === 60;
         const paidResumeLabel = document.querySelector('#play-current-game-btn').textContent.includes('Resume (1m 0s)');

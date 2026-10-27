@@ -6,8 +6,9 @@ import {
     FORMATIVE_PASS_MINUTES,
     MAX_QUEUED_ARCADE_SECONDS
 } from './studentArcadePolicy.js';
-import { writeLocalArcadeSession } from './studentArcadeTimeStorage.js';
+import { readLocalArcadeSession, writeLocalArcadeSession } from './studentArcadeSessionStorage.js';
 import { captureArcadeSession } from './studentGameAccessMethods.js';
+import { prepareArcadeEligibility } from './studentArcadeEligibility.js';
 
 export class StudentGameLifecycle {
     constructor(games) {
@@ -95,7 +96,7 @@ export class StudentGameLifecycle {
                 return false;
             }
 
-            this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
+            if (!minute.localCreditApplied) this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
             if (!operation.current()) return false;
             await this.games.updateArcadeUI({ force: false });
             if (!operation.current()) return false;
@@ -121,9 +122,9 @@ export class StudentGameLifecycle {
             && operationGeneration === this.operationGeneration;
         const current = () => ownsOperation() && !operation.cancelled;
         try {
-            await this.sm.activities?.refreshCurrentSparkGate?.({ updateDisplay: false });
-            if (!current()) return false;
-            const access = this.sm.activities?.getPendingRequiredWork?.();
+            const eligibility = await prepareArcadeEligibility(this.sm, { isCurrent: current });
+            if (!eligibility?.isCurrent()) return false;
+            const { access } = eligibility;
             if (access?.isBlocked) {
                 this.sm.activities.updateArcadeGateDisplay(access);
                 notifications.warning('Complete your required activities before playing Arcade games.');
@@ -136,14 +137,13 @@ export class StudentGameLifecycle {
                 this.games.loadGlobalSettings(),
                 this.games.loadArcadeTime({ force: true })
             ]);
-            if (!current()) return false;
+            if (!current() || !eligibility.isCurrent()) return false;
             const exchangeRate = this.games.getExchangeRate();
 
             if (this.games.gameTimeRemaining > 0) {
                 this.games.savedGameId = type;
                 this.updateGameTimer();
-                this.launchGame(type, { resetTimer: false });
-                return true;
+                return await this.launchGame(type, { resetTimer: false });
             }
 
             if (this.games.getAvailableArcadeSeconds() < ARCADE_MINUTE_SECONDS) {
@@ -161,12 +161,11 @@ export class StudentGameLifecycle {
             if (minute) {
                 this.games.savedGameId = type;
                 // A completed purchase remains resumable when Stop cancelled only the launch.
-                this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
-                if (!current()) return false;
+                if (!minute.localCreditApplied) this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
+                if (!current() || !eligibility.isCurrent()) return false;
                 await this.games.updateArcadeUI({ force: false });
-                if (!current()) return false;
-                this.launchGame(type, { resetTimer: true });
-                return true;
+                if (!current() || !eligibility.isCurrent()) return false;
+                return await this.launchGame(type, { resetTimer: true });
             }
         } catch (error) {
             if (!current()) return false;
@@ -194,15 +193,28 @@ export class StudentGameLifecycle {
         }
     }
 
-    restartCurrentGame(type) {
+    async restartCurrentGame(type) {
+        const isCurrent = captureArcadeSession(this.games);
+        let eligibility;
+        try { eligibility = await prepareArcadeEligibility(this.sm, { isCurrent }); }
+        catch (error) { if (isCurrent()) notifications.warning(error.message); return false; }
+        if (!eligibility?.isCurrent() || eligibility.access.isBlocked) return false;
         this.cleanupCurrentGame({ keepTimer: true, saveScore: false });
-        this.launchGame(type, { resetTimer: false });
+        return this.launchGame(type, { resetTimer: false });
     }
 
-    launchGame(type, { resetTimer = false } = {}) {
+    async launchGame(type, { resetTimer = false } = {}) {
         if (this.games.destroyed) return false;
         const launchGeneration = ++this.launchGeneration;
-        const access = this.sm.activities?.getPendingRequiredWork?.();
+        const isSessionCurrent = captureArcadeSession(this.games);
+        let eligibility;
+        try {
+            eligibility = await prepareArcadeEligibility(this.sm, {
+                isCurrent: () => isSessionCurrent() && launchGeneration === this.launchGeneration
+            });
+        } catch (error) { if (isSessionCurrent()) notifications.warning(error.message); return false; }
+        if (!eligibility?.isCurrent()) return false;
+        const { access } = eligibility;
         if (access?.isBlocked) {
             this.sm.activities.updateArcadeGateDisplay(access);
             notifications.warning('Arcade is locked until required activities are complete.');
@@ -228,6 +240,21 @@ export class StudentGameLifecycle {
         if (resetTimer || !this.games.gameTimerInterval) {
             this.startGameTimer();
         }
+        const pendingGame = this.games.currentGame;
+        const pendingTimer = this.games.gameTimerInterval;
+        const pendingKeyHandler = this.arrowKeyHandler;
+        const abandonPendingLaunch = () => {
+            if (launchGeneration !== this.launchGeneration || this.games.currentGame !== pendingGame) return;
+            if (this.games.gameTimerInterval === pendingTimer) this.clearGameTimer();
+            if (this.arrowKeyHandler === pendingKeyHandler) {
+                window.removeEventListener('keydown', pendingKeyHandler);
+                this.arrowKeyHandler = null;
+            }
+            if (isSessionCurrent()) {
+                $('#game-stage')?.classList.add('hidden');
+                $('#game-selection')?.classList.remove('hidden');
+            }
+        };
 
         // Initialize Game Logic
         const canvas = $('#game-canvas');
@@ -271,6 +298,7 @@ export class StudentGameLifecycle {
 
         game.launch.load().then(module => {
             if (this.games.destroyed || launchGeneration !== this.launchGeneration) return;
+            if (!eligibility.isCurrent()) { abandonPendingLaunch(); return; }
             const ExportedGame = module[game.launch.exportName];
             if (!ExportedGame) throw new Error(`Game module ${game.id} does not export ${game.launch.exportName}.`);
             this.games.currentGame = game.launch.create(ExportedGame, {
@@ -282,6 +310,7 @@ export class StudentGameLifecycle {
             this.games.currentGame.start();
         }).catch(error => {
             if (this.games.destroyed || launchGeneration !== this.launchGeneration) return;
+            if (!eligibility.isCurrent()) { abandonPendingLaunch(); return; }
             console.error(`Could not launch ${game.id}:`, error);
             notifications.warning('This game could not be loaded. Please refresh and try again.');
             this.exitToGameSelection();
@@ -406,7 +435,7 @@ export class StudentGameLifecycle {
             }
 
             if (minute) {
-                this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
+                if (!minute.localCreditApplied) this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
                 if (!operation.current()) return;
                 await this.games.updateArcadeUI({ force: false });
                 if (!operation.current()) return;
@@ -460,7 +489,44 @@ export class StudentGameLifecycle {
         this.updateGameTimer();
     }
 
-    updateGameTimer({ preserveFeedback = false } = {}) {
+    updateGameTimer(options = {}) {
+        this.renderGameTimer(options);
+        this.persistGameTimer(options);
+    }
+
+    persistGameTimer(options = {}) {
+        if (this.clockWritePending) return;
+        const isCurrent = captureArcadeSession(this.games);
+        if (!isCurrent()) return;
+        const ownerId = this.games.sessionOwnerId;
+        const expectedLastAppliedEventId = this.games.arcadeSessionEventId;
+        const value = { remainingSeconds: this.games.gameTimeRemaining,
+            gameId: this.games.currentGame?.gameType || this.games.savedGameId || '' };
+        const save = () => {
+            if (!isCurrent()) return;
+            const saved = writeLocalArcadeSession(ownerId, value, { expectedLastAppliedEventId });
+            if (saved && saved.lastAppliedEventId !== this.games.arcadeSessionEventId) {
+                this.games.gameTimeRemaining = saved.remainingSeconds;
+                this.games.savedGameId = saved.gameId;
+                this.games.arcadeSessionEventId = saved.lastAppliedEventId;
+                this.renderGameTimer(options);
+            }
+        };
+        const locks = globalThis.navigator?.locks;
+        if (!locks?.request) {
+            // Older runtimes keep the single-tab timer, but do not write over an
+            // unresolved purchase. Cross-tab serialization requires Web Locks.
+            if (!readLocalArcadeSession(ownerId).pendingPurchase) save();
+            return;
+        }
+        this.clockWritePending = true;
+        void locks.request(`sparks-arcade-purchase:${ownerId}`, { ifAvailable: true }, lock => {
+            if (lock) save();
+        }).catch(error => console.warn('Could not save the Arcade clock:', error))
+            .finally(() => { this.clockWritePending = false; });
+    }
+
+    renderGameTimer({ preserveFeedback = false } = {}) {
         const mins = Math.floor(this.games.gameTimeRemaining / ARCADE_MINUTE_SECONDS);
         const secs = this.games.gameTimeRemaining % ARCADE_MINUTE_SECONDS;
         const timerEl = $('#game-timer');
@@ -473,9 +539,6 @@ export class StudentGameLifecycle {
                 ? `Maximum queued Arcade time is ${FORMATIVE_PASS_MINUTES} minutes.`
                 : '';
         }
-        writeLocalArcadeSession(this.games.sessionOwnerId, {
-            remainingSeconds: this.games.gameTimeRemaining,
-            gameId: this.games.currentGame?.gameType || this.games.savedGameId || ''
-        });
+
     }
 }

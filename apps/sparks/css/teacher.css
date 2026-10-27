@@ -5047,6 +5047,35 @@ button.activity-card {
     display: none;
 }
 
+.teacher-top-bar-school {
+    min-width: 0;
+    max-width: 60%;
+    margin-left: auto;
+    overflow-wrap: anywhere;
+    color: #e7edff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: right;
+}
+
+@media (max-width: 1120px) {
+    .teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) > .teacher-top-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+    }
+
+    .teacher-top-bar-copy {
+        min-width: 0;
+        font-size: 0.75rem;
+    }
+
+    .teacher-top-bar-copy > span {
+        display: none;
+    }
+}
+
 @media (min-width: 1121px) {
     html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) {
         --teacher-shell-sidebar-width: 240px;
@@ -5190,6 +5219,12 @@ button.activity-card {
         text-overflow: ellipsis;
     }
 
+    #tab-platform span {
+        max-width: 100%;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
     html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) .teacher-tab:hover {
         border-color: rgba(173, 198, 255, 0.13);
         border-right-color: rgba(173, 198, 255, 0.32);
@@ -5240,7 +5275,7 @@ button.activity-card {
         z-index: 38;
         display: flex;
         align-items: center;
-        justify-content: flex-end;
+        justify-content: space-between;
         box-sizing: border-box;
         height: var(--teacher-shell-topbar-height);
         padding: 0 28px;
@@ -5250,6 +5285,7 @@ button.activity-card {
 
     .teacher-top-bar-copy {
         display: flex;
+        min-width: 0;
         align-items: baseline;
         gap: 10px;
         color: rgba(173, 198, 255, 0.66);

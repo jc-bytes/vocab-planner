@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_TEACHER_QUIZ_HOST || '127.0.0.1';
-const port = Number(process.env.UI_TEACHER_QUIZ_PORT || 8000);
+const port = Number(process.env.UI_TEACHER_QUIZ_PORT || 8561);
 const baseUrl = (process.env.UI_TEACHER_QUIZ_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 
 let server;
@@ -42,10 +42,12 @@ try {
         const { installTeacherLazyFeatureMethods } = await import(
             `/js/teacherLazyFeatures.js?quiz-lazy-smoke=${Date.now()}`
         );
-        const { QUIZ_VOCABULARY_BROWSER_CAPABILITIES } = await import('/js/teacherQuizVocabularyBrowserAdapter.js');
+        const { installTeacherAuthMethods } = await import('/js/teacherAuth.js');
+        const { installTeacherVocabularyMethods } = await import('/js/teacherVocabulary.js');
         let libraryRequests = 0;
         class Manager {
             constructor() {
+                this.isAuthenticated = true;
                 this.vocabularyMode = 'assign';
                 this.vocabSet = { id: '', subjectSlug: 'technology', words: [] };
                 this.libraryItems = [{ vocab: { id: 'assign-only' } }];
@@ -59,11 +61,19 @@ try {
             setRoute(route, options) { this.routeCalls.push({ route, options }); }
             async getTeacherLibrary() { libraryRequests += 1; return { items: [] }; }
             getSubjects() { return []; }
+            formatGradeLabel(value) { return `Grade ${value}`; }
+            getTeacherTrimesterLabel(value) { return `Trimester ${value}`; }
+            getTeacherMonthLabel(value) { return value; }
+            getTeacherVocabularyViewDepth() { return 'root'; }
+            getDefaultTeacherVocabularyViewMode() { return 'cards'; }
             refreshIcons() {}
             updateFormUI() {}
             renderWords() {}
         }
-        QUIZ_VOCABULARY_BROWSER_CAPABILITIES.forEach(name => { Manager.prototype[name] = () => []; });
+        const readLibrary = Manager.prototype.getTeacherLibrary;
+        installTeacherAuthMethods(Manager);
+        installTeacherVocabularyMethods(Manager);
+        Manager.prototype.getTeacherLibrary = readLibrary;
 
         installTeacherLazyFeatureMethods(Manager);
         const manager = new Manager();
@@ -74,7 +84,7 @@ try {
         const firstPicker = document.querySelector('#quiz-vocab-picker');
         const first = {
             mounted: Boolean(firstPicker),
-            empty: firstPicker?.textContent.includes('No vocabulary sets are available yet.'),
+            empty: firstPicker?.textContent.includes('No vocabulary sets match these filters.'),
             requests: libraryRequests,
             mode: manager.vocabularyMode,
             route: manager.routeCalls.at(-1),
@@ -124,7 +134,8 @@ try {
         const { teacherVocabularyWorkflowMethods } = await import(
             '/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js'
         );
-        const { QUIZ_VOCABULARY_BROWSER_CAPABILITIES } = await import('/js/teacherQuizVocabularyBrowserAdapter.js');
+        const { installTeacherAuthMethods } = await import('/js/teacherAuth.js');
+        const { installTeacherVocabularyMethods } = await import('/js/teacherVocabulary.js');
         class Manager {
             constructor() {
                 this.currentUser = { id: 'teacher-navigation' };
@@ -145,11 +156,19 @@ try {
             switchView() { this.activations += 1; }
             async getTeacherLibrary() { this.libraryRequests += 1; return { items: [] }; }
             getSubjects() { return []; }
+            formatGradeLabel(value) { return `Grade ${value}`; }
+            getTeacherTrimesterLabel(value) { return `Trimester ${value}`; }
+            getTeacherMonthLabel(value) { return value; }
+            getTeacherVocabularyViewDepth() { return 'root'; }
+            getDefaultTeacherVocabularyViewMode() { return 'cards'; }
             refreshIcons() {}
             updateFormUI() {}
             renderWords() {}
         }
-        QUIZ_VOCABULARY_BROWSER_CAPABILITIES.forEach(name => { Manager.prototype[name] = () => []; });
+        const readLibrary = Manager.prototype.getTeacherLibrary;
+        installTeacherAuthMethods(Manager);
+        installTeacherVocabularyMethods(Manager);
+        Manager.prototype.getTeacherLibrary = readLibrary;
         Manager.prototype.setVocabularyWorkflowTab = teacherVocabularyWorkflowMethods.setVocabularyWorkflowTab;
         installTeacherLazyFeatureMethods(Manager);
         installTeacherRoutingMethods(Manager);
@@ -328,6 +347,33 @@ try {
         throw new Error(`Quiz reorder teardown changed: ${JSON.stringify(reorderTeardown)}`);
     }
     await reorderPage.close();
+    console.log('Teacher Quiz empty/navigation/reorder cases passed.');
+    const populatedPage = await browser.newPage();
+    populatedPage.on('console', message => {
+        if (message.type() === 'error') problems.push(`populated console.error: ${message.text()}`);
+    });
+    populatedPage.on('pageerror', error => problems.push(`populated pageerror: ${error.message}`));
+    let backendRequests = 0;
+    await populatedPage.route(/\/(?:rest|auth|storage|functions)\/v1(?:\/|$)/, route => {
+        backendRequests += 1;
+        return route.abort('blockedbyclient');
+    });
+    await populatedPage.route('**/vocabularies/manifest.json*', route => route.fulfill({
+        contentType: 'application/json', body: JSON.stringify({ vocabularies: [] })
+    }));
+    await populatedPage.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+    const populated = await populatedPage.evaluate(async () => {
+        const html = await (await fetch('/teacher.html')).text();
+        const { runPopulatedTeacherQuizIntegration } = await import('/scripts/fixtures/teacher-quiz-populated.mjs');
+        return runPopulatedTeacherQuizIntegration(html);
+    });
+    if (backendRequests !== 0) throw new Error(`Populated Quiz attempted ${backendRequests} backend requests.`);
+    console.log(`Populated Quiz integration: ${JSON.stringify(populated)}`);
+    await populatedPage.close();
+    if (!populated.replacementControlsAlive || !populated.replacementReturnsToEditor) {
+        throw new Error(`Replacement QuizMaker lost its handlers/preview: ${JSON.stringify(populated)}`);
+    }
+
     if (problems.length) throw new Error(problems.join('\n'));
     console.log('Teacher Quiz lazy-feature smoke passed.');
 } finally {

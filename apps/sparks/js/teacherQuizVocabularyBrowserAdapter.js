@@ -1,8 +1,10 @@
-import { renderTeacherVocabularyHierarchy } from './teacherVocabularyLibrary/teacherVocabularyHierarchy.js';
-import { filterTeacherVocabularyItems } from './teacherVocabularyLibrary/teacherVocabularyModel.js';
+import { renderTeacherVocabularyHierarchy, renderVocabularyBreadcrumb } from './teacherVocabularyLibrary/teacherVocabularyHierarchy.js';
+import { createTeacherVocabularyBrowserModel } from './teacherVocabularyLibrary/teacherVocabularyBrowserModel.js';
 
 export const QUIZ_VOCABULARY_BROWSER_CAPABILITIES = Object.freeze([
+    'beginRender',
     'renderHierarchy',
+    'renderBreadcrumb',
     'getViewDepth',
     'getDefaultViewMode',
     'filterItems',
@@ -14,10 +16,15 @@ export const QUIZ_VOCABULARY_BROWSER_CAPABILITIES = Object.freeze([
     'getPickerPresentation'
 ]);
 
-export function createQuizVocabularyBrowserAdapter(manager) {
+export function createQuizVocabularyBrowserAdapter(dependencies) {
+    const manager = createTeacherVocabularyBrowserModel(dependencies);
     return Object.freeze({
+        beginRender() { manager.beginRender(); },
         renderHierarchy(options) {
             return renderTeacherVocabularyHierarchy(manager, options);
+        },
+        renderBreadcrumb(options) {
+            return renderVocabularyBreadcrumb(manager, options);
         },
         getViewDepth(drilldown) {
             return manager.getTeacherVocabularyViewDepth(drilldown);
@@ -26,11 +33,7 @@ export function createQuizVocabularyBrowserAdapter(manager) {
             return manager.getDefaultTeacherVocabularyViewMode(depth);
         },
         filterItems(items, drilldown) {
-            return filterTeacherVocabularyItems(items, drilldown, {
-                getGrades: vocab => manager.getVocabGrades(vocab),
-                getTrimesterKey: vocab => manager.getTeacherTrimesterKey(vocab),
-                getMonthKey: vocab => manager.getTeacherMonthKey(vocab)
-            });
+            return manager.getTeacherVocabularyItemsForDrilldown(drilldown, items);
         },
         getRowLayout(drilldown) {
             return Object.freeze({

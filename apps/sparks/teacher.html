@@ -18,7 +18,10 @@
     <link rel="stylesheet" href="css/feedback.css?v=shared-feedback-20260830a" data-shared-feedback>
     <link rel="stylesheet" href="css/containers.css?v=shared-containers-20260824a" data-shared-containers>
     <link rel="stylesheet" href="css/teacher.css?v=teacher-typography-20260713d">
+    <link rel="stylesheet" href="css/floating-action-menu.css">
+    <link rel="stylesheet" href="css/teacher-library-workspace.css">
     <link rel="stylesheet" href="css/typography.css?v=typography-runtime-ui-20260713f">
+    <link rel="stylesheet" href="css/learning-library-appearance.css">
 </head>
 
 <body class="teacher-site">
@@ -35,38 +38,37 @@
                     <i data-lucide="menu"></i>
                     <span id="teacher-mobile-section-label">Home</span>
                 </button>
-                <div id="teacher-school-name" class="school-name" aria-live="polite"></div>
                 <div id="teacher-tabs" class="teacher-tabs" role="tablist" aria-label="Teacher tools">
-                    <button class="teacher-tab primary-nav__item" id="tab-administration" type="button" role="tab" aria-selected="false"
-                        aria-controls="teacher-administration-view" data-section="administration" data-tooltip="Schools">
-                        <i data-lucide="school"></i><span>Schools</span>
-                    </button>
-                    <button class="teacher-tab primary-nav__item" id="tab-classes" type="button" role="tab" aria-selected="false"
-                        aria-controls="teacher-classes-view" data-section="classes" data-tooltip="Classes">
-                        <i data-lucide="graduation-cap"></i><span>Classes</span>
-                    </button>
                     <button class="teacher-tab primary-nav__item primary-nav__item--active active" id="tab-overview" type="button" role="tab" aria-selected="true"
                         aria-controls="teacher-overview-view" data-section="overview" data-tooltip="Home">
                         <i data-lucide="layout-dashboard"></i>
                         <span>Home</span>
                     </button>
+                    <button class="teacher-tab primary-nav__item" id="tab-classes" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-classes-view" data-section="classes" data-tooltip="Classwork">
+                        <i data-lucide="graduation-cap"></i><span>Classwork</span>
+                    </button>
                     <button class="teacher-tab primary-nav__item" id="tab-vocabulary" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-dashboard-view" data-section="vocabulary" data-tooltip="Library">
-                        <i data-lucide="library-big"></i>
+                        <i data-lucide="book-open"></i>
                         <span>Library</span>
                     </button>
                     <button class="teacher-tab primary-nav__item" id="tab-assignments" type="button" role="tab" aria-selected="false"
-                        aria-controls="teacher-assignments-view" data-section="assignments" data-tooltip="Assignments">
-                        <i data-lucide="send"></i><span>Assignments</span>
-                    </button>
-                    <button class="teacher-tab primary-nav__item" id="tab-review" type="button" role="tab" aria-selected="false"
-                        aria-controls="teacher-review-view" data-section="review" data-tooltip="Review">
-                        <i data-lucide="clipboard-check"></i><span>Review</span>
+                        aria-controls="teacher-assignments-view" data-section="assignments" data-tab="needs-review" data-tooltip="Assignments and review">
+                        <i data-lucide="send"></i><span>Review</span>
                     </button>
                     <button class="teacher-tab primary-nav__item" id="tab-settings" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-data-management-view" data-section="settings" data-tooltip="Settings">
                         <i data-lucide="settings"></i>
                         <span>Settings</span>
+                    </button>
+                    <button class="teacher-tab primary-nav__item" id="tab-administration" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-administration-view" data-section="administration" data-tooltip="School settings">
+                        <i data-lucide="sliders-horizontal"></i><span>School settings</span>
+                    </button>
+                    <button class="teacher-tab primary-nav__item" id="tab-platform" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-platform-view" data-section="platform" data-tooltip="Platform" hidden>
+                        <i data-lucide="shield-user"></i><span>Platform</span>
                     </button>
                 </div>
             </nav>
@@ -84,9 +86,15 @@
 
         <aside class="teacher-top-bar" aria-label="Teacher workspace status">
             <div class="teacher-top-bar-copy">
-                <span>Teacher workspace</span>
                 <strong id="teacher-top-bar-section">Home</strong>
             </div>
+            <label id="teacher-class-switcher" class="teacher-class-switcher" hidden>
+                <svg class="teacher-class-switcher-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m2 9 10-5 10 5-10 5-10-5Z"/><path d="M6 11v6c4 3 8 3 12 0v-6M22 9v7"/></svg>
+                <span class="teacher-class-switcher-copy" aria-hidden="true"><strong id="teacher-class-name">Choose a class</strong><small id="teacher-class-year">Switch class</small></span>
+                <svg class="teacher-class-switcher-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+                <select id="teacher-class-select" aria-label="Current class" disabled><option value="">Choose a class</option></select>
+            </label>
+            <div id="teacher-school-name" class="teacher-top-bar-school" aria-live="polite"></div>
         </aside>
 
         <main class="teacher-main">
@@ -132,102 +140,17 @@
 
             <!-- View: Overview -->
             <section id="teacher-administration-view" class="view hidden" role="tabpanel" aria-labelledby="tab-administration"></section>
+            <section id="teacher-platform-view" class="view hidden" role="tabpanel" aria-labelledby="tab-platform"></section>
             <section id="teacher-classes-view" class="view hidden" role="tabpanel" aria-labelledby="tab-classes"></section>
             <section id="teacher-assignments-view" class="view hidden" role="tabpanel" aria-labelledby="tab-assignments"></section>
-            <section id="teacher-review-view" class="view hidden" role="tabpanel" aria-labelledby="tab-review"></section>
-            <section id="teacher-overview-view" class="view hidden" role="tabpanel" aria-labelledby="tab-overview">
-                <div class="teacher-page-heading page-header">
-                    <div>
-                        <p class="teacher-eyebrow page-header__eyebrow">Daily teaching</p>
-                        <h2 class="page-header__title">Home</h2>
-                    </div>
-                    <div class="teacher-toolbar">
-                        <button id="overview-create-vocab-btn" class="btn primary-btn">
-                            <i data-lucide="plus"></i>
-                            New Vocabulary
-                        </button>
-                        <button id="overview-groups-btn" class="btn secondary-btn">
-                            <i data-lucide="shuffle"></i>
-                            Randomize Groups
-                        </button>
-                        <button id="overview-students-btn" class="btn secondary-btn">
-                            <i data-lucide="users"></i>
-                            View Students
-                        </button>
-                    </div>
-                </div>
+            <section id="teacher-overview-view" class="view hidden" role="tabpanel" aria-labelledby="tab-overview"></section>
 
-                <div class="teacher-stat-grid">
-                    <div class="mini-stat">
-                        <div class="mini-stat-label">Total Students</div>
-                        <div class="mini-stat-value" id="overview-total-students">--</div>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="mini-stat-label">Recent Activity Items</div>
-                        <div class="mini-stat-value" id="overview-recent-activity-count">--</div>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="mini-stat-label">Vocabulary Sets</div>
-                        <div class="mini-stat-value" id="overview-vocab-count">--</div>
-                    </div>
-                </div>
-
-                <div class="teacher-overview-grid">
-                    <section class="teacher-panel">
-                        <div class="teacher-panel-header">
-                            <div>
-                                <h3>Quick Actions</h3>
-                                <p>Common classroom tasks without hunting through the app.</p>
-                            </div>
-                        </div>
-                        <div class="teacher-action-grid">
-                            <button class="teacher-action-card" id="overview-groups-action-btn" type="button">
-                                <i data-lucide="shuffle"></i>
-                                <span>Randomize groups</span>
-                            </button>
-                            <button class="teacher-action-card" id="overview-vocabulary-btn" type="button">
-                                <i data-lucide="book-open"></i>
-                                <span>Manage vocabulary</span>
-                            </button>
-                            <button class="teacher-action-card" id="overview-sparks-btn" type="button">
-                                <i data-lucide="sparkles"></i>
-                                <span>Manage Sparks</span>
-                            </button>
-                            <button class="teacher-action-card" id="overview-quiz-btn" type="button">
-                                <i data-lucide="file-text"></i>
-                                <span>Prepare quiz</span>
-                            </button>
-                            <button class="teacher-action-card" id="overview-settings-btn" type="button">
-                                <i data-lucide="sliders-horizontal"></i>
-                                <span>Game settings</span>
-                            </button>
-                            <button class="teacher-action-card" id="overview-export-btn" type="button">
-                                <i data-lucide="download"></i>
-                                <span>Review and export results</span>
-                            </button>
-                        </div>
-                    </section>
-
-                    <section class="teacher-panel teacher-recent-activity-panel">
-                        <div class="teacher-panel-header">
-                            <div>
-                                <h3>Recent Activity</h3>
-                                <p>Latest student updates from progress data.</p>
-                            </div>
-                        </div>
-                        <div id="overview-recent-activity" class="teacher-activity-list">
-                            <div class="loading-spinner runtime-status">Loading activity...</div>
-                        </div>
-                    </section>
-                </div>
-            </section>
-
-            <!-- View: Library -->
             <section id="teacher-dashboard-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
+                <p class="teacher-library-scope">Reusable material for all your classes.</p>
                 <div class="data-tab-list activity-workflow-tabs secondary-tabs" role="tablist" aria-label="Library tools">
                     <button id="vocabulary-tab-assign" class="data-tab-btn activity-workflow-tab secondary-tab secondary-tab--active active" type="button"
                         role="tab" aria-selected="true" aria-controls="vocabulary-assign-panel" data-vocabulary-tab="assign">
-                        <i data-lucide="send"></i>
+                        <i data-lucide="book-open"></i>
                         Vocabulary
                     </button>
                     <button id="vocabulary-tab-review" hidden class="hidden data-tab-btn activity-workflow-tab secondary-tab" type="button"
@@ -247,25 +170,22 @@
                     </button>
                 </div>
 
-                <div id="vocabulary-assign-panel" class="activity-workflow-panel" role="tabpanel" aria-labelledby="vocabulary-tab-assign">
-                    <p class="teacher-empty-state">Create reusable materials here. Use Assignments to choose classes and availability dates.</p>
-                    <div class="teacher-vocab-library-header">
-                        <div id="teacher-vocab-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
-                        <div class="teacher-toolbar">
-                            <div id="teacher-vocab-view-toggle" class="vocab-view-toggle teacher-vocab-view-toggle" aria-label="Vocabulary view"></div>
-                            <button type="button" class="btn secondary-btn" data-publish-material>Assign saved material</button>
-                            <button id="create-new-btn" class="btn primary-btn">
-                                <i data-lucide="plus"></i>
-                                Create
-                            </button>
-                            <label for="import-file" class="btn secondary-btn">
-                                <i data-lucide="upload"></i>
-                                Import
-                            </label>
+                <div id="vocabulary-assign-panel" class="activity-workflow-panel teacher-student-library" role="tabpanel" aria-labelledby="vocabulary-tab-assign">
+                    <h1 class="teacher-library-accessible-title">Vocabulary Units</h1>
+                    <div id="teacher-vocab-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
+                    <div class="teacher-library-control-row">
+                        <div id="teacher-library-filters" class="teacher-library-filters"></div>
+                        <div id="teacher-vocab-view-toggle" class="vocab-view-toggle segmented-control" aria-label="Vocabulary view"></div>
+                        <div class="teacher-library-authoring-tools">
+                            <button type="button" id="teacher-library-create-btn" class="btn primary-btn" aria-label="Create vocabulary"><i data-lucide="plus"></i>Create<i data-lucide="chevron-down"></i></button>
+                            <div id="teacher-library-create-menu" popover="auto" class="floating-action-menu" aria-label="Create vocabulary">
+                                <button type="button" id="create-new-btn" role="menuitem"><i data-lucide="plus"></i>New vocabulary</button>
+                                <button type="button" id="import-vocabulary-btn" role="menuitem"><i data-lucide="upload"></i>Import JSON</button>
+                            </div>
                             <input type="file" id="import-file" accept=".json" hidden>
                         </div>
                     </div>
-
+                    <p id="teacher-library-result-count" class="teacher-library-result-count" role="status"></p>
                     <section class="library-section">
                         <div id="library-list" class="teacher-library-browser">
                             <div class="loading-spinner">Loading library...</div>
@@ -283,26 +203,26 @@
                     </section>
                 </div>
 
-                <div id="vocabulary-quizzes-panel" class="activity-workflow-panel hidden" role="tabpanel" aria-labelledby="vocabulary-tab-quizzes">
-                    <section class="teacher-panel">
-                        <div class="teacher-vocab-library-header">
-                            <div>
-                                <h3 id="quiz-active-vocab-name">Choose a vocabulary set</h3>
-                                <p id="quiz-active-vocab-meta">Open the builder from a specific unit card below.</p>
-                            </div>
-                            <div class="teacher-toolbar">
-                                <div id="quiz-vocab-view-toggle" class="vocab-view-toggle teacher-vocab-view-toggle" aria-label="Quiz vocabulary view"></div>
-                            </div>
-                        </div>
-                        <div id="quiz-vocab-picker" class="teacher-library-browser">
-                            <div class="loading-spinner">Loading vocabulary choices...</div>
-                        </div>
-                    </section>
+                <div id="vocabulary-quizzes-panel" class="activity-workflow-panel teacher-student-library hidden" role="tabpanel" aria-labelledby="vocabulary-tab-quizzes">
+                    <div class="teacher-library-accessible-title">
+                        <h1 id="quiz-active-vocab-name">Quizzes</h1>
+                        <p id="quiz-active-vocab-meta">Choose a vocabulary set to build or preview a quiz.</p>
+                    </div>
+                    <div id="quiz-vocab-breadcrumb" class="vocab-context-breadcrumb teacher-library-location" aria-label="Quiz vocabulary location"></div>
+                    <div class="teacher-library-control-row">
+                        <div id="quiz-library-filters" class="teacher-library-filters"></div>
+                        <div id="quiz-vocab-view-toggle" class="vocab-view-toggle segmented-control" aria-label="Quiz vocabulary view"></div>
+                    </div>
+                    <p id="quiz-library-result-count" class="teacher-library-result-count" role="status"></p>
+                    <div id="quiz-vocab-picker" class="teacher-library-browser">
+                        <div class="loading-spinner">Loading vocabulary choices...</div>
+                    </div>
                 </div>
             </section>
 
             <!-- View: Sparks -->
             <section id="teacher-sparks-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
+                <p class="teacher-library-scope">Reusable material for all your classes.</p>
                 <div class="data-tab-list activity-workflow-tabs secondary-tabs" role="tablist" aria-label="Library tools">
                     <button class="data-tab-btn activity-workflow-tab secondary-tab" type="button"
                         role="tab" aria-selected="false" aria-controls="vocabulary-assign-panel" data-content-destination="vocabulary">
@@ -321,21 +241,21 @@
                         Sparks
                     </button>
                 </div>
-                <div class="teacher-page-heading page-header">
-                    <div>
-                        <p class="teacher-eyebrow page-header__eyebrow">Spark of the Week</p>
-                        <h1 class="page-header__title">Sparks</h1>
+                <div id="teacher-spark-library-panel" class="teacher-student-library">
+                    <h1 class="teacher-library-accessible-title">Sparks</h1>
+                    <div id="teacher-spark-breadcrumb" class="vocab-context-breadcrumb teacher-library-location" aria-label="Sparks location"></div>
+                    <div class="teacher-library-control-row">
+                        <div id="teacher-spark-filters" class="teacher-spark-search teacher-library-filters"></div>
+                        <div id="teacher-spark-view-toggle" class="vocab-view-toggle segmented-control" aria-label="Spark view"></div>
+                        <div class="teacher-library-authoring-tools">
+                            <button id="add-spark-btn" class="btn primary-btn teacher-library-create-button" type="button" aria-label="Create Spark"><i data-lucide="plus"></i>Create</button>
+                        </div>
                     </div>
-                    <div class="teacher-toolbar">
-                        <button id="add-spark-btn" class="btn primary-btn" type="button">
-                            <i data-lucide="plus"></i>
-                            Add Spark
-                        </button>
+                    <p id="spark-library-result-count" class="teacher-library-result-count" role="status"></p>
+                    <h2 class="teacher-library-accessible-title">Spark materials</h2>
+                    <div id="spark-library-list" class="teacher-library-browser spark-library">
+                        <div class="loading-spinner">Loading Sparks...</div>
                     </div>
-                </div>
-
-                <div id="spark-library-list" class="spark-library">
-                    <div class="loading-spinner">Loading Sparks...</div>
                 </div>
             </section>
 
@@ -706,6 +626,7 @@
                     </div>
 
                     <div id="student-profile-account-panel" class="student-profile-panel hidden" role="tabpanel">
+                        <p>Rewards and account details are shared across classes.</p>
                         <div class="student-profile-account-grid">
                             <section class="teacher-panel student-detail-section">
                                 <div class="teacher-panel-header"><div><h3>Rewards</h3><p>Current balance: <strong id="detail-student-coins">0</strong> coins.</p></div></div>

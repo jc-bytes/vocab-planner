@@ -50,13 +50,15 @@ test('teacher routes keep their public URL contract through the shared parser', 
     class TeacherManager {}
     installTeacherRoutingMethods(TeacherManager);
     const teacher = new TeacherManager();
+    assert.deepEqual(teacher.parseRoute('#/teacher/platform'), { view: 'platform' });
+    assert.equal(teacher.buildRoute({ view: 'platform' }), '#/teacher/platform');
 
     assert.deepEqual(teacher.parseRoute('#/teacher/vocabulary/editor/week%201'), {
         view: 'editor',
         vocabularyId: 'week 1'
     });
     assert.deepEqual(teacher.parseRoute('#/teacher/data?tab=export'), {
-        view: 'review'
+        view: 'assignments', tab: 'needs-review'
     });
     assert.equal(teacher.buildRoute({ view: 'data', tab: 'export' }), '#/teacher/settings?tab=export');
     assert.deepEqual(teacher.parseRoute('#/teacher/data-settings?tab=dashboard'), {

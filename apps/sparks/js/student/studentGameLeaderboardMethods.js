@@ -134,7 +134,7 @@ export class StudentGameLeaderboard {
         state.inFlight = (async () => {
             try {
                 const saved = await supabaseService.submitStudentGameScore(submission, {
-                    signal: abortController.signal
+                    signal: abortController.signal, ownerUserId: ownerId
                 });
                 if (this.destroyed
                     || syncGeneration !== this.syncGeneration

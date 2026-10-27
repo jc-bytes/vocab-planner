@@ -19,3 +19,40 @@
 .teacher-assignment-response { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .teacher-assignment-dialog [hidden] { display: none; }
+.assignment-details-metadata { display: grid; grid-template-columns: auto minmax(0,1fr); gap: .5rem 1rem; margin: 0; font-size: .9rem; }
+.assignment-details-metadata dt { font-weight: 600; }
+.assignment-details-metadata dd { margin: 0; overflow-wrap: anywhere; }
+.classrooms .assignment-details-metadata dd { margin: 0; }
+#teacher-assignments-view { min-width: 0; }
+#teacher-assignments-view .inline-status:empty { display: none; }
+#teacher-assignments-view > h3 { overflow-wrap: anywhere; }
+#teacher-assignments-view .teacher-library-filters { flex-wrap: wrap; }
+#teacher-assignments-view .teacher-library-filters > label:first-child { flex: 0 1 240px; min-width: 0; }
+#teacher-assignments-view .teacher-library-filters select { width: 100%; min-width: 0; }
+#teacher-assignments-view .teacher-library-search { flex: 1 1 180px; }
+#teacher-assignments-view .teacher-library-authoring-tools .btn { min-height: 48px; white-space: nowrap; }
+#teacher-assignments-view .assignment-library-rows { display: grid; gap: 8px; }
+#teacher-assignments-view .assignment-library-rows .student-vocab-row { display: grid; grid-template-columns: minmax(0, 1fr) 160px 100px 160px 28px; gap: 14px; width: 100%; text-align: left; padding-right: 48px; }
+#teacher-assignments-view .assignment-library-item { position: relative; min-width: 0; }
+#teacher-assignments-view .assignment-library-item > .student-vocab-row { padding-right: 48px; }
+#teacher-assignments-view .assignment-library-item > .student-vocab-row strong { white-space: normal; overflow-wrap: anywhere; }
+#teacher-assignments-view .assignment-library-item > .student-vocab-row > :last-child { visibility: hidden; }
+#teacher-assignments-view .assignment-library-item > .floating-action-menu-trigger { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 40px; min-height: 44px; padding: 0; background: transparent; border: 0; box-shadow: none; }
+.assignment-detail-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 20px; }
+#teacher-assignments-view .teacher-library-control-row { flex-wrap: wrap; }
+#teacher-assignments-view .teacher-library-control-row > label { min-width: 0; }
+@media (max-width: 1050px) {
+    #teacher-assignments-view .assignment-library-rows .student-vocab-row { grid-template-columns: minmax(0, 1fr) 110px 85px 120px 20px; gap: 10px; }
+}
+@media (max-width: 720px) {
+    #teacher-assignments-view .activity-workflow-tabs { flex-wrap: wrap; }
+    #teacher-assignments-view .teacher-library-control-row > .teacher-library-filters { flex-basis: 100%; }
+    #teacher-assignments-view .assignment-library-rows .student-vocab-row-header { display: none; }
+    #teacher-assignments-view .assignment-library-rows .student-vocab-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 12px; }
+    #teacher-assignments-view .assignment-library-item > .student-vocab-row strong { grid-column: 1 / -1; }
+    #teacher-assignments-view .assignment-library-rows .student-vocab-row > span { display: block; white-space: normal; overflow-wrap: anywhere; text-align: left; justify-self: start; }
+    #teacher-assignments-view .assignment-library-rows .student-vocab-row > span::before { content: none; }
+    #teacher-assignments-view .assignment-library-item > .floating-action-menu-trigger { top: 8px; transform: none; }
+    .assignment-details-metadata { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .assignment-details-metadata dd { margin-bottom: 12px; }
+}

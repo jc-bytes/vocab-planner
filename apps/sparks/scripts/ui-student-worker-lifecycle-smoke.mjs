@@ -10,6 +10,7 @@ import { chromium } from 'playwright';
 import { generateSW } from 'workbox-build';
 import { generateStudentServiceWorker } from './generate-service-worker.mjs';
 import { collectStudentShellFiles } from './student-precache.mjs';
+import { verifyBuildArtifact } from './lib/buildArtifactIdentity.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const run = promisify(execFile);
@@ -17,6 +18,7 @@ if (process.env.STUDENT_WORKER_LIFECYCLE_REUSE !== '1') {
     console.log('Building current production assets for the student worker upgrade check.');
     await run('npm', ['run', 'desktop:build:web'], { cwd: root, maxBuffer: 20 * 1024 * 1024 });
 }
+await verifyBuildArtifact(root, join(root, 'dist-desktop'));
 const temporary = await mkdtemp(join(tmpdir(), 'sparks-worker-lifecycle-'));
 const builds = new Map();
 const updater = await readFile(join(root, 'js/student/studentAppUpdates.js'));

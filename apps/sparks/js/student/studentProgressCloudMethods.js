@@ -58,7 +58,7 @@ export class StudentProgressCloud {
         window.addEventListener('storage', this.storageSyncHandler);
 
         this.onlineSyncHandler = () => {
-            this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
+            void this.syncSavedChangesInBackground({ silent: true, ownerUserId: userId, generation });
         };
         window.addEventListener('online', this.onlineSyncHandler);
 
@@ -85,7 +85,21 @@ export class StudentProgressCloud {
             });
         });
 
-        this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
+        void this.syncSavedChangesInBackground({ silent: true, ownerUserId: userId, generation });
+    }
+
+    async syncSavedChangesInBackground(options) {
+        try {
+            await this.flushLocalSyncQueue(options);
+        } catch {
+            if (!this.isCurrentOwner(options.ownerUserId)
+                || options.generation !== this.cloudGeneration) return;
+            // An event listener cannot return a rejected promise to its caller.
+            // Explicit awaited flushes still reject; the receipt remains intact.
+            try {
+                this.syncQueue.setQueueStatus('Local sync needs attention', options.ownerUserId, options.generation);
+            } catch { /* A failed status observer must not escape the background boundary. */ }
+        }
     }
 
     stopCoinSync() {
@@ -217,7 +231,9 @@ export class StudentProgressCloud {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
         const ownerUserId = options.ownerUserId || this.sm.currentUser.uid;
-        if (!this.isCurrentOwner(ownerUserId, options)) return;
+        const generation = options.generation ?? this.cloudGeneration;
+        const isCurrent = () => this.isCurrentOwner(ownerUserId, options) && generation === this.cloudGeneration;
+        if (!isCurrent()) return;
         try {
             let data = null;
 
@@ -227,13 +243,17 @@ export class StudentProgressCloud {
                 data = await studentProgressRepository.get(ownerUserId, options);
             }
 
-            if (!this.isCurrentOwner(ownerUserId, options)) return;
+            if (!isCurrent()) return;
 
             if (!data) {
                 this.sm.setAuthStatus('Ready');
                 return;
             }
 
+            const units = await this.syncQueue.restorePendingUnitWork(data.units || {}, {
+                ...options, ownerUserId, generation
+            });
+            if (!isCurrent()) return;
             const cloudCoinData = this.progress.migrateCoinData(data);
             const cloudGiftCoins = cloudCoinData.coinData.giftCoins || 0;
             const localGiftCoins = this.sm.coinData.giftCoins || 0;
@@ -254,7 +274,7 @@ export class StudentProgressCloud {
 
             this.sm.progressData = {
                 studentProfile: mergedStudentProfile,
-                units: data.units || {},
+                units,
                 totalXp: Number(data.totalXp) || 0,
                 coins: this.sm.coins,
                 coinData: this.sm.coinData,
@@ -263,11 +283,11 @@ export class StudentProgressCloud {
             this.sm.updateCoinDisplay();
             this.sm.studentProfile = mergedStudentProfile;
             await this.restoreImagesFromProgress({ ...options, ownerUserId });
-            if (!this.isCurrentOwner(ownerUserId, options)) return;
+            if (!isCurrent()) return;
 
             if (!hasWelcomeBonus && this.sm.coinData.balance === 0 && typeof supabaseService.claimStudentWelcomeBonus === 'function') {
                 const progress = await supabaseService.claimStudentWelcomeBonus({ clientId: this.progress.clientId });
-                if (!this.isCurrentOwner(ownerUserId, options)) return;
+                if (!isCurrent()) return;
                 if (progress) {
                     const previousBalance = this.sm.coinData.balance;
                     this.applyRemoteCoinProgress(progress);
@@ -281,7 +301,7 @@ export class StudentProgressCloud {
 
             this.sm.setAuthStatus(this.syncQueue.getAuthStatus());
         } catch (error) {
-            if (!this.isCurrentOwner(ownerUserId, options)) return;
+            if (!isCurrent()) return;
             console.error('Failed to load cloud progress:', error);
             // Check if we're offline
             const isOffline = !navigator.onLine;

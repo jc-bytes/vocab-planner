@@ -1,4 +1,3 @@
-import Papa from 'papaparse';
 import { $, notifications } from '../main.js';
 import { supabaseService } from '../supabaseService.js';
 import { setInlineStatus } from '../ui/inlineStatus.js';
@@ -165,8 +164,8 @@ getGradeSectionFromStudentCsvName(fileName) {
         };
     },
 
-parseStudentCsvText(text, fileName, placement) {
-        const rows = this.parseCsvRows(text);
+async parseStudentCsvText(text, fileName, placement) {
+        const rows = await this.parseCsvRows(text);
         if (rows.length < 2) return [];
 
         const headers = rows[0].map(header => this.normalizeStudentCsvHeader(header));
@@ -180,7 +179,8 @@ parseStudentCsvText(text, fileName, placement) {
         });
     },
 
-parseCsvRows(text) {
+async parseCsvRows(text) {
+        const { default: Papa } = await import('papaparse');
         const source = String(text || '').replace(/^\uFEFF/, '');
         const parsed = Papa.parse(source, {
             skipEmptyLines: 'greedy'

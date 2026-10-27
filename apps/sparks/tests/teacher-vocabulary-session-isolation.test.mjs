@@ -90,10 +90,6 @@ function initializeManager(manager, ownerId = 'teacher-a') {
         authDisabled: false,
         teacherVocabularySessionGeneration: 0,
         teacherVocabularyDocumentGeneration: 1,
-        teacherVocabularySaveSequence: 0,
-        teacherVocabularySaveQueue: null,
-        teacherVocabularySaveDebounces: new Map(),
-        teacherVocabularyLatestSaveByDocument: new Map(),
         teacherVocabularyQueryService: createServerStateQuery({ gcTime: Infinity }),
         teacherVocabularyLibraryLoadGeneration: 0,
         libraryItems: [],
@@ -107,9 +103,25 @@ function initializeManager(manager, ownerId = 'teacher-a') {
         vocab.activitySettings ||= {};
         return { required: [], additional: [] };
     };
+    manager.applyAssignedDatePlacement = () => {};
+    manager.prepareWordHuntWordsForSave = () => {};
+    manager.updateGeneratedVocabId = () => {};
+    manager.setCloudStatus = () => {};
     manager.getLocalVocabs = () => [];
     manager.dedupeTeacherVocabularyItems = items => items;
     return manager;
+}
+
+
+const turn = () => new Promise(resolve => setImmediate(resolve));
+function captureTimers() {
+    const originalSet = globalThis.setTimeout, originalClear = globalThis.clearTimeout, timers = new Map();
+    let sequence = 0;
+    globalThis.setTimeout = (callback, delay) => { const id = ++sequence; timers.set(id, { callback, delay }); return id; };
+    globalThis.clearTimeout = id => timers.delete(id);
+    return { delays: () => [...timers.values()].map(timer => timer.delay),
+        fire(delay) { for (const [id, timer] of [...timers]) if (timer.delay === delay) { timers.delete(id); timer.callback(); } },
+        restore() { globalThis.setTimeout = originalSet; globalThis.clearTimeout = originalClear; } };
 }
 
 test('Vocabulary cleanup scrubs account state and preserves device-local policy', () => {
@@ -124,25 +136,27 @@ test('Vocabulary cleanup scrubs account state and preserves device-local policy'
     elements.get('#pos-input').value = 'verb';
     elements.get('#word-hunt-input').checked = true;
     const manager = initializeManager(new (createManagerClass())());
-    manager.libraryItems = [{ vocab: { id: 'a-secret' } }];
+    // Browser data is private to its disposable feature; this manager retains only route state.
     manager.lastVocabularyRoute = { view: 'editor', vocabularyId: 'a-secret' };
     manager.editingWordIndex = 4;
     manager.autoGenerateVocabId = true;
     let timerCleared = false;
-    const originalClearTimeout = globalThis.clearTimeout;
+    const originalClearTimeout = globalThis.clearTimeout, originalSetTimeout = globalThis.setTimeout;
+    globalThis.setTimeout = () => 77;
     globalThis.clearTimeout = timeout => { if (timeout === 77) timerCleared = true; };
-    manager.teacherVocabularySaveDebounces.set(1, 77);
+    manager.triggerAutoSave();
 
     try {
         clearTeacherVocabularySessionState(manager);
     } finally {
         globalThis.clearTimeout = originalClearTimeout;
+        globalThis.setTimeout = originalSetTimeout;
     }
 
     assert.equal(timerCleared, true);
     assert.equal(manager.teacherVocabularySessionGeneration, 1);
     assert.equal(manager.vocabSet.id, '');
-    assert.deepEqual(manager.libraryItems, []);
+    assert.deepEqual(manager.libraryDrilldown, { subject: null, grade: null, trimester: null, month: null });
     assert.equal(manager.lastVocabularyRoute, null);
     assert.equal(manager.editingWordIndex, -1);
     assert.equal(elements.get('#vocab-name').value, '');
@@ -178,26 +192,24 @@ test('a pending save from account A cannot block account B saves', async () => {
     manager.removeLocalVocab = () => {};
 
     try {
-        const oldSave = manager.enqueueTeacherVocabularySave(
-            manager.createTeacherVocabularySaveTicket(manager.vocabSet)
-        );
+        const oldSave = manager.publishVocabulary();
         await new Promise(resolve => setImmediate(resolve));
         assert.equal(calls.length, 1);
 
         clearTeacherVocabularySessionState(manager);
         manager.currentUser = { uid: 'teacher-b' };
         manager.vocabSet = { id: 'unit-b', name: 'Account B', subjectSlug: 'technology', words: [] };
-        const newSave = manager.enqueueTeacherVocabularySave(
-            manager.createTeacherVocabularySaveTicket(manager.vocabSet)
-        );
+        const newSave = manager.publishVocabulary();
         await new Promise(resolve => setImmediate(resolve));
 
         assert.equal(calls.length, 2);
         assert.equal(calls[1].payload.name, 'Account B');
         accountBSave.resolve({});
-        assert.equal((await newSave).status, 'saved');
-        accountASave.resolve({});
-        assert.equal((await oldSave).status, 'stale');
+        await newSave;
+        assert.equal(manager.vocabSet.source, 'cloud');
+        const current = JSON.stringify(manager.vocabSet);
+        accountASave.resolve({}); await oldSave;
+        assert.equal(JSON.stringify(manager.vocabSet), current, 'late account A cannot alter the acknowledged B document');
     } finally {
         vocabularyRepository.save = originalSave;
     }
@@ -310,64 +322,44 @@ test('cloud saves use immutable snapshots and reach the repository in initiation
     manager.removeLocalVocab = id => removed.push(id);
 
     try {
-        const oldTicket = manager.createTeacherVocabularySaveTicket({
-            id: 'unit-a', name: 'Old', subjectSlug: 'technology', activitySettings: {}, words: []
-        });
-        const oldSave = manager.enqueueTeacherVocabularySave(oldTicket);
-        const newTicket = manager.createTeacherVocabularySaveTicket({
-            id: 'unit-a', name: 'New', subjectSlug: 'technology', activitySettings: {}, words: []
-        });
-        const newSave = manager.enqueueTeacherVocabularySave(newTicket);
+        manager.vocabSet.name = 'Old';
+        const oldSave = manager.publishVocabulary();
+        manager.vocabSet.name = 'New';
+        const newSave = manager.publishVocabulary();
         await new Promise(resolve => setImmediate(resolve));
         assert.deepEqual(calls.map(call => call.payload.name), ['Old']);
         first.resolve({});
         await new Promise(resolve => setImmediate(resolve));
         assert.deepEqual(calls.map(call => call.payload.name), ['Old', 'New']);
         second.resolve({});
-        assert.equal((await oldSave).status, 'saved');
-        assert.equal((await newSave).status, 'saved');
+        await Promise.all([oldSave, newSave]);
         assert.deepEqual(removed, ['unit-a']);
         assert.equal(manager.vocabSet.source, 'cloud');
         assert.deepEqual(statuses[0], ['Saved to cloud', 'success']);
     } finally {
         vocabularyRepository.save = originalSave;
-        clearTimeout(manager.teacherVocabularyStatusTimer);
+        manager.clearTeacherVocabularySessionState();
     }
 });
 
 test('debounced autosave captures the edited document before another document opens', async () => {
-    const Manager = createManagerClass();
-    const manager = initializeManager(new Manager());
-    const scheduled = new Map();
-    let nextTimer = 1;
-    const originalSetTimeout = globalThis.setTimeout;
-    const originalClearTimeout = globalThis.clearTimeout;
-    globalThis.setTimeout = callback => {
-        const id = nextTimer;
-        nextTimer += 1;
-        scheduled.set(id, callback);
-        return id;
-    };
-    globalThis.clearTimeout = id => scheduled.delete(id);
-    const tickets = [];
-    manager.setCloudStatus = () => {};
-    manager.enqueueTeacherVocabularySave = async ticket => { tickets.push(ticket); };
-
+    const manager = initializeManager(new (createManagerClass())());
+    const clock = captureTimers(), calls = [], originalSave = vocabularyRepository.save;
+    vocabularyRepository.save = async (id, payload) => { calls.push({ id, payload }); };
     try {
-        manager.queueCloudSave();
-        const timeoutId = manager.teacherVocabularySaveDebounces.get(
-            manager.teacherVocabularyDocumentGeneration
-        );
+        manager.vocabSet.source = 'cloud';
+        manager.triggerAutoSave();
+        assert.equal(clock.delays().filter(delay => delay === 800).length, 1);
         manager.beginTeacherVocabularyDocument();
         manager.vocabSet = { id: 'unit-b', name: 'Next document', words: [] };
-        scheduled.get(timeoutId)();
-        await Promise.resolve();
-        assert.equal(tickets.length, 1);
-        assert.equal(tickets[0].snapshot.id, 'unit-a');
-        assert.equal(tickets[0].snapshot.name, 'Account A');
+        clock.fire(800); await turn(); await turn();
+        assert.equal(calls.length, 1);
+        assert.equal(calls[0].id, 'unit-a');
+        assert.equal(calls[0].payload.name, 'Account A');
+        assert.equal(manager.vocabSet.name, 'Next document');
+        assert.equal(manager.vocabSet.source, undefined);
     } finally {
-        globalThis.setTimeout = originalSetTimeout;
-        globalThis.clearTimeout = originalClearTimeout;
+        manager.clearTeacherVocabularySessionState(); clock.restore(); vocabularyRepository.save = originalSave;
     }
 });
 
@@ -383,14 +375,13 @@ test('a save completion from account A cannot mutate account B', async () => {
     manager.removeLocalVocab = id => removed.push(id);
 
     try {
-        const ticket = manager.createTeacherVocabularySaveTicket(manager.vocabSet);
-        const saving = manager.enqueueTeacherVocabularySave(ticket);
+        const saving = manager.publishVocabulary();
         await new Promise(resolve => setImmediate(resolve));
         clearTeacherVocabularySessionState(manager);
         manager.currentUser = { uid: 'teacher-b' };
         manager.vocabSet = { id: 'unit-a', name: 'Account B', words: [] };
         accountASave.resolve({});
-        assert.equal((await saving).status, 'stale');
+        await saving;
         assert.equal(manager.vocabSet.name, 'Account B');
         assert.equal(manager.vocabSet.source, undefined);
         assert.deepEqual(statuses, []);
@@ -459,6 +450,7 @@ test('the newest failed save owns the local fallback during publish and autosave
     const manager = initializeManager(new Manager());
     const publishRequest = deferred();
     const autosaveRequest = deferred();
+    const clock = captureTimers();
     const originalSave = vocabularyRepository.save;
     const originalConsoleError = console.error;
     let requestCount = 0;
@@ -478,18 +470,18 @@ test('the newest failed save owns the local fallback during publish and autosave
         const publishing = manager.publishVocabulary();
         await new Promise(resolve => setImmediate(resolve));
         manager.vocabSet.name = 'Newest unsaved edit';
-        const autosave = manager.enqueueTeacherVocabularySave(
-            manager.createTeacherVocabularySaveTicket(manager.vocabSet)
-        );
+        manager.vocabSet.source = 'cloud';
+        manager.triggerAutoSave(); clock.fire(800);
 
         publishRequest.reject(new Error('publish failed'));
         await publishing;
         assert.deepEqual(localFallbacks, []);
         await new Promise(resolve => setImmediate(resolve));
         autosaveRequest.reject(new Error('autosave failed'));
-        assert.equal((await autosave).status, 'failed');
+        await turn(); await turn();
         assert.deepEqual(localFallbacks.map(vocab => vocab.name), ['Newest unsaved edit']);
     } finally {
+        manager.clearTeacherVocabularySessionState(); clock.restore();
         vocabularyRepository.save = originalSave;
         console.error = originalConsoleError;
     }
@@ -500,6 +492,7 @@ test('a successful publish finalizes the active document when a newer autosave e
     const manager = initializeManager(new Manager());
     const publishRequest = deferred();
     const autosaveRequest = deferred();
+    const clock = captureTimers();
     const originalSave = vocabularyRepository.save;
     let requestCount = 0;
     vocabularyRepository.save = () => {
@@ -516,17 +509,18 @@ test('a successful publish finalizes the active document when a newer autosave e
     try {
         const publishing = manager.publishVocabulary();
         await new Promise(resolve => setImmediate(resolve));
-        const autosave = manager.enqueueTeacherVocabularySave(
-            manager.createTeacherVocabularySaveTicket(manager.vocabSet)
-        );
+        manager.vocabSet.source = 'cloud';
+        manager.triggerAutoSave(); clock.fire(800);
         publishRequest.resolve({});
         await publishing;
         assert.equal(manager.autoGenerateVocabId, false);
         autosaveRequest.resolve({});
-        assert.equal((await autosave).status, 'saved');
+        await turn(); await turn();
+        assert.equal(manager.vocabSet.source, 'cloud');
     } finally {
+        manager.clearTeacherVocabularySessionState(); clock.restore();
         vocabularyRepository.save = originalSave;
-        clearTimeout(manager.teacherVocabularyStatusTimer);
+        manager.clearTeacherVocabularySessionState();
     }
 });
 
@@ -553,18 +547,24 @@ test('authenticated school library never requests or mixes the retired public vo
         assert.deepEqual(requested, [], 'Private school library must not fetch the public manifest');
         assert.deepEqual(library.remoteVocabs, []);
         assert.deepEqual(library.items.map(item => item.vocab.id), ['private-school-vocabulary']);
-    } finally {
-        globalThis.fetch = originalFetch;
-    }
+    } finally { globalThis.fetch = originalFetch; }
 });
 
 test('a cloud vocabulary read failure is rejected instead of becoming an empty library', async () => {
     const manager = initializeManager(new (createManagerClass())());
-    manager.setCloudStatus = () => {};
     const original = vocabularyRepository.listMetadata;
     const failure = new Error('Temporary vocabulary outage');
     vocabularyRepository.listMetadata = async () => { throw failure; };
-    try {
-        await assert.rejects(manager.fetchCloudVocabs(), error => error === failure);
-    } finally { vocabularyRepository.listMetadata = original; }
+    try { await assert.rejects(manager.fetchCloudVocabs(), error => error === failure); }
+    finally { vocabularyRepository.listMetadata = original; }
+});
+
+test('vocabulary operation guard retires when school context is invalidated without replacing its actor', async () => {
+    const { schoolContext } = await import('../js/services/schoolContext.js');
+    const manager = initializeManager(new (createManagerClass())());
+    const current = manager.createTeacherVocabularyOperationGuard();
+    assert.equal(current(), true);
+    schoolContext.clear();
+    assert.equal(current(), false);
+    assert.equal(manager.createTeacherVocabularyOperationGuard()(), true);
 });

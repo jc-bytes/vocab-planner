@@ -147,12 +147,10 @@ export class StudentListeners {
             this.sm.setStudentMobileMenu(!isOpen);
         });
 
+
         this.listen(document, 'click', (event) => {
             const shell = $('#student-tab-shell');
             if (shell && !shell.contains(event.target)) this.sm.closeStudentMobileMenu();
-
-            const exportMenu = $('#student-vocab-export-menu');
-            if (exportMenu && !exportMenu.contains(event.target)) exportMenu.open = false;
         });
 
         this.listen(document, 'click', async (event) => {
@@ -161,7 +159,7 @@ export class StudentListeners {
 
             const activityType = button.dataset.activityPdfExport;
             this.setStudentExportButtonState(button, true, 'Generating PDF...');
-            $('#student-vocab-export-menu')?.removeAttribute('open');
+            $('#student-vocab-export-menu .floating-action-menu:popover-open')?.hidePopover();
             try {
                 await this.sm.activities.downloadCompletedActivityReport(activityType);
             } catch (error) {
@@ -175,11 +173,6 @@ export class StudentListeners {
         this.listen(document, 'keydown', (event) => {
             if (event.key === 'Escape') {
                 this.sm.closeStudentMobileMenu({ focusToggle: true });
-                const exportMenu = $('#student-vocab-export-menu');
-                if (exportMenu?.open) {
-                    exportMenu.open = false;
-                    exportMenu.querySelector('summary')?.focus({ preventScroll: true });
-                }
             }
         });
 
@@ -278,18 +271,16 @@ export class StudentListeners {
         this.addListener('#change-password-form', 'submit', (e) => this.sm.handleForcedPasswordChange(e));
 
         // Activity Selection
-        $$('.activity-card').forEach(card => {
-            this.listen(card, 'click', async () => {
-                const activityType = card.dataset.activity;
-                await this.sm.activities.startActivity(activityType);
-            });
+        this.listen(document.querySelector('#activity-menu-view'), 'click', async event => {
+            const card = event.target.closest?.('.activity-card');
+            if (card && !card.disabled) await this.sm.activities.startActivity(card.dataset.activity);
         });
 
 
 
         // Generate Final Report
         this.addListener('#download-word-hunt-btn', 'click', () => {
-            $('#student-vocab-export-menu')?.removeAttribute('open');
+            $('#student-vocab-export-menu .floating-action-menu:popover-open')?.hidePopover();
             this.sm.activities.downloadWordHuntSubmission();
         });
 
@@ -299,7 +290,7 @@ export class StudentListeners {
 
             this.finalReportExportInProgress = true;
             this.setStudentExportButtonState(button, true, 'Generating report...');
-            $('#student-vocab-export-menu')?.removeAttribute('open');
+            $('#student-vocab-export-menu .floating-action-menu:popover-open')?.hidePopover();
 
             try {
                 if (!this.sm.currentVocab) return;
@@ -373,7 +364,9 @@ export class StudentListeners {
 
             closeDialog('#profile-modal', { restoreFocus: false });
             this.sm.auth.updateHeader();
-            this.sm.activities.renderDashboard();
+            const view = this.sm.parseRoute()?.view;
+            if (view === 'units') this.sm.activities.renderDashboard();
+            if (view === 'menu') this.sm.activities.renderStudentHome();
         });
     }
 

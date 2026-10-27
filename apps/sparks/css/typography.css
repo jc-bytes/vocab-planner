@@ -322,18 +322,8 @@ option,
 }
 
 /* Student activity disclosure and compact back-control roles */
-.activity-disclosure,
-.activity-disclosure__summary,
 .activity-back-control {
     font-family: var(--font-family-sans);
-}
-
-.activity-disclosure__summary {
-    font-size: var(--type-card-title-size);
-    font-weight: var(--font-weight-bold);
-    line-height: var(--type-body-line-height);
-    letter-spacing: var(--letter-spacing-normal);
-    text-transform: none;
 }
 
 .activity-back-control {

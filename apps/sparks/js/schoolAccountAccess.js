@@ -1,5 +1,6 @@
 import '../css/auth-access.css';
 import { supabaseService } from './supabaseService.js';
+import { takePasswordRecoveryIntent, trackPasswordSessions } from './services/passwordChangeIntent.js';
 
 function node(tag, text) {
     const element = document.createElement(tag);
@@ -13,6 +14,7 @@ export async function mountSchoolAccountAccess(root) {
     await supabaseService.init();
     if (!root.isConnected || root.querySelector('[data-school-account-access]')) return;
     const client = supabaseService.getClient();
+    trackPasswordSessions(client);
     const panel = node('section'); panel.dataset.schoolAccountAccess = ''; panel.className = 'school-account-access';
     const register = node('button', 'Create invited account'); register.type = 'button'; register.className = 'auth-account-link';
     const recover = node('button', 'Forgot password?'); recover.type = 'button'; recover.className = 'auth-account-link';
@@ -26,9 +28,10 @@ export async function mountSchoolAccountAccess(root) {
         passwordLabel.replaceWith(row); row.append(passwordLabel, recover);
     } else { panel.append(recover); }
     let activeDialog = null, activeMode = null;
-    function open(mode) {
+    function open(mode, intent = null) {
         if (!root.isConnected) return;
-        if (activeDialog?.open && activeMode === mode) return;
+        if (mode === 'password' && !intent?.isCurrent()) return;
+        if (activeDialog?.open && activeMode === mode) { intent?.dispose(); return; }
         activeDialog?.close();
         const dialog = node('dialog'); dialog.className = 'card';
         activeDialog = dialog; activeMode = mode;
@@ -50,7 +53,15 @@ export async function mountSchoolAccountAccess(root) {
         submit.type = 'submit'; submit.className = 'btn primary-btn';
         const close = node('button', 'Close'); close.type = 'button'; close.className = 'btn secondary-btn';
         close.addEventListener('click', () => dialog.close());
-        dialog.addEventListener('close', () => { dialog.remove(); if (activeDialog === dialog) { activeDialog = null; activeMode = null; } }, { once: true });
+        dialog.addEventListener('close', () => {
+            if (fields.password) fields.password.value = '';
+            intent?.dispose(); dialog.remove();
+            if (activeDialog === dialog) { activeDialog = null; activeMode = null; }
+        }, { once: true });
+        intent?.signal.addEventListener('abort', () => {
+            fields.password.value = '';
+            if (dialog.open) dialog.close();
+        }, { once: true });
         form.append(submit, close, status); dialog.append(title, form); document.body.append(dialog); dialog.showModal();
         form.addEventListener('submit', async event => {
             event.preventDefault(); if (submit.disabled) return; submit.disabled = true; status.textContent = 'Please wait…';
@@ -60,18 +71,25 @@ export async function mountSchoolAccountAccess(root) {
                 if (mode === 'register') result = await client.auth.signUp({ email: fields.email.value.trim(), password: fields.password.value,
                     options: { emailRedirectTo: redirectTo, data: { first_name: fields.firstName.value.trim(), last_name: fields.lastName.value.trim() } } });
                 else if (mode === 'recover') result = await client.auth.resetPasswordForEmail(fields.email.value.trim(), { redirectTo });
-                else result = await client.auth.updateUser({ password: fields.password.value });
-                if (result.error) throw result.error;
+                else {
+                    if (!intent.isCurrent()) return;
+                    await supabaseService.updateAccountPassword(fields.password.value, { intent });
+                    if (!intent.isCurrent() || !dialog.open) return;
+                }
+                if (result?.error) throw result.error;
                 status.textContent = mode === 'register' ? 'Check your email to verify your account. Then sign in and accept your school invitation.'
                     : mode === 'recover' ? 'If this account can receive recovery email, a link has been requested. Check your inbox.' : 'Password saved.';
                 if (mode === 'password') fields.password.value = '';
-            } catch (error) { status.textContent = error.message || 'Could not complete this request.'; }
+            } catch (error) { if (dialog.open && (!intent || intent.isCurrent())) status.textContent = error.message || 'Could not complete this request.'; }
             finally { submit.disabled = false; }
         });
     }
     register.addEventListener('click', () => open('register'));
     recover.addEventListener('click', () => open('recover'));
-    client.auth.onAuthStateChange(event => { if (event === 'PASSWORD_RECOVERY') open('password'); });
+    client.auth.onAuthStateChange(event => {
+        if (event === 'PASSWORD_RECOVERY' && root.isConnected && panel.isConnected) open('password', takePasswordRecoveryIntent(client));
+    });
     // Auth may consume the recovery URL before this lazy feature subscribes.
-    if (window.__sparksPasswordRecoveryPending) { window.__sparksPasswordRecoveryPending = false; open('password'); }
+    const pending = takePasswordRecoveryIntent(client);
+    if (pending) open('password', pending);
 }

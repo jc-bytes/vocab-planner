@@ -1,6 +1,6 @@
-import { schoolContext } from './services/schoolContext.js';
 import { schoolSessionKey } from './services/schoolScope.js';
-import { createElement, escapeHtml, notifications } from './main.js';
+import { notifications } from './main.js';
+import { getTeacherVocabularySaves } from './teacherVocabularySaves.js';
 import { vocabularyRepository } from './services/vocabularyRepository.js';
 import {
     getVocabSubjectSlug,
@@ -80,72 +80,7 @@ class TeacherVocabularyStorageMethods {
         localStorage.setItem(`teacher_vocab_library:${this.authDisabled ? 'demo' : schoolSessionKey(this.currentUser?.uid || this.currentUser?.id)}`, JSON.stringify(vocabs));
     }
 
-    createLibraryCard(container, vocab, type) {
-        const card = createElement('div', 'card teacher-vocab-card');
-        card.tabIndex = 0;
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', `Open ${vocab.name || vocab.id || 'vocabulary'}`);
 
-        const badgeStyles = {
-            remote: { className: 'teacher-vocab-source-badge--remote', text: 'Repo' },
-            local: { className: 'teacher-vocab-source-badge--local', text: 'Draft' },
-            cloud: { className: 'teacher-vocab-source-badge--cloud', text: 'Cloud' }
-        };
-
-        const badge = badgeStyles[type] || badgeStyles.remote;
-        const subject = this.getSubjectForVocab(vocab);
-
-        let deleteBtnHtml = '';
-        if (type === 'local' || type === 'cloud') {
-            const label = type === 'cloud' ? 'Delete Cloud' : 'Delete Draft';
-            deleteBtnHtml = `<button class="delete-vocab-btn" title="${label}" aria-label="${label}"><i data-lucide="trash-2"></i></button>`;
-        }
-
-        card.innerHTML = `
-            <div class="badge teacher-vocab-source-badge ${badge.className}">${badge.text}</div>
-            <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
-            <h3 class="card-title">${escapeHtml(vocab.name || 'Untitled')}</h3>
-            <small class="card-caption teacher-vocab-id">${escapeHtml(vocab.id)}</small>
-            ${this.formatVocabPlacementLabel(vocab) ? `<small class="card-caption teacher-vocab-placement">${escapeHtml(this.formatVocabPlacementLabel(vocab))}</small>` : ''}
-            ${type === 'cloud' && schoolContext.hasRole('teacher') ? '<button type="button" class="btn secondary-btn assign-vocab-btn">Assign</button>' : ''}
-            ${deleteBtnHtml}
-        `;
-
-        card.addEventListener('click', (e) => {
-            // Prevent click if deleting
-            if (e.target.closest('button')) return;
-            this.openTeacherVocabularyItem(vocab, type);
-        });
-        card.addEventListener('keydown', (event) => {
-            if (event.target !== card || (event.key !== 'Enter' && event.key !== ' ')) return;
-            event.preventDefault();
-            card.click();
-        });
-
-        if (type === 'local' || type === 'cloud') {
-            const deleteBtn = card.querySelector('.delete-vocab-btn');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    const label = type === 'cloud' ? 'cloud' : 'draft';
-                    if (confirm(`Delete ${label} vocabulary "${vocab.name}"? This cannot be undone.`)) {
-                        if (type === 'local') {
-                            this.removeLocalVocab(vocab.id);
-                            this.loadLibrary();
-                        } else {
-                            const deleted = await this.deleteCloudVocab(vocab.id);
-                            if (deleted) this.loadLibrary();
-                        }
-                    }
-                });
-            }
-        }
-        card.querySelector('.assign-vocab-btn')?.addEventListener('click', event => {
-            event.stopPropagation();
-            if (schoolContext.hasRole('teacher')) this.openAssignmentPublisher({ materialId: vocab.id, kind: 'vocabulary' });
-        });
-        container.appendChild(card);
-    }
 
     async deleteCloudVocab(id) {
         if (!this.ensureAuthenticated()) return;
@@ -211,6 +146,23 @@ class TeacherVocabularyStorageMethods {
             return false;
         }
 
+        if (options.localCopy === true) {
+            try {
+                const localCopy = this.getLocalVocabs().find(vocab => vocab.id === id);
+                if (!isCurrent()) return false;
+                if (!localCopy) throw new Error('The requested local copy is unavailable.');
+                this.loadVocabularyObject(localCopy, { source: 'local', localCopy: true });
+                return true;
+            } catch (error) {
+                if (!isCurrent()) return false;
+                console.warn('Could not open local vocabulary copy:', error);
+                this.setCloudStatus('Local copy unavailable', 'error');
+                notifications.warning('That local copy is unavailable on this device. Return to the library to choose a version.');
+                this.showTeacherSection(VOCABULARY_PAGE.id, { replaceRoute: true });
+                return false;
+            }
+        }
+
         this.setCloudStatus('Loading vocabulary...', 'info');
 
         try {
@@ -255,6 +207,7 @@ class TeacherVocabularyStorageMethods {
         if (options.path) clone.path = options.path;
         clone.subjectSlug = getVocabSubjectSlug(clone);
         this.beginTeacherVocabularyDocument();
+        if (options.localCopy === true && clone.id) this.teacherVocabularyLocalCopyDocumentGeneration = this.teacherVocabularyDocumentGeneration;
         this.vocabSet = clone;
         this.autoGenerateVocabId = false;
         this.updateFormUI();
@@ -269,117 +222,7 @@ class TeacherVocabularyStorageMethods {
         this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
         this.normalizeActivityFlowSettings();
 
-        if (this.authDisabled) {
-            this.saveToLocal(this.vocabSet);
-            this.setCloudStatus('Saved locally', 'success');
-            return;
-        }
-
-        if (this.vocabSet.source === 'cloud') {
-            this.queueCloudSave();
-        } else {
-            this.saveToLocal(this.vocabSet);
-            this.queueCloudSave();
-        }
-    }
-
-    queueCloudSave() {
-        if (this.authDisabled) {
-            this.setCloudStatus('Saved locally', 'success');
-            return;
-        }
-        if (!this.isAuthenticated || !this.vocabSet.id) return;
-        const ticket = this.createTeacherVocabularySaveTicket(this.vocabSet);
-        const documentGeneration = ticket.documentGeneration;
-        const debounces = this.teacherVocabularySaveDebounces ||= new Map();
-        clearTimeout(debounces.get(documentGeneration));
-        clearTimeout(this.teacherVocabularyStatusTimer);
-        this.teacherVocabularyStatusTimer = null;
-        this.setCloudStatus('Saving...', 'info');
-        const timeoutId = setTimeout(() => {
-            if (debounces.get(documentGeneration) !== timeoutId) return;
-            debounces.delete(documentGeneration);
-            void this.enqueueTeacherVocabularySave(ticket);
-        }, 800);
-        debounces.set(documentGeneration, timeoutId);
-    }
-
-    createTeacherVocabularySaveTicket(vocab = this.vocabSet) {
-        const snapshot = JSON.parse(JSON.stringify(vocab || {}));
-        snapshot.subjectSlug = getVocabSubjectSlug(snapshot);
-        this.normalizeActivityFlowSettings(snapshot);
-        const documentGeneration = this.teacherVocabularyDocumentGeneration || 0;
-        const sequence = (this.teacherVocabularySaveSequence || 0) + 1;
-        this.teacherVocabularySaveSequence = sequence;
-        this.teacherVocabularyLatestSaveByDocument ||= new Map();
-        this.teacherVocabularyLatestSaveByDocument.set(documentGeneration, sequence);
-        const sessionIsCurrent = this.createTeacherVocabularyOperationGuard();
-        const navigation = this.captureTeacherNavigation?.() || null;
-        return Object.freeze({ snapshot, documentGeneration, sequence, sessionIsCurrent, navigation });
-    }
-
-    isTeacherVocabularySaveLatest(ticket) {
-        return ticket.sessionIsCurrent()
-            && this.teacherVocabularyLatestSaveByDocument?.get(ticket.documentGeneration) === ticket.sequence;
-    }
-
-    isTeacherVocabularySaveUiCurrent(ticket) {
-        return this.isTeacherVocabularySaveLatest(ticket)
-            && ticket.documentGeneration === (this.teacherVocabularyDocumentGeneration || 0)
-            && (!ticket.navigation || this.isTeacherNavigationCurrent?.(ticket.navigation));
-    }
-
-    enqueueTeacherVocabularySave(ticket) {
-        const previous = this.teacherVocabularySaveQueue || Promise.resolve();
-        const operation = previous.catch(() => {}).then(() => this.performTeacherVocabularySave(ticket));
-        this.teacherVocabularySaveQueue = operation;
-        return operation.finally(() => {
-            if (this.teacherVocabularySaveQueue === operation) this.teacherVocabularySaveQueue = null;
-        });
-    }
-
-    async performTeacherVocabularySave(ticket) {
-        if (this.authDisabled || !ticket?.snapshot?.id || !ticket.sessionIsCurrent()) {
-            return { status: 'stale', ticket };
-        }
-        if (!this.ensureAuthenticated(false)) return { status: 'stale', ticket };
-
-        try {
-            const { __source, source, ...rest } = ticket.snapshot;
-            const payload = {
-                ...rest,
-                ownerId: this.currentUser?.uid || this.currentUser?.id || null,
-                updatedAt: new Date().toISOString()
-            };
-            await vocabularyRepository.save(ticket.snapshot.id, payload);
-            if (!ticket.sessionIsCurrent()) return { status: 'stale', ticket };
-            if (this.isTeacherVocabularySaveLatest(ticket)) {
-                this.removeLocalVocab(ticket.snapshot.id);
-                this.invalidateTeacherLibraryCache();
-            }
-            if (this.isTeacherVocabularySaveUiCurrent(ticket)) {
-                if (this.vocabSet?.id === ticket.snapshot.id) this.vocabSet.source = 'cloud';
-                this.setCloudStatus('Saved to cloud', 'success');
-                clearTimeout(this.teacherVocabularyStatusTimer);
-                this.teacherVocabularyStatusTimer = setTimeout(() => {
-                    if (!this.isTeacherVocabularySaveUiCurrent(ticket)) return;
-                    this.teacherVocabularyStatusTimer = null;
-                    this.setCloudStatus('Ready', 'info');
-                }, 1500);
-            }
-            return { status: 'saved', ticket };
-        } catch (error) {
-            if (!ticket.sessionIsCurrent()) return { status: 'stale', ticket };
-            console.error('Failed to save vocabulary to backend:', error);
-            if (this.isTeacherVocabularySaveLatest(ticket)) {
-                this.saveToLocal(ticket.snapshot);
-            }
-            if (this.isTeacherVocabularySaveUiCurrent(ticket)) {
-                this.setCloudStatus('Save failed', 'error');
-                notifications.error('Cloud save failed. Check backend rules to ensure authenticated users can write to the vocabularies collection.');
-            }
-            return { status: 'failed', ticket };
-        }
+        getTeacherVocabularySaves(this).schedule(this.vocabSet);
     }
 
 }

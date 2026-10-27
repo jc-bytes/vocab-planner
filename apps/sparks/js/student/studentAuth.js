@@ -185,12 +185,10 @@ export class StudentAuth {
         if (!isCurrent()) return false;
 
         document.querySelector('.app-container')?.classList.add('student-header-loading');
-        // Paint the cached dashboard immediately on repeat visits. Cloud progress
-        // remains authoritative and replaces this snapshot as soon as it arrives.
+        // The requested route owns its view; startup only prepares shared data.
         this.updateHeader();
         const initialRoute = this.sm.parseRoute?.();
         if (!initialRoute || initialRoute.view === 'menu') {
-            this.sm.renderDashboard();
             this.sm.switchView('main-menu-view');
         }
 
@@ -240,7 +238,11 @@ export class StudentAuth {
         ]);
         if (!isCurrent()) return false;
         document.querySelector('.app-container')?.classList.remove('student-header-loading');
-        this.sm.renderDashboard();
+        // Populate the shared class selector without acquiring or painting Units.
+        // Routes join this same class read and own their own loading/error UI.
+        void this.sm.activities.vocabularyData.prepareClassData({ isCurrent }).then(prepared => {
+            if (prepared?.isCurrent() && isCurrent()) this.sm.activities.renderSubjectPicker('#student-subject-picker');
+        }).catch(error => { if (isCurrent()) console.warn('Class selector unavailable:', error); });
         await this.sm.restoreRouteOrDefault();
         if (!isCurrent()) return false;
         const requiresProfile = !this.hasCompleteStudentProfile();

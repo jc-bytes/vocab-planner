@@ -1276,7 +1276,6 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     }
 }
 
-.student-page-skeleton--sparks { max-width: none; margin-inline: 0; }
 
 /* Library navigation follows the shared Units choice-card and breadcrumb patterns. */
 .student-spark-breadcrumb { margin-bottom: var(--student-space-4); flex-wrap: wrap; }

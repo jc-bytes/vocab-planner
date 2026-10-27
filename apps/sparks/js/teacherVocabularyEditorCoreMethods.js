@@ -1,4 +1,5 @@
 import { $, notifications } from './main.js';
+import { getTeacherVocabularySaves } from './teacherVocabularySaves.js';
 import {
     DEFAULT_SUBJECT_SLUG,
     getVocabSubjectSlug
@@ -203,47 +204,32 @@ class TeacherVocabularyEditorCoreMethods {
     }
 
     async publishVocabulary({ asNew = false } = {}) {
-        if (!this.ensureAuthenticated()) return;
-        const currentDocument = this.teacherVocabularyDocumentGeneration || 0;
-        const pendingTimeout = this.teacherVocabularySaveDebounces?.get(currentDocument);
-        clearTimeout(pendingTimeout);
-        clearTimeout(this.teacherVocabularyStatusTimer);
-        this.teacherVocabularyStatusTimer = null;
-        this.teacherVocabularySaveDebounces?.delete(currentDocument);
-        this.applyAssignedDatePlacement(this.vocabSet);
-
-        if (asNew) {
-            this.beginTeacherVocabularyDocument();
-            const currentId = this.vocabSet.id;
-            const generatedId = this.createVocabIdSuggestion();
-            this.vocabSet.id = generatedId === currentId
-                ? `${generatedId}_${Date.now().toString(36)}`
-                : generatedId;
-            $('#vocab-id').value = this.vocabSet.id;
-            delete this.vocabSet.source;
-        } else {
-            this.updateGeneratedVocabId();
-        }
-
-        this.prepareWordHuntWordsForSave(this.vocabSet);
-        this.normalizeActivityFlowSettings();
-        const ticket = this.createTeacherVocabularySaveTicket(this.vocabSet);
-        if (this.authDisabled) {
-            this.saveToLocal(ticket.snapshot);
-            return;
-        }
-        const result = await this.enqueueTeacherVocabularySave(ticket);
-        if (!ticket.sessionIsCurrent()) return;
-
-        const activeDocument = ticket.documentGeneration === (this.teacherVocabularyDocumentGeneration || 0);
-        if (result.status === 'saved' && activeDocument) {
-            this.autoGenerateVocabId = false;
-        }
-
-        if (result.status === 'saved' && this.isTeacherVocabularySaveUiCurrent(ticket)) {
-            notifications.success(asNew ? 'Saved as a new vocabulary.' : 'Vocabulary update saved.');
-            this.loadLibrary({ isCurrent: ticket.sessionIsCurrent });
-        }
+        await getTeacherVocabularySaves(this).publish(() => {
+            this.applyAssignedDatePlacement(this.vocabSet);
+            if (asNew) {
+                const reviewingLocalCopy = this.teacherVocabularyLocalCopyDocumentGeneration != null
+                    && this.teacherVocabularyLocalCopyDocumentGeneration === this.teacherVocabularyDocumentGeneration;
+                this.beginTeacherVocabularyDocument();
+                const currentId = this.vocabSet.id;
+                const generatedId = this.createVocabIdSuggestion();
+                this.vocabSet.id = generatedId === currentId
+                    ? `${generatedId}_${Date.now().toString(36)}` : generatedId;
+                $('#vocab-id').value = this.vocabSet.id;
+                delete this.vocabSet.source;
+                if (reviewingLocalCopy) this.setRoute({ view: 'editor', vocabularyId: this.vocabSet.id }, { replace: true });
+            } else {
+                this.updateGeneratedVocabId();
+            }
+            this.prepareWordHuntWordsForSave(this.vocabSet);
+            this.normalizeActivityFlowSettings();
+            return this.vocabSet;
+        }, {
+            onDocumentSaved: () => { this.autoGenerateVocabId = false; },
+            onUiSaved: ({ isCurrent }) => {
+                notifications.success(asNew ? 'Saved as a new vocabulary.' : 'Vocabulary update saved.');
+                this.refreshTeacherVocabularyBrowser?.({ isCurrent });
+            }
+        });
     }
 
     exportJSON() {

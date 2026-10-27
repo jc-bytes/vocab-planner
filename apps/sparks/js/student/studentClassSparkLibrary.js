@@ -28,8 +28,7 @@ export function sparkBreadcrumb(route, navigate) {
     if (route.sparkId) crumb('Read and answer', {}, true);
     return nav;
 }
-export function renderSparkViewToggle(mode, onChange, hidden = false) {
-    const container = document.getElementById('spark-view-toggle');
+export function renderSparkViewToggle(mode, onChange, hidden = false, container = document.getElementById('spark-view-toggle')) {
     if (!container) return;
     container.hidden = hidden;
     container.replaceChildren();
@@ -87,7 +86,7 @@ function sparkCard(item, data, status, date, onClick) {
     return card;
 }
 
-export async function renderClassSparkLibrary(root, { items, route, navigate, repository, signal, current, viewMode = 'cards' }) {
+export async function renderClassSparkLibrary(root, { items, route, navigate, repository, signal, current, viewMode = 'cards', decorateCard = card => card, getStatus, getDateLabel, emptyMessage = 'No released Sparks are available here yet.' }) {
     let incomplete = false;
     const rows = viewMode === 'rows';
     const makeChoice = (...args) => choice(...args, rows);
@@ -136,15 +135,16 @@ export async function renderClassSparkLibrary(root, { items, route, navigate, re
         for (const [index, item] of group.entries()) {
             const result = results[index];
             const data = result.status === 'fulfilled' ? result.value : null;
-            const status = !data ? 'Status unavailable' : data.detail.content.checkMode === 'reading_only' ? 'Reading only' : data.saved ? 'Answer saved' : 'Not answered';
-            const date = new Intl.DateTimeFormat('en', {month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(`${item.date}T12:00:00Z`));
+            const status = getStatus ? getStatus(item) : !data ? 'Status unavailable' : data.detail.content.checkMode === 'reading_only' ? 'Reading only' : data.saved ? 'Answer saved' : 'Not answered';
+            const date = getDateLabel ? getDateLabel(item) : new Intl.DateTimeFormat('en', {month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(`${item.date}T12:00:00Z`));
             const open = () => navigate({view:'sparks',trimester:item.trimester,month:item.month,sparkId:item.id});
-            grid.append(rows
+            const card = rows
                 ? makeChoice(formatClassSparkHeading(item.title).title, status, `${date}${item.closed ? ' · Closed · Review available' : ''}`, open)
-                : sparkCard(item, data, status, date, open));
+                : sparkCard(item, data, status, date, open);
+            grid.append(decorateCard(card, item));
         }
     }
-    if (!grid.querySelector('button')) grid.append(node('p', 'No released Sparks are available here yet.', 'teacher-empty-state'));
+    if (!grid.querySelector('button')) grid.append(node('p', emptyMessage, 'teacher-empty-state'));
     refreshIcons(grid);
     return incomplete;
 }

@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_TEACHER_SPARKS_HOST || '127.0.0.1';
-const port = Number(process.env.UI_TEACHER_SPARKS_PORT || 8000);
+const port = Number(process.env.UI_TEACHER_SPARKS_PORT || 8562);
 const baseUrl = (process.env.UI_TEACHER_SPARKS_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 
 let server;
@@ -25,8 +25,16 @@ try {
     });
     page.on('pageerror', error => problems.push(`pageerror: ${error.message}`));
 
+    // Keep this fixture independent of hosted permissions and prohibit real writes.
+    await page.route(/https?:\/\/[^/]+\/(?:rest|auth)\/v1\//, async route => {
+        if (route.request().url().includes('/rpc/my_school_access_v1')) {
+            const roles = await page.evaluate(() => window.sparkSchoolRoles || []);
+            await route.fulfill({ json: { platformAdmin: false, schools: [{ id: 'school-smoke', active: true, roles }] } });
+        } else await route.abort();
+    });
     await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
     const initial = await page.evaluate(async () => {
+        try {
         document.body.innerHTML = `
             <section id="teacher-sparks-view"><button id="add-spark-btn">Add Spark</button><div id="spark-library-list"></div></section>
             <div data-teacher-feature-mount="sparks-modal"></div>
@@ -116,6 +124,7 @@ try {
             internalMethod: typeof manager.openSparkModal,
             internalState: Object.keys(manager).filter(key => key.startsWith('weeklySpark') || key.startsWith('sparkModal'))
         };
+        } catch (error) { throw new Error(error?.message || JSON.stringify(error)); }
     });
 
     if (initial.modalBefore || !initial.modalAfter) {
@@ -143,6 +152,7 @@ try {
         await schoolContext.load('teacher-smoke');
         await window.teacherSparksSmoke.manager.showSparksView();
     });
+    await page.locator('.teacher-material-item').filter({ has: page.locator('[data-spark-action=assign]') }).first().locator('.floating-action-menu-trigger').click();
     await page.locator('[data-spark-action=assign]').first().click();
     await page.waitForFunction(() => window.sparkPublishedContext?.kind === 'spark' && window.sparkPublishedContext?.materialId);
     await page.evaluate(() => window.teacherSparksSmoke.manager.showSparkEditor({ materialId: window.sparkPublishedContext.materialId }));

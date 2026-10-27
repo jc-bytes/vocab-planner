@@ -51,6 +51,7 @@ const { StudentActivityGateDisplay } = await import('../js/student/studentActivi
 const { StudentActivityHome } = await import('../js/student/studentActivityHomeMethods.js');
 const { StudentActivityHomeSpark } = await import('../js/student/studentActivityHomeSpark.js');
 const { StudentActivityLauncher } = await import('../js/student/studentActivityLauncherMethods.js');
+const { LazyStudentActivityLauncher } = await import('../js/student/lazyStudentActivityLauncher.js');
 const { StudentActivityMenu } = await import('../js/student/studentActivityMenuMethods.js');
 const { StudentActivityModuleLoader } = await import('../js/student/studentActivityModuleLoaderMethods.js');
 const { StudentActivityProgressPersistence } = await import('../js/student/studentActivityProgressPersistenceMethods.js');
@@ -60,6 +61,7 @@ const { StudentActivityResultProcessor } = await import('../js/student/studentAc
 const { StudentActivityStateStore } = await import('../js/student/studentActivityStateStore.js');
 const { StudentActivitySyncCoordinator } = await import('../js/student/studentActivitySyncCoordinator.js');
 const { StudentActivityProgressFlow } = await import('../js/student/studentActivityProgressFlowMethods.js');
+const { getHomeRecommendation } = await import('../js/student/studentHomePresentation.js');
 const { getStudentActivity } = await import('../js/student/studentActivityRegistry.js');
 const { StudentActivitySchedule } = await import('../js/student/studentActivityScheduleMethods.js');
 const { StudentActivitySession } = await import('../js/student/studentActivitySession.js');
@@ -129,21 +131,24 @@ test('individual activity exports keep fresh in-memory score details', () => {
     assert.deepEqual(normalized.evidence, { correctCount: 10, totalCount: 10 });
 });
 
-test('StudentActivities owns explicit runtime components', () => {
+test('StudentActivities owns explicit runtime components', async () => {
     const manager = {};
     const activities = new StudentActivities(manager);
 
     assert.equal(activities.sm, manager);
     assert.equal(activities.manifest, null);
-    assert.deepEqual(activities.availableVocabs, []);
+    assert.equal('availableVocabs' in activities, false, 'routing reads prepared data instead of a presentation cache');
     assert.equal(activities.studentVocabularyViewMode, 'cards');
     assert.ok(activities.activityRouteTypes.length > 0);
     assert.ok(activities.session instanceof StudentActivitySession);
     assert.equal(activities.session.activities, activities);
     assert.ok(activities.menu instanceof StudentActivityMenu);
     assert.ok(activities.moduleLoader instanceof StudentActivityModuleLoader);
-    assert.ok(activities.launcher instanceof StudentActivityLauncher);
+    assert.ok(activities.launcher instanceof LazyStudentActivityLauncher);
     assert.ok(activities.progressPersistence instanceof StudentActivityProgressPersistence);
+    assert.equal(activities.progressPersistence.attemptService, null);
+    assert.equal(activities.progressPersistence.syncCoordinator, null);
+    await activities.prepareActiveRuntime();
     assert.ok(activities.progressPersistence.attemptService instanceof StudentActivityAttemptService);
     assert.ok(activities.progressPersistence.autoSave instanceof StudentActivityAutoSave);
     assert.ok(activities.progressPersistence.resultProcessor instanceof StudentActivityResultProcessor);
@@ -159,7 +164,6 @@ test('StudentActivities owns explicit runtime components', () => {
     assert.equal(activities.launcher.activities, activities);
     for (const state of [
         'manifest',
-        'availableVocabs',
         'studentVocabularyViewMode',
         'activityRouteTypes'
     ]) {
@@ -199,8 +203,9 @@ test('activity sync teardown clears scheduled work and releases pending callers'
     assert.equal(waiterResult, null);
 });
 
-test('settled activity sync fingerprints are retained in a bounded LRU', () => {
+test('settled activity sync fingerprints are retained in a bounded LRU', async () => {
     const persistence = new StudentActivities({}).progressPersistence;
+    await persistence.prepareActiveRuntime();
     const coordinator = persistence.syncCoordinator;
     for (let index = 0; index < 80; index += 1) {
         coordinator.activitySyncStates.set(`student:unit-${index}:quiz`, {
@@ -689,10 +694,13 @@ test('Illustration feature context exposes only its required data and capabiliti
     });
 
     context.onWordChange(1);
-    current = false;
-    context.onWordChange(2);
     await context.uploadImage('Password', 'blob', { width: 160 });
     await context.loadImage('saved.webp');
+    context.onDownloadWordHunt();
+    current = false;
+    context.onWordChange(2);
+    assert.throws(() => context.uploadImage('Password', 'old blob'), { name: 'AbortError' });
+    assert.throws(() => context.loadImage('old.webp'), { name: 'AbortError' });
     context.onDownloadWordHunt();
     context.onSave('Internet Safety', 'Password', { definition: 'Secret text' });
     assert.deepEqual(calls, [
@@ -702,7 +710,7 @@ test('Illustration feature context exposes only its required data and capabiliti
         ['upload', 'Password', 'blob', { width: 160 }],
         ['load', 'saved.webp'],
         ['download'],
-        ['save', 'Internet Safety', 'Password', { definition: 'Secret text' }]
+        ['save', 'assignment:example', 'Password', { definition: 'Secret text' }]
     ]);
 });
 
@@ -927,28 +935,27 @@ test('StudentActivities catalog and browser state is isolated per instance', () 
     const second = new StudentActivities({});
 
     first.manifest = { vocabularies: [{ id: 'unit-1' }] };
-    first.availableVocabs.push({ id: 'available-1' });
     first.studentVocabularyViewMode = 'rows';
     first.activityRouteTypes.push('custom-test-activity');
 
     assert.equal(second.manifest, null);
-    assert.deepEqual(second.availableVocabs, []);
     assert.equal(second.studentVocabularyViewMode, 'cards');
     assert.equal(second.activityRouteTypes.includes('custom-test-activity'), false);
 });
 
 test('vocabulary view preference persists through the activity owner', () => {
     const activities = new StudentActivities({});
+    activities.browser = new StudentActivityBrowser(activities);
     const writes = [];
     let renderCount = 0;
     const originalSetItem = localStorage.setItem;
     localStorage.setItem = (...args) => writes.push(args);
-    activities.browser.renderDashboard = () => {
+    activities.renderDashboard = () => {
         renderCount += 1;
     };
 
     try {
-        activities.setStudentVocabularyViewMode('rows');
+        activities.browser.navigation.setStudentVocabularyViewMode('rows');
         assert.equal(activities.studentVocabularyViewMode, 'rows');
         assert.deepEqual(writes, [['student_vocabulary_view_mode', 'rows']]);
         assert.equal(renderCount, 1);
@@ -961,6 +968,8 @@ test('StudentActivities owns explicit browser and home components', () => {
     const manager = {};
     const activities = new StudentActivities(manager);
 
+    assert.equal(activities.browser, null, 'Units presentation is absent until requested');
+    activities.browser = new StudentActivityBrowser(activities);
     assert.ok(activities.browser instanceof StudentActivityBrowser);
     assert.ok(activities.home instanceof StudentActivityHome);
     assert.ok(activities.browser.cards instanceof StudentActivityBrowserCards);
@@ -1259,28 +1268,26 @@ test('StudentManager omits owner-only legacy forwarding methods', () => {
 });
 
 test('StudentActivities declares its presentation interface directly', () => {
+    for (const method of ['getUnitProgressSummary', 'getContinueLearningPercent', 'getHomeCurrentWeekBounds', 'isVocabScheduleInCurrentWeek', 'createStudentSparkCard', 'removeSparkHomePanel', 'createSparkHomePanel']) {
+        assert.equal(Object.hasOwn(StudentActivities.prototype, method), false, `${method} is private Home presentation`);
+    }
     for (const method of [
         'renderDashboard',
-        'renderVocabularyBrowser',
-        'renderStudentTrimesterPicker',
-        'renderStudentMonthPicker',
-        'renderStudentAssignmentPicker',
-        'createVocabularyCard',
         'formatVocabularyCardTitle',
         'scheduleFirstVocabularyPreload',
-        'getUnitProgressSummary',
         'renderStudentHome',
         'renderSparkLibrary',
-        'createContinueLearningHero',
         'fetchCurrentSpark',
-        'createStudentSparkCard',
-        'createHomeUnitCard'
     ]) {
         assert.equal(
             Object.prototype.hasOwnProperty.call(StudentActivities.prototype, method),
             true,
             `${method} must be declared by StudentActivities`
         );
+    }
+    for (const method of ['renderVocabularyBrowser', 'renderStudentTrimesterPicker', 'renderStudentMonthPicker', 'renderStudentAssignmentPicker', 'createVocabularyCard']) {
+        assert.equal(Object.hasOwn(StudentActivities.prototype, method), false, `${method} is internal to Units`);
+        assert.equal(Object.hasOwn(StudentActivityBrowser.prototype, method), true);
     }
 });
 
@@ -1389,26 +1396,16 @@ test('StudentActivities delegates runtime work to the owning component', async (
     ]);
 });
 
-test('StudentActivities delegates presentation work to the owning component', async () => {
+test('shared vocabulary labels and Home do not acquire Units presentation', async () => {
     const activities = new StudentActivities({});
-    const calls = [];
-    activities.browser.renderDashboard = () => calls.push(['renderDashboard']);
-    activities.browser.formatVocabularyCardTitle = vocab => {
-        calls.push(['formatVocabularyCardTitle', vocab]);
-        return 'Formatted unit';
-    };
-    activities.home.renderStudentHome = async () => calls.push(['renderStudentHome']);
-
-    activities.renderDashboard();
-    const title = activities.formatVocabularyCardTitle({ name: 'Raw unit' });
+    let homes = 0;
+    activities.home.renderStudentHome = async () => { homes++; };
+    assert.equal(activities.formatVocabularyCardTitle({ name: 'Raw unit' }), 'Raw unit');
+    assert.equal(activities.formatVocabularyPurpose('practice'), 'Practice');
+    assert.equal(activities.getVocabularyPurposeClass('summative'), 'is-summative');
     await activities.renderStudentHome();
-
-    assert.equal(title, 'Formatted unit');
-    assert.deepEqual(calls, [
-        ['renderDashboard'],
-        ['formatVocabularyCardTitle', { name: 'Raw unit' }],
-        ['renderStudentHome']
-    ]);
+    assert.equal(homes, 1);
+    assert.equal(activities.browser, null);
 });
 
 test('StudentActivities delegates scheduling work to the owning component', async () => {
@@ -1683,7 +1680,7 @@ test('student home recommends overdue required work before unfinished and curren
     });
     const current = makeItem({ id: 'current', dueDate: new Date(2026, 7, 17, 12) });
 
-    const recommendation = home.getHomeRecommendation({
+    const recommendation = getHomeRecommendation({
         decoratedVocabs: [current, unfinished, oldest],
         weekItems: [current],
         requiredWork: {
@@ -1727,7 +1724,7 @@ test('student home falls back from unfinished work to this week and then complet
         }
     };
 
-    const unfinishedRecommendation = home.getHomeRecommendation({
+    const unfinishedRecommendation = getHomeRecommendation({
         decoratedVocabs: [current, unfinished],
         weekItems: [current],
         requiredWork: { units: [{ vocab: current.vocab }] },
@@ -1739,7 +1736,7 @@ test('student home falls back from unfinished work to this week and then complet
     assert.equal(unfinishedRecommendation.badge, 'In progress');
     assert.equal(unfinishedRecommendation.action, 'Continue');
 
-    const currentRecommendation = home.getHomeRecommendation({
+    const currentRecommendation = getHomeRecommendation({
         decoratedVocabs: [current],
         weekItems: [current],
         requiredWork: { units: [{ vocab: current.vocab }] },
@@ -1751,7 +1748,7 @@ test('student home falls back from unfinished work to this week and then complet
     assert.equal(currentRecommendation.badge, 'This week');
     assert.equal(currentRecommendation.action, 'Start unit');
 
-    const completeRecommendation = home.getHomeRecommendation({
+    const completeRecommendation = getHomeRecommendation({
         decoratedVocabs: [],
         weekItems: [],
         requiredWork: { units: [] },
@@ -1762,7 +1759,7 @@ test('student home falls back from unfinished work to this week and then complet
     assert.equal(completeRecommendation.heading, 'You\u2019re all caught up');
 });
 
-test('legacy completed flashcards are not regressed by the new mastery-state initialization', () => {
+test('legacy completed flashcards are not regressed by the new mastery-state initialization', async () => {
     const manager = {
         authDisabled: true,
         currentUser: null,
@@ -1789,6 +1786,8 @@ test('legacy completed flashcards are not regressed by the new mastery-state ini
     activities.scheduleActivityPreload = () => {};
     activities.updateArcadeGateDisplay = () => {};
 
+    manager.getVocabRouteId = vocab => vocab.id;
+    await activities.prepareActiveRuntime();
     activities.progressPersistence.handleAutoSave({
         score: 0,
         isComplete: false,
@@ -1800,7 +1799,7 @@ test('legacy completed flashcards are not regressed by the new mastery-state ini
     assert.equal(manager.unitScores.flashcards.details, 'Studied: 1/1 cards');
 });
 
-test('replayable activity completion preserves evidence for server verification', () => {
+test('replayable activity completion preserves evidence for server verification', async () => {
     const manager = {
         authDisabled: true,
         currentUser: null,
@@ -1821,6 +1820,8 @@ test('replayable activity completion preserves evidence for server verification'
     activities.scheduleActivityPreload = () => {};
     activities.updateArcadeGateDisplay = () => {};
 
+    manager.getVocabRouteId = vocab => vocab.id;
+    await activities.prepareActiveRuntime();
     activities.progressPersistence.handleAutoSave({
         score: 100,
         isComplete: true,
@@ -2035,4 +2036,21 @@ test('completed Fill in Blank work can resume verification without replay, but u
     assert.equal(launcher.getRestoredCompletion('matching', state, activity, words), null);
     manager.unitScores['fill-in-blank'] = { verified: true, isComplete: true };
     assert.equal(launcher.getRestoredCompletion('fill-in-blank', state, activity, words), null);
+});
+
+test('optional vocabulary preferences cannot block activity construction when storage is denied', t => {
+    t.mock.method(globalThis.localStorage, 'getItem', () => { throw new DOMException('Storage disabled', 'SecurityError'); });
+    const activities = new StudentActivities({});
+    assert.equal(activities.studentVocabularyViewMode, 'cards');
+});
+
+test('vocabulary view controls still render when preference storage is full', t => {
+    t.mock.method(globalThis.localStorage, 'setItem', () => { throw new DOMException('Storage full', 'QuotaExceededError'); });
+    const activities = new StudentActivities({});
+    activities.browser = new StudentActivityBrowser(activities);
+    let renders = 0;
+    activities.renderDashboard = () => { renders++; };
+    activities.browser.navigation.setStudentVocabularyViewMode('rows');
+    assert.equal(activities.studentVocabularyViewMode, 'rows');
+    assert.equal(renders, 1);
 });

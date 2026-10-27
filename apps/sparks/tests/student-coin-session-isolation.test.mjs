@@ -158,7 +158,8 @@ test('real coin service forwards cancellation without adding client predicates t
     }
     assert.equal(calls.length, 2);
     for (const call of calls) {
-        assert.equal(call.signal, controller.signal);
+        assert.ok(call.signal instanceof AbortSignal);
+        assert.equal(call.signal.aborted, false, 'The composed deadline/cancellation signal reaches transport');
         assert.equal('isCurrent' in call.args, false);
         assert.equal('signal' in call.args, false);
     }

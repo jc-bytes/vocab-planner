@@ -1,229 +1,75 @@
-import { mapScoreRow } from './services/supabaseValues.js';
 import { createUniqueId } from './randomUtils.js';
 import { requestWithTimeout } from './services/requestReliability.js';
+import { schoolContext } from './services/schoolContext.js';
+import { captureSupabaseOperation } from './services/supabaseOperationSession.js';
 
-const firstRow = (data) => Array.isArray(data) ? data[0] : data;
+const EVENT_PREFIXES = Object.freeze({
+    submitStudentActivityProgress: 'activity-progress:',
+    syncStudentUnitWork: 'unit-work:',
+    startStudentArcadeMinute: 'arcade-minute:',
+    spendStudentCoins: 'spend-coins:',
+    acceptStudentGiftCoins: 'accept-gift:',
+    claimStudentWelcomeBonus: 'welcome-bonus:',
+    giftStudentCoins: 'teacher-gift:'
+});
+const LAZY_METHODS = Object.freeze([
+    'submitStudentActivityProgress', 'submitStudentSparkResponse',
+    'startStudentActivityAttempt', 'reportStudentActivityTime', 'syncStudentUnitWork',
+    'getOwnArcadeTime', 'startStudentArcadeMinute', 'recoverStudentArcadeMinute', 'spendStudentCoins',
+    'acceptStudentGiftCoins', 'claimStudentWelcomeBonus', 'giftStudentCoins',
+    'submitStudentGameScore'
+]);
 
-const createEventId = operation => createUniqueId(`${operation}:`);
-
-const requireRpcResult = (mapper, data, error) => {
-    if (error) throw error;
-    return mapper(firstRow(data));
-};
-
-function createOwnerMismatchError() {
-    const error = new Error('The authenticated student does not own this saved browser work.');
-    error.code = 'SYNC_OWNER_MISMATCH';
-    error.status = 403;
-    return error;
-}
-
-async function resolveExpectedStudentOwner(service, options = {}) {
-    const expectedOwnerUserId = String(options.ownerUserId || '').trim();
-
-    if (options.verifyOwner === true || !expectedOwnerUserId) {
-        const { data, error } = await service.client.auth.getUser();
-        if (error) throw error;
-        const verifiedOwnerUserId = String(data?.user?.id || '').trim();
-        if (!verifiedOwnerUserId
-            || (expectedOwnerUserId && verifiedOwnerUserId !== expectedOwnerUserId)) {
-            throw createOwnerMismatchError();
-        }
-        return verifiedOwnerUserId;
-    }
-
-    return expectedOwnerUserId;
-}
-
-function assertCoinOperationCurrent(options) {
-    options.signal?.throwIfAborted();
-    if (options.isCurrent && !options.isCurrent()) throw new DOMException('Coin session changed', 'AbortError');
-}
-
-export function installSupabaseStudentWriteMethods(service) {
+export function installSupabaseStudentWriteMethods(service, {
+    loadOperations = () => import('./supabaseStudentWriteOperations.js'),
+    context = schoolContext
+} = {}) {
+    // Account startup needs progress immediately; feature writes load on demand.
     service.ensureOwnStudentProgress = async function ensureOwnStudentProgress(studentProfile = {}, options = {}) {
         await this.init();
         let query = this.client.rpc('get_own_student_progress_v2');
-        if (options.signal && typeof query.abortSignal === 'function') {
-            query = query.abortSignal(options.signal);
-        }
+        if (options.signal && typeof query.abortSignal === 'function') query = query.abortSignal(options.signal);
         const { data, error } = await query;
         if (error) throw error;
-        return firstRow(data);
+        return Array.isArray(data) ? data[0] : data;
     };
 
-    service.submitStudentActivityProgress = async function submitStudentActivityProgress(payload = {}, options = {}) {
-        await this.init();
-        const expectedOwnerUserId = await resolveExpectedStudentOwner(this, options);
-        payload.eventId ||= createEventId('activity-progress');
-        const { data, error } = await this.client.rpc('submit_student_activity_progress_owned_v1', {
-            p_expected_user_id: expectedOwnerUserId,
-            p_event_id: payload.eventId,
-            p_unit_key: payload.unitKey,
-            p_unit_context: payload.unitContext || {},
-            p_activity_type: payload.activityType,
-            p_score: payload.score,
-            p_is_complete: Boolean(payload.isComplete),
-            p_is_finished: Boolean(payload.isFinished),
-            p_details: payload.details || {},
-            p_metrics: payload.metrics || {},
-            p_state_snapshot: payload.stateSnapshot ?? null,
-            p_activity_settings: payload.activitySettings || {},
-            p_client_id: payload.clientId || '',
-            p_is_required: Boolean(payload.isRequired),
-            p_attempt_id: payload.attemptId || ''
-        });
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.submitStudentSparkResponse = async function submitStudentSparkResponse(payload = {}, options = {}) {
-        await this.init();
-        const expectedOwnerUserId = await resolveExpectedStudentOwner(this, options);
-        const { data, error } = await this.client.rpc('submit_student_spark_response_owned_v1', {
-            p_expected_user_id: expectedOwnerUserId,
-            p_spark_id: payload.sparkId,
-            p_answers: payload.answers || {}
-        });
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.startStudentActivityAttempt = async function startStudentActivityAttempt(payload = {}) {
-        await this.init();
-        let query = this.client.rpc('start_student_activity_attempt', {
-            p_unit_key: payload.unitKey,
-            p_vocabulary_id: payload.vocabularyId,
-            p_activity_type: payload.activityType
-        });
-        if (payload.signal && typeof query.abortSignal === 'function') {
-            query = query.abortSignal(payload.signal);
-        }
-        const { data, error } = await query;
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.reportStudentActivityTime = async function reportStudentActivityTime(payload = {}) {
-        await this.init();
-        const { data, error } = await this.client.rpc('report_student_activity_time_v1', {
-            p_attempt_id: payload.attemptId,
-            p_active_seconds: Math.max(0, Math.floor(Number(payload.activeSeconds) || 0))
-        });
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.syncStudentUnitWork = async function syncStudentUnitWork(payload = {}, options = {}) {
-        await this.init();
-        const expectedOwnerUserId = await resolveExpectedStudentOwner(this, options);
-        payload.eventId ||= createEventId('unit-work');
-        return requestWithTimeout(async signal => {
-            let query = this.client.rpc('sync_student_unit_work_owned_v1', {
-                p_expected_user_id: expectedOwnerUserId,
-                p_event_id: payload.eventId,
-                p_unit_key: payload.unitKey,
-                p_unit_context: payload.unitContext || {},
-                p_work_patch: payload.workPatch || {}
-            });
-            if (typeof query.abortSignal === 'function') query = query.abortSignal(signal);
-            const { data, error } = await query;
-            if (error) throw error;
-            return firstRow(data);
-        }, { signal: options.signal, timeoutMs: 30000, label: 'Saving unit work' });
-    };
-
-    service.getOwnArcadeTime = async function getOwnArcadeTime() {
-        await this.init();
-        const { data, error } = await this.client.rpc('get_own_arcade_time_v1');
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.startStudentArcadeMinute = async function startStudentArcadeMinute(payload = {}, options = {}) {
-        assertCoinOperationCurrent(options);
-        await this.init();
-        assertCoinOperationCurrent(options);
-        payload.eventId ||= createEventId('arcade-minute');
-        const { data, error } = await this.client.rpc('start_student_arcade_minute_v1', {
-            p_event_id: payload.eventId,
-            p_game_id: payload.gameId || '',
-            p_client_id: payload.clientId || ''
-        });
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.spendStudentCoins = async function spendStudentCoins(payload = {}, options = {}) {
-        assertCoinOperationCurrent(options);
-        await this.init();
-        assertCoinOperationCurrent(options);
-        payload.eventId ||= createEventId('spend-coins');
-        let query = this.client.rpc('spend_student_coins_v2', {
-            p_event_id: payload.eventId,
-            p_amount: Number(payload.amount) || 0,
-            p_source: payload.source || 'game',
-            p_description: payload.description || 'Spent on game',
-            p_client_id: payload.clientId || ''
-        });
-        if (options.signal) query = query.abortSignal(options.signal);
-        const { data, error } = await query;
-        assertCoinOperationCurrent(options);
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.acceptStudentGiftCoins = async function acceptStudentGiftCoins(payload = {}, options = {}) {
-        assertCoinOperationCurrent(options);
-        await this.init();
-        assertCoinOperationCurrent(options);
-        payload.eventId ||= createEventId('accept-gift');
-        let query = this.client.rpc('accept_student_gift_coins_v2', {
-            p_event_id: payload.eventId,
-            p_client_id: payload.clientId || ''
-        });
-        if (options.signal) query = query.abortSignal(options.signal);
-        const { data, error } = await query;
-        assertCoinOperationCurrent(options);
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.claimStudentWelcomeBonus = async function claimStudentWelcomeBonus(payload = {}) {
-        await this.init();
-        payload.eventId ||= createEventId('welcome-bonus');
-        const { data, error } = await this.client.rpc('claim_student_welcome_bonus_v2', {
-            p_event_id: payload.eventId,
-            p_client_id: payload.clientId || ''
-        });
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.giftStudentCoins = async function giftStudentCoins(payload = {}) {
-        await this.init();
-        payload.eventId ||= createEventId('teacher-gift');
-        const { data, error } = await this.client.rpc('gift_student_coins_v2', {
-            p_event_id: payload.eventId,
-            p_student_id: payload.studentId,
-            p_amount: Number(payload.amount) || 0,
-            p_message: payload.message || 'Gift from teacher'
-        });
-        if (error) throw error;
-        return firstRow(data);
-    };
-
-    service.submitStudentGameScore = async function submitStudentGameScore(payload = {}, options = {}) {
-        await this.init();
-        let request = this.client.rpc('submit_student_game_score', {
-            p_game_id: payload.gameId,
-            p_score: Number(payload.score) || 0,
-            p_metadata: payload.metadata || {}
-        });
-        if (options.signal && typeof request.abortSignal === 'function') {
-            request = request.abortSignal(options.signal);
-        }
-        const { data, error } = await request;
-        return requireRpcResult(mapScoreRow, data, error);
-    };
+    for (const method of LAZY_METHODS) {
+        service[method] = async function (payload = {}, options = {}) {
+            if (method === 'getOwnArcadeTime') options = payload;
+            if (EVENT_PREFIXES[method]) payload.eventId ||= createUniqueId(EVENT_PREFIXES[method]);
+            const externalSignal = method === 'startStudentActivityAttempt' ? payload.signal : options.signal;
+            try {
+                // One deadline covers import, initialization, owner checks and transport.
+                return await requestWithTimeout(async signal => {
+                    const operation = captureSupabaseOperation(this, { signal, isCurrent: options.isCurrent, context });
+                    const { assertCurrent } = operation;
+                    await operation.initialize();
+                    let studentWriteOperations;
+                    try {
+                        ({ studentWriteOperations } = await loadOperations());
+                    } catch (cause) {
+                        assertCurrent();
+                        const error = new Error('Activity request files could not load.', { cause });
+                        error.code = 'CLIENT_MODULE_LOAD_FAILED';
+                        throw error;
+                    }
+                    assertCurrent();
+                    const operationOptions = { ...options, signal, isCurrent: assertCurrent };
+                    const result = method === 'getOwnArcadeTime'
+                        ? await studentWriteOperations[method].call(this, operationOptions)
+                        : await studentWriteOperations[method].call(this, payload, operationOptions);
+                    assertCurrent();
+                    return result;
+                }, {
+                    signal: externalSignal,
+                    timeoutMs: options.timeoutMs || (method === 'startStudentActivityAttempt' ? 10000 : 30000),
+                    label: 'Student activity request'
+                });
+            } catch (error) {
+                if (error.code === 'REQUEST_ABORTED') error.name = 'AbortError';
+                throw error;
+            }
+        };
+    }
 }

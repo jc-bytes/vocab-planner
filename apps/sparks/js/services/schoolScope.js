@@ -12,6 +12,7 @@ export function schoolSessionKey(accountId) {
 }
 
 export function canOpenSchoolSection(section) {
+    if (section === 'platform') return schoolContext.getAccess().platformAdmin === true;
     if (section === 'administration') return true;
     if (section === 'settings') return schoolContext.hasRole('school_admin');
     return schoolContext.hasRole('teacher') || schoolContext.hasRole('school_admin');

@@ -15,7 +15,7 @@ on:
         default: false
         type: boolean
       pilot_publish:
-        description: "Publish a formative pilot while the unrelated cross-browser smoke test is being repaired"
+        description: "Deprecated compatibility input; Firefox and WebKit checks always run"
         required: false
         default: false
         type: boolean
@@ -89,6 +89,8 @@ jobs:
         run: npm run test:school-platform:rest
       - name: Verify student insight and feedback database regressions
         run: npm run test:student-insight:database
+      - name: Verify database authorization, receipts and progress contracts
+        run: npm run test:arcade-purchase:database && npm run test:student-mutation-ownership:database && npm run test:school-setting-ownership:database && npm run test:school-progress-snapshot:database && npm run test:selected-profile-export:database && npm run test:student-queue-order:database && npm run test:school-progress-batch:database && npm run test:school-progress-permissions:database && npm run test:school-progress-groups:database && npm run test:policy-request-identity:database && npm run test:progress-lint-compatibility:database
       - name: Supabase authorization acceptance tests
         run: npm run test:acceptance:supabase && npm run test:private-classrooms
       - name: Diagnose local Supabase failure
@@ -98,30 +100,75 @@ jobs:
             echo "===== ${container} ====="
             docker logs --tail 200 "${container}" 2>&1 || true
           done
-      - name: Production dependency audit
-        run: npm audit --omit=dev --audit-level=high
+      - name: Dependency audit including build and test tools
+        run: npm audit --audit-level=high
       - name: Authenticated app smoke
-        run: npm run test:ui:auth-smoke && npm run test:ui:startup-recovery && npm run test:ui:section-recovery
+        run: npm run test:ui:auth-smoke && npm run test:ui:startup-recovery
       - name: Firefox and WebKit focused smoke
-        if: ${{ !inputs.pilot_publish }}
         run: npm run test:ui:cross-browser
       - name: Responsive authenticated audit
         run: npm run test:ui:responsive:local
       - name: Supabase lint
-        run: supabase db lint --local --fail-on error
+        run: supabase db lint --local --fail-on warning
       - name: Supabase advisors
-        run: supabase db advisors --local --level warn --fail-on error --type all
+        run: supabase db advisors --local --level warn --fail-on warn --type all
       - name: Build site
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
         run: npm run desktop:build:web
-      - name: Smoke test built site
-        run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
-      - name: Verify built dashboard and private vocabulary loading
+      - name: Verify built private classroom ownership and activity reload
+        run: PRIVATE_CLASSROOM_UI_DIST=1 npm run test:private-classrooms
+      - name: Verify built student navigation recovery
+        run: UI_STUDENT_NAVIGATION_DIST=1 npm run test:ui:student-navigation-recovery
+      - name: Verify built authenticated teacher and student flows
         run: UI_AUTH_SMOKE_DIST=1 npm run test:ui:auth-smoke
+      - name: Verify built teacher catalog and published material delivery
+        run: UI_TEACHER_CATALOG_DIST=1 npm run test:ui:teacher-catalog
+      - name: Verify built teacher roster and profile feature ownership
+        run: UI_TEACHER_PROGRESS_FEATURE_DIST=1 npm run test:ui:teacher-progress-feature
+      - name: Verify built quiz editor replacement and return paths
+        run: UI_TEACHER_QUIZ_REPLACEMENT_DIST=1 npm run test:ui:teacher-quiz-replacement
+      - name: Verify built teacher vocabulary browser ownership
+        run: UI_TEACHER_VOCABULARY_BROWSER_DIST=1 npm run test:ui:teacher-vocabulary-browser
+      - name: Verify built teacher save outcomes and reset ownership
+        run: UI_TEACHER_VOCABULARY_SAVES_DIST=1 npm run test:ui:teacher-vocabulary-saves
+      - name: Verify built explicit local copy recovery
+        run: UI_TEACHER_LOCAL_COPIES_DIST=1 npm run test:ui:teacher-local-copies
+      - name: Verify built teacher material faces and action ownership
+        run: UI_TEACHER_MATERIAL_ACTIONS_DIST=1 npm run test:ui:teacher-material-actions
       - name: Verify built section recovery
         run: SECTION_RECOVERY_DIST=1 npm run test:ui:section-recovery
+      - name: Verify built narrow teacher preview controls
+        run: UI_TEACHER_PREVIEW_LAYOUT_DIST=1 npm run test:ui:teacher-preview-layout
+      - name: Verify built student Units presentation ownership
+        run: UI_STUDENT_UNITS_DIST=1 npm run test:ui:student-units-lazy
+      - name: Verify built student unit workspace ownership
+        run: UI_STUDENT_UNIT_WORKSPACE_DIST=1 npm run test:ui:student-unit-workspace
+      - name: Verify built Home Spark scope ownership
+        run: UI_STUDENT_HOME_SPARK_SCOPE_DIST=1 npm run test:ui:student-home-spark-scope
+      - name: Verify built Home presentation ownership
+        run: UI_STUDENT_HOME_PRESENTATION_DIST=1 npm run test:ui:student-home-presentation
+      - name: Verify built shared library style ownership
+        run: UI_STUDENT_LIBRARY_STYLES_DIST=1 npm run test:ui:student-library-styles
+      - name: Verify built active student attempt runtime ownership
+        run: UI_STUDENT_RUNTIME_DIST=1 npm run test:ui:student-active-runtime
+      - name: Verify built Word Hunt evidence ownership and persistence
+        run: UI_STUDENT_WORD_HUNT_EVIDENCE_DIST=1 npm run test:ui:word-hunt-evidence
+      - name: Verify built Arcade required-work eligibility
+        run: UI_ARCADE_ELIGIBILITY_DIST=1 npm run test:ui:arcade-eligibility
+      - name: Verify built mobile Arcade card controls
+        run: UI_ARCADE_LAYOUT_DIST=1 npm run test:ui:arcade-layout
+      - name: Verify built password changes preserve the other role session
+        run: UI_PASSWORD_ISOLATION_DIST=1 npm run test:ui:password-isolation
+      - name: Verify built Arcade purchase receipt recovery
+        run: UI_ARCADE_PURCHASE_DIST=1 npm run test:ui:arcade-purchase-recovery
+      - name: Verify built activity startup fault recovery
+        run: UI_ACTIVITY_RECOVERY_DIST=1 npm run test:ui:activity-startup-recovery
+      - name: Verify built student worker upgrades
+        run: STUDENT_WORKER_LIFECYCLE_REUSE=1 npm run test:ui:worker-lifecycle
+      - name: Smoke test built site
+        run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
       - name: Verify built startup recovery
         run: STARTUP_RECOVERY_DIST=1 npm run test:ui:startup-recovery
       - name: Verify built Sparks library and display modes
@@ -139,25 +186,7 @@ jobs:
           mkdir -p dist-desktop/g9-summative2-safety-check-site
           cp -R ../../public/g9-summative2-safety-check-site/. dist-desktop/g9-summative2-safety-check-site/
       - name: Retain previous immutable assets for open student tabs
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          # Promotions publish Pages too. Keep two promoted artifacts so a
-          # previously skipped release can also be restored during this rollout.
-          previous_runs=$(
-            gh run list --repo "$GITHUB_REPOSITORY" --workflow static.yml --branch main --status success --limit 1 --json databaseId --jq '.[].databaseId'
-            gh run list --repo "$GITHUB_REPOSITORY" --workflow promote-sparks-release.yml --status success --limit 2 --json databaseId --jq '.[].databaseId'
-          )
-          for previous_run in $previous_runs; do
-            previous_dir=$(mktemp -d)
-            if gh run download "$previous_run" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$previous_dir"; then
-              mkdir -p "$previous_dir/site"
-              tar -xf "$previous_dir/artifact.tar" -C "$previous_dir/site"
-              if [ -d "$previous_dir/site/assets" ]; then
-                rsync -a --ignore-existing "$previous_dir/site/assets/" dist-desktop/assets/
-              fi
-            fi
-          done
           node scripts/retain-hosted-assets.mjs "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
           node scripts/check-dist-size.mjs
       - name: Upload artifact
@@ -169,6 +198,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validation_only }}
     needs: validate
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
@@ -176,6 +206,17 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout release compatibility verifier
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Setup Node for release compatibility check
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+      - name: Verify required hosted owned RPCs before publishing
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: node apps/sparks/scripts/verify-owned-rpc-readiness.mjs
       - name: Setup Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
       - name: Deploy to GitHub Pages

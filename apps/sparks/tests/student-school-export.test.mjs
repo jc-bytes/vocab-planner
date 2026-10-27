@@ -34,6 +34,15 @@ test('activity PDF keeps a deep snapshot while its renderer loads', async () => 
     assert.equal(calls[0][4].state.answer, 'cell');
 });
 
+test('activity PDF deadline settles an ignored workspace import without late factory or output', async () => {
+    const { activities } = fixture(), load = deferred(); let created = 0, generated = 0;
+    const menu = new StudentActivityMenu(activities, { timeoutMs: 5, load: () => load.promise });
+    await assert.rejects(menu.downloadCompletedActivityReport('quiz'), { code: 'REQUEST_TIMEOUT' });
+    load.resolve({ createStudentUnitWorkspace() { created++; return { downloadActivityReport() { generated++; } }; } });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(created, 0); assert.equal(generated, 0);
+});
+
 for (const change of ['assignment', 'account', 'away-and-back']) {
     test(`activity PDF cancels after ${change} changes during module loading`, async () => {
         const { sm, activities } = fixture(), load = deferred(); let generated = false;

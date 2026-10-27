@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { access, readFile } from 'node:fs/promises';
+import postcss from 'postcss';
 
 const viteConfig = await readFile(new URL('../vite.config.mjs', import.meta.url), 'utf8');
 const serviceWorkerGenerator = await readFile(new URL('../scripts/generate-service-worker.mjs', import.meta.url), 'utf8');
@@ -20,6 +21,7 @@ const teacherCss = await readFile(new URL('../css/teacher.css', import.meta.url)
 const teacherQuizCss = await readFile(new URL('../css/teacherQuiz.css', import.meta.url), 'utf8');
 const studentCss = await readFile(new URL('../css/student.css', import.meta.url), 'utf8');
 const studentFeatureCss = await readFile(new URL('../css/student-features.css', import.meta.url), 'utf8');
+const studentRuntimeViewCss = await readFile(new URL('../css/student-runtime-views.css', import.meta.url), 'utf8');
 const studentDesignSystemCss = await readFile(new URL('../css/student-design-system.css', import.meta.url), 'utf8');
 const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 'utf8');
 const icons = await readFile(new URL('../js/icons.js', import.meta.url), 'utf8');
@@ -31,6 +33,24 @@ const { collectStudentPrecacheFiles, collectStudentShellFiles } = await import('
 test('obsolete client save stubs do not return as a second persistence system', async () => {
     assert.doesNotMatch(mainModule, /export const store\s*=/);
     await assert.rejects(access(new URL('../js/saveSystem.js', import.meta.url)));
+});
+
+test('deferred student view styles retain narrow ownership and the existing runtime cascade', async () => {
+    const featureEntry = await readFile(new URL('../js/student/studentFeatureStyles.js', import.meta.url), 'utf8');
+    const arcadeShellCss = await readFile(new URL('../css/student-arcade.css', import.meta.url), 'utf8');
+    const ownedSelector = /^(?:#(?:arcade-view|game-stage|game-selection)\b|\.(?:game-|arcade-|flashcard))/;
+    let rules = 0;
+    postcss.parse(studentRuntimeViewCss).walkRules(rule => {
+        assert.ok(rule.selectors.every(selector => ownedSelector.test(selector)), rule.selector);
+        rules++;
+    });
+    assert.ok(rules > 50);
+    assert.ok(featureEntry.indexOf('student-runtime-views.css') < featureEntry.indexOf('student-features.css'));
+    assert.doesNotMatch(studentCss, /\.flashcard-mastery-wrapper\s*\{|\.game-card\s*\{/);
+    assert.match(studentCss, /\.student-app-header\s*\{/);
+    assert.match(studentCss, /student-loading/);
+    assert.match(arcadeShellCss, /\.app-container:has\(#student-tab-shell/);
+    assert.doesNotMatch(studentRuntimeViewCss, /\.app-container|\.student-app-header|student-loading/);
 });
 
 test('unreachable platform-auth message code does not return as a duplicate UI system', () => {
@@ -174,7 +194,11 @@ test('retired quiz preview cannot return beside the current Quiz Maker', async (
 });
 
 test('the local Lucide registry covers icons present in the teacher shell', () => {
-    for (const iconName of ['ShieldPlus', 'ShieldUser', 'UsersRound']) {
+    const sidebarStart = teacherHtml.indexOf('id="teacher-tab-shell"');
+    const sidebar = teacherHtml.slice(sidebarStart, teacherHtml.indexOf('</nav>', sidebarStart));
+    const sidebarIcons = [...sidebar.matchAll(/data-lucide="([^"]+)"/g)].map(([, name]) => name.replace(/(^|-)([a-z0-9])/g, (_, dash, letter) => letter.toUpperCase()));
+    assert.ok(sidebarIcons.length > 0);
+    for (const iconName of [...sidebarIcons, 'ShieldPlus', 'ShieldUser', 'UsersRound']) {
         assert.match(icons, new RegExp(`\\b${iconName}\\b`));
     }
 });

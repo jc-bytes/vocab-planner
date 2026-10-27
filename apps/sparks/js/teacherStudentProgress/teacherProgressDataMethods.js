@@ -1,3 +1,4 @@
+import { requestWithTimeout } from '../services/requestReliability.js';
 import { $, closeModal, createElement } from '../main.js';
 import { serverStateQuery } from '../services/serverStateQuery.js';
 import { supabaseService } from '../supabaseService.js';
@@ -27,6 +28,28 @@ export function getTeacherProgressQueryService(owner) {
 function runTeacherProgressQuery(owner, options, forceRefresh) {
     const service = getTeacherProgressQueryService(owner);
     return forceRefresh ? service.refresh(options) : service.ensure(options);
+}
+
+// QueryCore owns sharing/caching. This read also honors the caller and private
+// feature lifetime, and settles even when initialization/transport ignores abort.
+async function readIdentityRoster(owner, querySignal, callerSignal, timeoutMs) {
+    const controller = new AbortController();
+    const signals = [querySignal, callerSignal, owner.rosterReadController?.signal].filter(Boolean);
+    const abort = () => controller.abort();
+    for (const signal of signals) {
+        if (signal.aborted) abort();
+        else signal.addEventListener('abort', abort, { once: true });
+    }
+    try {
+        return await requestWithTimeout(signal => supabaseService.listStudentIdentityRoster({ signal }), {
+            signal: controller.signal, timeoutMs, label: 'Loading student identities'
+        });
+    } catch (error) {
+        if (error.code === 'REQUEST_ABORTED') error.name = 'AbortError';
+        throw error;
+    } finally {
+        for (const signal of signals) signal.removeEventListener('abort', abort);
+    }
 }
 
 function resetStudentProgressView() {
@@ -86,7 +109,7 @@ function resetStudentProgressView() {
         profileError.classList.add('hidden');
     }
     const resetPasswordButton = $('#reset-student-password-btn');
-    if (resetPasswordButton) resetPasswordButton.disabled = false;
+    if (resetPasswordButton) resetPasswordButton.disabled = true;
     ['#select-all-students', '#select-visible-students-mobile'].forEach(selector => {
         const checkbox = $(selector);
         if (!checkbox) return;
@@ -116,7 +139,7 @@ function resetStudentProgressView() {
         addStudentStatus.textContent = '';
     }
     const addStudentButton = $('#create-student-account-btn');
-    if (addStudentButton) addStudentButton.disabled = false;
+    if (addStudentButton) addStudentButton.disabled = true;
     closeModal('#add-student-modal', { restoreFocus: false });
     const csvInput = $('#student-csv-input');
     if (csvInput) csvInput.value = '';
@@ -128,6 +151,9 @@ export const teacherProgressDataMethods = {
 async showProgressView() {
         if (!this.ensureAuthenticated(false)) return;
         const generation = this.studentProgressSessionGeneration || 0;
+        const navigation = this.captureTeacherNavigation?.();
+        const current = () => generation === (this.studentProgressSessionGeneration || 0)
+            && (!navigation || this.isTeacherNavigationCurrent(navigation));
         this.switchView(STUDENTS_PAGE.viewId);
 
         const loadingEl = $('#progress-loading');
@@ -137,14 +163,14 @@ async showProgressView() {
 
         try {
             await this.loadStudentRosterFilters();
-            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
+            if (!current()) return;
             this.populateFilters();
             await this.fetchStudentProgressPage();
-            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
+            if (!current()) return;
         } catch {
             // The loader renders a retryable error without replacing good data.
         } finally {
-            if (generation === (this.studentProgressSessionGeneration || 0) && loadingEl) {
+            if (current() && loadingEl) {
                 loadingEl.classList.add('hidden');
             }
         }
@@ -155,20 +181,20 @@ applyStudentProgressData(data) {
         this.filteredStudentData = [...this.allStudentData];
     },
 
-async getStudentRosterData({ forceRefresh = false } = {}) {
+async getStudentRosterData({ forceRefresh = false, signal, isCurrent = () => true, timeoutMs = 30000 } = {}) {
         if (this.authDisabled) {
+            if (signal?.aborted || !isCurrent()) throw new DOMException('Teacher session changed.', 'AbortError');
             this.applyStudentProgressData([]);
             return [];
         }
-
         const generation = this.studentIdentityRosterGeneration || 0;
-        const students = await runTeacherProgressQuery(this, {
+        const students = await requestWithTimeout(readSignal => runTeacherProgressQuery(this, {
             accountId: getTeacherProgressAccountId(this),
             key: getTeacherProgressQueryKey(this, 'identity-roster'),
-            queryFn: ({ signal }) => supabaseService.listStudentIdentityRoster({ signal })
-        }, forceRefresh);
+            queryFn: ({ signal: querySignal }) => readIdentityRoster(this, querySignal, readSignal, timeoutMs)
+        }, forceRefresh), { signal, timeoutMs, label: 'Loading student roster' });
+        if (signal?.aborted || !isCurrent()) throw new DOMException('Teacher session changed.', 'AbortError');
         if (generation !== (this.studentIdentityRosterGeneration || 0)) return [];
-
         this.applyStudentProgressData(students || []);
         return students || [];
     },
@@ -181,6 +207,7 @@ async getStudentRosterData({ forceRefresh = false } = {}) {
     },
 
     clearStudentProgressSessionState() {
+        this.rosterReadController?.abort();
         this.studentInsightYear = undefined;
         this.studentInsightRequest = (this.studentInsightRequest || 0) + 1;
         this.studentDashboardCharts?.dispose();

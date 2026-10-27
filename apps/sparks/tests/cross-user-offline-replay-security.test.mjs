@@ -6,7 +6,7 @@ const migration = await readFile(new URL(
     '../supabase/migrations/20260816225620_cross_user_offline_replay_guard.sql',
     import.meta.url
 ), 'utf8');
-const clientWrites = await readFile(new URL('../js/supabaseStudentWriteMethods.js', import.meta.url), 'utf8');
+const clientWrites = await readFile(new URL('../js/supabaseStudentWriteOperations.js', import.meta.url), 'utf8');
 const replayQueue = await readFile(new URL('../js/student/studentProgressSyncQueue.js', import.meta.url), 'utf8');
 
 test('replayed student mutations atomically bind the authenticated user to the browser owner', () => {

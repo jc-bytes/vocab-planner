@@ -1,4 +1,6 @@
 import { getStudentRouteLoadingSkeleton } from './student/studentLoadingSkeletons.js';
+import { loadStudentFeatureStyles } from './student/studentFeatureStyleLoader.js';
+import { loadStudentSparkStyles } from './student/studentLibraryStyleLoader.js';
 import { getStudentSectionForRoutePath } from './student/studentSectionRegistry.js';
 
 try {
@@ -12,8 +14,8 @@ try {
             .replace(/^#\/?/, '')
             .split('?')[0];
         const initialSection = getStudentSectionForRoutePath(routePath);
-        if (routePath === 'sparks') void import('../css/student-class-spark.css');
-        if (routePath.includes('/activity/')) void import('./student/studentFeatureStyles.js');
+        if (routePath === 'sparks') void loadStudentSparkStyles().catch(() => {});
+        if (routePath.includes('/activity/')) void loadStudentFeatureStyles().catch(() => {});
         const view = document.getElementById('loading-view');
         if (view) view.innerHTML = getStudentRouteLoadingSkeleton(window.location.hash);
         appContainer?.classList.add('student-session-loading');

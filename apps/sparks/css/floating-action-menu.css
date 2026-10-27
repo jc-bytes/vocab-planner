@@ -1,0 +1,10 @@
+:root .floating-action-menu-trigger { display: inline-grid; place-items: center; flex: 0 0 auto; width: 2.25rem; height: 2.25rem; min-height: 2.25rem; margin: 0; padding: 0; border: 0; border-radius: .5rem; background: transparent; color: var(--color-text, #e7edff); font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: none; }
+:root .floating-action-menu-trigger:hover { background: rgb(170 182 208 / .12); }
+:root .floating-action-menu { position: fixed; inset: auto; margin: 0; box-sizing: border-box; width: 15rem; max-width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); overflow: auto; padding: .35rem; border: 1px solid var(--color-border, #38435d); border-radius: .65rem; background: var(--color-background, #101a30); color: var(--color-text, #e7edff); box-shadow: 0 .75rem 2rem rgb(0 0 0 / .35); }
+:root .floating-action-menu button { display: flex; align-items: center; gap: .5rem; width: 100%; min-height: 2.5rem; margin: 0; padding: .55rem .75rem; border: 0; border-radius: .35rem; background: transparent; color: inherit; box-shadow: none; text-align: left; font-size: .875rem; font-weight: 500; white-space: normal; }
+:root .floating-action-menu button:hover, :root .floating-action-menu button:focus-visible { background: rgb(170 182 208 / .15); outline: none; }
+:root .floating-action-menu button:disabled { opacity: .5; cursor: default; }
+:root .floating-action-menu-trigger:focus-visible { outline: 2px solid #8e9bff; outline-offset: 2px; }
+:root .floating-action-menu:not(:popover-open) { display: none; }
+#activity-menu-view .floating-action-menu-trigger { width: 2.75rem; height: 2.75rem; min-height: 2.75rem; }
+#activity-menu-view .floating-action-menu button { min-height: 2.75rem; }
