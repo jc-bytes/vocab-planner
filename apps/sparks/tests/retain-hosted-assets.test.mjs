@@ -32,6 +32,8 @@ test('live graph retains published lazy chunks, preview and CSS assets without o
   try {
     await mkdir(join(output, 'assets'));
     await writeFile(join(output, 'assets/shared-QRSTUVWX.js'), 'current shared code');
+    await assert.rejects(readFile(join(output, '.vite/manifest.json')), { code: 'ENOENT' },
+      'Packaged promotion must refresh the hosted graph without hidden build metadata');
     const result = await retainHostedAssets(`http://127.0.0.1:${server.address().port}/app/`, output);
     assert.equal(result.copied, 6);
     assert.equal(await readFile(join(output, 'assets/preview-PREVIEW1.js'), 'utf8'), 'export const preview=true;');
@@ -104,7 +106,15 @@ test('both release paths retain the actual hosted graph without selecting previo
     const source = await readFile(new URL(name, root), 'utf8');
     const retention = source.split(/- name: Retain [^\n]+\n/)[1]?.split(/\n      - name:/)[0];
     assert.ok(retention, `${name} must run hosted retention`);
-    assert.match(retention, /node (?:apps\/sparks\/)?scripts\/retain-hosted-assets\.mjs "https:\/\/\$\{GITHUB_REPOSITORY_OWNER\}\.github\.io\/\$\{GITHUB_REPOSITORY#\*\/\}\/"/);
+    if (name === 'static.yml') {
+      assert.match(retention, /node scripts\/retain-hosted-assets\.mjs "https:\/\/\$\{GITHUB_REPOSITORY_OWNER\}\.github\.io\/\$\{GITHUB_REPOSITORY#\*\/\}\/"/);
+    } else {
+      assert.match(retention, /import \{ retainHostedAssets \} from '\.\/apps\/sparks\/scripts\/retain-hosted-assets\.mjs'/);
+      assert.match(retention, /process\.env\.GITHUB_REPOSITORY\.split\('\/'\)\[1\]/);
+      assert.match(retention, /await retainHostedAssets\(`https:\/\/\$\{process\.env\.GITHUB_REPOSITORY_OWNER\}\.github\.io\/\$\{repository\}\/`, 'validated-site'\)/);
+      assert.doesNotMatch(retention, /pruneCandidateAssets|node apps\/sparks\/scripts\/retain-hosted-assets\.mjs/,
+        'Promotion refreshes the packaged artifact without manifest-based pruning');
+    }
     assert.doesNotMatch(retention, /gh run (?:list|download)|previous_run|rsync|cp -Rn/);
     assert.match(retention, name === 'static.yml' ? /check-dist-size\.mjs/ : /30 \* 1024 \* 1024/);
     if (name === 'promote-sparks-release.yml') {

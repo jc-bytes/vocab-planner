@@ -32,6 +32,7 @@ test('built fault and ownership checks run after the actual CI build and in the 
         ['UI_TEACHER_LOCAL_COPIES_DIST', 'test:ui:teacher-local-copies'],
         ['UI_TEACHER_MATERIAL_ACTIONS_DIST', 'test:ui:teacher-material-actions'],
         ['UI_TEACHER_PREVIEW_LAYOUT_DIST', 'test:ui:teacher-preview-layout'],
+        ['UI_TEACHER_PREVIEW_SECURITY_DIST', 'test:ui:teacher-preview-security:built'],
         ['SECTION_RECOVERY_DIST', 'test:ui:section-recovery'],
         ['UI_STUDENT_UNITS_DIST', 'test:ui:student-units-lazy'],
         ['UI_STUDENT_UNIT_WORKSPACE_DIST', 'test:ui:student-unit-workspace'],
