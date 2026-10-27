@@ -137,12 +137,20 @@ updateActiveClue() {
         const activeWord = this.getActiveWord();
         if (!panel || !activeWord) return;
 
-        panel.innerHTML = `
-            <div class="cw-active-label">${activeWord.number} ${activeWord.direction}</div>
-            <div class="cw-active-text">${activeWord.definition}</div>
-            <div class="cw-active-meta">${activeWord.word.length} letters</div>
-            ${this.activeFeedback ? `<div class="cw-word-feedback ${this.activeFeedback.type}" role="status">${this.activeFeedback.message}</div>` : ''}
-        `;
+        panel.replaceChildren();
+        const line = (className, value) => {
+            const node = document.createElement('div');
+            node.className = className;
+            node.textContent = String(value ?? '');
+            panel.appendChild(node);
+            return node;
+        };
+        line('cw-active-label', `${activeWord.number} ${activeWord.direction}`);
+        line('cw-active-text', activeWord.definition);
+        line('cw-active-meta', `${activeWord.word.length} letters`);
+        if (this.activeFeedback) {
+            line(`cw-word-feedback ${this.activeFeedback.type}`, this.activeFeedback.message).setAttribute('role', 'status');
+        }
     },
 
 clearTransientValidation() {

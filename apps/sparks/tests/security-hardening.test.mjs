@@ -101,7 +101,7 @@ test('public account creation and student authorization-field edits stay disable
 });
 
 test('entry pages enforce CSP and contain no public registration form or inline script', async () => {
-    const pages = await Promise.all(['index.html', 'student.html', 'teacher.html'].map(read));
+    const pages = await Promise.all(['index.html', 'student.html', 'teacher.html', 'student-preview.html'].map(read));
     for (const page of pages) {
         assert.match(page, /http-equiv="Content-Security-Policy"/);
         assert.match(page, /script-src 'self'/);

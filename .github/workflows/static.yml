@@ -148,6 +148,8 @@ jobs:
         run: SECTION_RECOVERY_DIST=1 npm run test:ui:section-recovery
       - name: Verify built narrow teacher preview controls
         run: UI_TEACHER_PREVIEW_LAYOUT_DIST=1 npm run test:ui:teacher-preview-layout
+      - name: Verify built preview content security and independent CSP enforcement
+        run: UI_TEACHER_PREVIEW_SECURITY_DIST=1 npm run test:ui:teacher-preview-security:built
       - name: Verify built student Units presentation ownership
         run: UI_STUDENT_UNITS_DIST=1 npm run test:ui:student-units-lazy
       - name: Verify built student unit workspace ownership

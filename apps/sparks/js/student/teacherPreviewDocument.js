@@ -7,6 +7,7 @@ export async function mountPreviewDocument(views) {
     const response = await fetch(new URL('student.html', document.baseURI));
     if (!response.ok) throw new Error('The student screen is unavailable.');
     const template = new DOMParser().parseFromString(await response.text(), 'text/html');
+    // Keep the preview shell's original CSP; imported student bootstrap/policy never runs.
     template.querySelectorAll('script, meta[http-equiv="Content-Security-Policy"]').forEach(node => node.remove());
     document.head.append(...template.head.querySelectorAll('link[rel="stylesheet"]'));
     document.body.replaceChildren(...template.body.childNodes);
