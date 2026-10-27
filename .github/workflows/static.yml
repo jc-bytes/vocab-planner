@@ -88,6 +88,7 @@ jobs:
         env:
           SUPABASE_TELEMETRY_DISABLED: 1
         run: |
+          set -o pipefail
           for attempt in 1 2 3; do
             if supabase start 2>&1 | tee /tmp/sparks-supabase-start.log; then
               exit 0
