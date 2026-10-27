@@ -71,3 +71,31 @@ test('failed process creation rejects without hanging during cleanup', { timeout
     await new Promise(resolve => options.server.close(resolve));
     await assert.rejects(ensureViteServer({ ...options, cwd: `${cwd}/missing-ui-test-directory` }), /ENOENT/);
 });
+
+
+test('owned Vite recognizes forced-color readiness and still serves this checkout', { timeout: 15000 }, async t => {
+    const previous = Object.fromEntries(['FORCE_COLOR', 'NO_COLOR', 'CI'].map(key => [key, process.env[key]]));
+    let server;
+    try {
+        // Tooling often sets NO_COLOR locally; GitHub's colored banner inserts
+        // terminal control sequences between "Local", its colon and the URL.
+        delete process.env.NO_COLOR;
+        process.env.FORCE_COLOR = '1';
+        process.env.CI = 'true';
+        const options = await fixture(t);
+        await new Promise(resolve => options.server.close(resolve));
+        server = await ensureViteServer(options);
+        assert.ok(server.pid);
+        assert.equal(await waitForServer(`${options.baseUrl}/student.html`), true);
+    } finally {
+        if (server && server.exitCode === null && server.signalCode === null) {
+            const stopped = once(server, 'close');
+            server.kill();
+            await stopped;
+        }
+        for (const [key, value] of Object.entries(previous)) {
+            if (value === undefined) delete process.env[key];
+            else process.env[key] = value;
+        }
+    }
+});

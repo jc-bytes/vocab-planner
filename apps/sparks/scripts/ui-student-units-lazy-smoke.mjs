@@ -111,7 +111,9 @@ try {
     await installStudentAssignedFlowFixture(page, { completeRequiredActivities: true });
     await page.route(`**${browserPath}`, route => route.fulfill({ status: 503, body: 'Controlled missing Units module', contentType: 'text/javascript' }));
     await page.goto(`${baseUrl}/student.html#/units`); await settled(page);
-    await page.waitForFunction(() => document.querySelector('#vocab-list')?.textContent.includes('Could not load Units. Please try again.'));
+    const recovery = page.locator('#vocab-list [data-section-recovery][role="alert"]');
+    await recovery.waitFor();
+    assert.match(await recovery.innerText(), /Could not load Units\. Check your connection and try again\./);
     assert.equal(await page.evaluate(() => studentApp.activities.browser), null);
     await page.getByRole('button', { name: 'Try again', exact: true }).waitFor();
     await page.evaluate(() => studentApp.navigateTo({ view: 'menu' }));

@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { stripVTControlCharacters } from 'node:util';
 import http from 'node:http';
 import https from 'node:https';
 import net from 'node:net';
@@ -120,7 +121,7 @@ export async function ensureViteServer({
     server.once('error', error => { startupError = error; });
     server.stdout.on('data', chunk => {
         output = (output + chunk).slice(-4096);
-        ready ||= /Local:\s+https?:\/\//.test(output);
+        ready ||= /Local:\s+https?:\/\//.test(stripVTControlCharacters(output));
     });
     server.stderr.resume();
     const started = Date.now();
