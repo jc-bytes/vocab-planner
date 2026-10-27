@@ -215,7 +215,7 @@ try {
     const staleRoute = await page.evaluate(async () => {
         const teacherMarkup = await fetch('/teacher.html').then(response => response.text());
         const teacherDocument = new DOMParser().parseFromString(teacherMarkup, 'text/html');
-        for (const viewId of ['teacher-overview-view', 'teacher-classes-view', 'teacher-assignments-view', 'teacher-groups-view']) {
+        for (const viewId of ['teacher-overview-view', 'teacher-classes-view', 'teacher-class-students-view', 'teacher-assignments-view', 'teacher-groups-view']) {
             if (document.getElementById(viewId)) continue;
             const contract = teacherDocument.getElementById(viewId);
             if (!contract) throw new Error(`Teacher workspace mount is missing: ${viewId}`);
