@@ -72,6 +72,13 @@ const requests = [
     { name: 'exports_transfer_owner', table: 'export_logs', action: 'update', row: { teacher_id: id('otherTeacher') }, key: id('export1:1') },
     { name: 'exports_transfer_school', table: 'export_logs', action: 'update', row: { school_id: id('school2') }, key: id('export1:1') },
     { name: 'exports_delete', table: 'export_logs', action: 'delete', key: id('export1:1') },
+    // Provider defaults differ: the application's migrations grant export SELECT
+    // and INSERT only. Exercise UPDATE/DELETE RLS separately from actual ACLs.
+    { name: 'exports_update_policy_probe', table: 'export_logs', action: 'update', row: { format: 'csv' }, key: id('export1:1'), sqlOnly: true, grantProbe: 'update' },
+    { name: 'exports_transfer_owner_policy_probe', table: 'export_logs', action: 'update', row: { teacher_id: id('otherTeacher') }, key: id('export1:1'), sqlOnly: true, grantProbe: 'update' },
+    { name: 'exports_transfer_school_policy_probe', table: 'export_logs', action: 'update', row: { school_id: id('school2') }, key: id('export1:1'), sqlOnly: true, grantProbe: 'update' },
+    { name: 'exports_delete_policy_probe', table: 'export_logs', action: 'delete', key: id('export1:1'), sqlOnly: true, grantProbe: 'delete' },
+    { name: 'exports_delete_other_owner_policy_probe', table: 'export_logs', action: 'delete', key: id('export-other-owner'), sqlOnly: true, grantProbe: 'delete' },
     { name: 'pairs_read', table: 'teacher_group_pair_restrictions', action: 'select' },
     { name: 'pairs_insert', table: 'teacher_group_pair_restrictions', action: 'insert', row: pairRow() },
     { name: 'pairs_wrong_owner', table: 'teacher_group_pair_restrictions', action: 'insert', row: pairRow('otherTeacher') },
@@ -108,7 +115,8 @@ function direct(request, context) {
                 reset role; select jsonb_build_object('inserted',exists(select 1 from public.teaching_classes where id=${literal(row.id)}));`;
         } else {
             const cmd = command(request, context);
-            body = `${auth(context)} ${request.rpc ? cmd : `with result as (${cmd}) select coalesce(jsonb_agg(to_jsonb(result) order by to_jsonb(result)::text),'[]') from result`};`;
+            const grant = request.grantProbe ? `grant ${request.grantProbe} on public.export_logs to authenticated; ` : '';
+            body = `${grant}${auth(context)} ${request.rpc ? cmd : `with result as (${cmd}) select coalesce(jsonb_agg(to_jsonb(result) order by to_jsonb(result)::text),'[]') from result`};`;
         }
         const data = JSON.parse(sql(`begin; set local statement_timeout='20s'; ${body} rollback;`));
         return { data: request.rpc ? normalizeRpc(data) : data };
@@ -159,17 +167,41 @@ function initPlans(node, result = []) {
     for (const child of node?.Plans || []) initPlans(child, result);
     return result;
 }
-function assertKnownOutcomes(matrix) {
+const exportPrivileges = () => JSON.parse(sql(`select jsonb_build_object(
+    'update',has_column_privilege('authenticated','public.export_logs','format','UPDATE'),
+    'delete',has_table_privilege('authenticated','public.export_logs','DELETE'))`));
+function assertKnownOutcomes(matrix, privileges) {
+    const dataFor = (context, request) => {
+        const result = matrix[context]?.[request];
+        assert.ok(result, `${context}/${request}: result is missing`);
+        assert.equal(result.error, undefined, `${context}/${request}: expected success, got ${JSON.stringify(result.error)}`);
+        assert.ok(Object.hasOwn(result, 'data'), `${context}/${request}: successful result must contain data`);
+        return result.data;
+    };
+    const assertRows = (context, request, count) => {
+        const data = dataFor(context, request);
+        assert.ok(Array.isArray(data), `${context}/${request}: expected returned rows`);
+        assert.equal(data.length, count, `${context}/${request}: expected ${count} returned rows`);
+    };
     const teacher = matrix.teacher, admin = matrix.school_admin;
-    for (const name of ['subjects_insert', 'subjects_current_owner', 'exports_insert', 'exports_update', 'exports_delete', 'pairs_insert', 'pairs_delete']) {
-        assert.equal(teacher[name].data.length, 1, `teacher/${name}: actual allowed write must return one row`);
+    for (const name of ['subjects_insert', 'subjects_current_owner', 'exports_insert', 'pairs_insert', 'pairs_delete',
+        'exports_update_policy_probe', 'exports_delete_policy_probe']) assertRows('teacher', name, 1);
+    for (const action of ['update', 'delete']) {
+        const name = `exports_${action}`;
+        assert.equal(typeof privileges[action], 'boolean', `${name}: source privilege must be recorded`);
+        if (privileges[action]) assertRows('teacher', name, 1);
+        else assert.deepEqual(teacher[name].error, { code: '42501', message: 'permission denied for table export_logs' },
+            `teacher/${name}: the source ACL denial must remain; do not grant SDK access for a policy probe`);
     }
+    assert.deepEqual(dataFor('teacher', 'exports_delete_other_owner_policy_probe'), [], 'The transaction-local delete probe cannot delete another owner');
+    for (const name of ['exports_transfer_owner_policy_probe', 'exports_transfer_school_policy_probe'])
+        assert.equal(teacher[name].error?.code, '42501', `teacher/${name}: the retained RLS check must reject scope transfer even with a temporary table grant`);
     assert.deepEqual(teacher.classes_policy_probe.data, { inserted: true }, 'Transaction-local grant probe must exercise a positive retained class policy');
     assert.equal(teacher.classes_wrong_owner_probe.error.code, '42501');
     assert.equal(teacher.classes_direct_grant_denial.error.code, '42501', 'Actual client INSERT grant remains revoked');
     assert.equal(teacher.classes_create_rpc.data.owner_id, id('teacher1'), 'Real client class-creation path remains functional');
     assert.equal(matrix.cross_school_teacher.classes_cross_school_rpc.data.owner_id, id('teacher2'));
-    assert.equal(admin.subjects_current_owner.data.length, 1, 'School admin can create its own subject');
+    assertRows('school_admin', 'subjects_current_owner', 1);
     assert.equal(admin.classes_create_rpc.data.owner_id, id('admin'));
     for (const [context, request, owner, school, subject] of [
         ['teacher', 'classes_create_rpc', 'teacher1', 'school1', 'subject1'],
@@ -183,17 +215,17 @@ function assertKnownOutcomes(matrix) {
     for (const name of ['subjects_wrong_owner', 'subjects_cross_school', 'subjects_null_school', 'exports_wrong_owner', 'exports_cross_school', 'exports_transfer_owner', 'exports_transfer_school', 'pairs_wrong_owner', 'pairs_null_school']) {
         assert.equal(teacher[name].error.code, '42501', `teacher/${name}: existing ownership/school denial must remain`);
     }
-    assert.equal(teacher.exports_read.data.length, 20, 'Read cannot expose another owner or NULL-school quarantine');
-    assert.equal(teacher.pairs_read.data.length, 1);
+    assertRows('teacher', 'exports_read', 20);
+    assertRows('teacher', 'pairs_read', 1);
     assert.deepEqual(teacher.pairs_delete_other_owner.data, []);
-    assert.equal(teacher.memberships_read.data.length, 4, 'Assigned teacher retains active and removed roster rows');
-    assert.equal(matrix.student.memberships_read.data.length, 1, 'Student sees only its own active membership');
+    assertRows('teacher', 'memberships_read', 4);
+    assertRows('student', 'memberships_read', 1);
     assert.deepEqual(matrix.inactive_class_student.memberships_read.data, []);
     for (const c of ['outsider', 'inactive_member', 'inactive_school', 'platform_admin', 'missing_sub']) {
         assert.deepEqual(matrix[c].exports_read.data, [], `${c} has no own active school export history`);
         assert.deepEqual(matrix[c].pairs_read.data, []);
     }
-    assert.equal(teacher.allowlist_read.data.length, 1);
+    assertRows('teacher', 'allowlist_read', 1);
     assert.deepEqual(matrix.uppercase_email.allowlist_read, teacher.allowlist_read, 'Email case remains normalized');
     assert.deepEqual(matrix.missing_email.allowlist_read.data, [], 'A missing email claim cannot enumerate the allowlist');
     assert.equal(matrix.different_email.allowlist_read.data[0].active, false, 'The policy retains email-claim semantics, including inactive self rows');
@@ -219,14 +251,15 @@ try {
     sql(readFileSync(new URL('./fixtures/policy-request-identity-baseline.sql', import.meta.url), 'utf8'));
     sql(readFileSync(new URL('./fixtures/policy-request-identity.sql', import.meta.url), 'utf8'));
     const protectedBefore = protectedMetadata(), dataBefore = fixtureData();
+    report.exportPrivileges = exportPrivileges();
     report.expressionsBefore = targetExpressions();
     report.before = sqlOutcomes();
     writeFileSync(join(evidence, 'before-sql.json'), JSON.stringify(report.before, null, 2));
-    assertKnownOutcomes(report.before);
+    assertKnownOutcomes(report.before, report.exportPrivileges);
     assert.equal(fixtureData(), dataBefore, 'Every direct SQL mutation and temporary class-policy grant must roll back');
     const planTables = ['export_logs', 'teacher_group_pair_restrictions', 'teacher_allowlist'];
     report.plansBefore = Object.fromEntries(planTables.map(table => [table, plan(table)]));
-    console.log('Baseline SQL matrix passed with explicit positive, negative and class-grant-probe assertions.');
+    console.log(`Baseline SQL matrix passed with actual export ACLs ${JSON.stringify(report.exportPrivileges)} and explicit positive/negative transaction-local policy probes.`);
 
     const secret = randomBytes(48).toString('hex'), password = randomBytes(32).toString('hex');
     sql(`create role ${gatewayRole} login noinherit password '${password}'; grant anon,authenticated to ${gatewayRole};`, 'postgres'); roleCreated = true;
@@ -284,7 +317,8 @@ try {
     assert.deepEqual(protectedMetadata(), protectedBefore, 'Other policies, all function/ACL contracts, table/column grants, RLS flags and constraints must remain exact');
     report.expressionsAfter = targetExpressions();
     assertOnlyIdentityCaches(report.expressionsBefore, report.expressionsAfter);
-    report.after = sqlOutcomes(); assertKnownOutcomes(report.after);
+    report.after = sqlOutcomes(); assertKnownOutcomes(report.after, report.exportPrivileges);
+    assert.deepEqual(exportPrivileges(), report.exportPrivileges, 'Policy probes and migration must preserve effective export ACLs');
     assert.deepEqual(report.after, report.before, 'Every SQL result/error must remain equivalent after the idempotent migration');
     report.httpAfter = await httpOutcomes();
     assert.deepEqual(report.httpAfter, report.httpBefore, 'Every actual SDK status/body must remain equivalent, except explicitly validated generated RPC IDs/timestamps');
@@ -305,7 +339,7 @@ try {
     console.log(`Policy request identity equivalence passed: ${report.sqlCases} SQL cases and ${report.sdkCases} actual SDK cases; eight policy shapes and protected metadata unchanged.`);
     console.log(`Invariant SELECT plans execute once for exports, group pairs and allowlist; the old allowlist already used an InitPlan. Evidence: ${evidence}`);
 } catch (error) {
-    console.error(error.message); if (error.stderr) console.error(String(error.stderr).slice(-2500));
+    console.error(error.message); console.error(`Policy rehearsal failure evidence: ${evidence}`); if (error.stderr) console.error(String(error.stderr).slice(-2500));
     writeFileSync(join(evidence, 'failure.json'), JSON.stringify({ message: error.message, stack: error.stack }, null, 2)); process.exitCode = 1;
 } finally {
     const cleanupFailures = [];
