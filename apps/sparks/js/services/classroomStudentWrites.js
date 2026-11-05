@@ -1,5 +1,5 @@
-// Only the two student answer mutations use this adapter. Teacher operations and
-// reads retain their existing interface and authorization rules.
+// Student answer writes and teacher grading writes bind the initiating account.
+// Reads retain their existing interface and authorization rules.
 export async function ownedClassroomWrite(getClient, name, args, ownerUserId, signal) {
     const client = await getClient();
     signal.throwIfAborted();

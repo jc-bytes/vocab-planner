@@ -2,6 +2,8 @@ import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 export const GATED_TESTS = Object.freeze({
+    'vocabulary-grading-database.test.mjs': 'test:student-insight:database',
+    'teacher-class-progress-database.test.mjs': 'test:student-insight:database',
     'local-supabase-acceptance.test.mjs': 'test:acceptance:supabase',
     'private-classrooms-acceptance.test.mjs': 'test:private-classrooms',
     'school-platform-database-acceptance.test.mjs': 'test:school-platform:rest',

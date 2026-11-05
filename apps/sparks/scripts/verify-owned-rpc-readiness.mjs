@@ -11,7 +11,12 @@ export const OWNED_RPC_PROBES = Object.freeze({
     recover_student_arcade_minute_owned_v1: Object.freeze({ p_expected_user_id: zero, p_event_id: 'readiness-probe', p_game_id: 'readiness-probe', p_client_id: 'readiness-probe' }),
     list_student_identity_roster_by_ids_school_owned_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_user_ids: [] }),
     set_school_setting_owned_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_key: 'readiness-probe', p_value: {} }),
-    set_school_year_owned_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_year: 2026, p_label: 'readiness-probe', p_archived: false })
+    set_school_year_owned_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_year: 2026, p_label: 'readiness-probe', p_archived: false }),
+    teacher_set_assignment_grading_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_assignment_id: zero, p_config: {}, p_expected_revision: 0 }),
+    teacher_publish_vocabulary_grades_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_assignment_id: zero, p_expected_revision: 0 }),
+    teacher_class_progress_v1: Object.freeze({ p_school_id: zero, p_class_id: zero, p_from: '2000-01-01', p_to: '2000-01-01' }),
+    teacher_class_gradebook_v1: Object.freeze({ p_school_id: zero, p_class_id: zero, p_from: '2000-01-01', p_to: '2000-01-01' }),
+    my_class_vocabulary_grades_v1: Object.freeze({ p_school_id: zero, p_class_id: zero })
 });
 
 function isAnonymousBrowserKey(key) {
@@ -75,7 +80,7 @@ export async function verifyOwnedRpcReadiness({ url, key, fetch: request = globa
 export async function runReadinessCli(env = process.env, output = console) {
     try {
         const { verified } = await verifyOwnedRpcReadiness({ url: env.SUPABASE_URL, key: env.SUPABASE_PUBLISHABLE_KEY });
-        output.log(`Verified anonymous execution denial for ${verified.length} required owned RPCs.`);
+        output.log(`Verified anonymous execution denial for ${verified.length} required RPCs.`);
         return 0;
     } catch (error) {
         output.error(error.message);

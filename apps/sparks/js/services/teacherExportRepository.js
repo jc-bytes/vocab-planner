@@ -2,6 +2,7 @@ import { schoolContext } from './schoolContext.js';
 import { supabaseService } from '../supabaseService.js';
 import { mapProfileRow, timestampToIso } from './supabaseValues.js';
 import { requestWithTimeout } from './requestReliability.js';
+import { runOwnedMutation, serviceMutationIdentity } from './ownedMutation.js';
 
 // Account-wide Arcade scores and wallet totals have no school provenance.
 // Export only school-attributable educational records.
@@ -87,21 +88,22 @@ export function createTeacherExportRepository({ service = supabaseService, conte
         // Kept for older export callers; school exports never query global scores.
         return [];
     },
-    async logExport(record = {}) {
+    async logExport(record = {}, options) {
+        const snapshot = JSON.parse(JSON.stringify({ ...record, timestamp: timestampToIso(record.timestamp) }));
+        const identity = serviceMutationIdentity(service);
         return scoped(async ({ schoolId, assertCurrent }) => {
+        record = snapshot;
         if (record.schoolId && record.schoolId !== schoolId) throw new Error('The export belongs to another school.');
-        await service.init();
-        assertCurrent();
         const payload = {
             school_id: schoolId, teacher_id: record.teacherId || null, data_types: record.dataTypes || [],
             student_count: record.studentCount || 0, format: record.format || 'json',
             filename: record.filename || '', metadata: { ...record.metadata, schoolId },
             timestamp: timestampToIso(record.timestamp)
         };
-        const { data, error } = await service.getClient().from('export_logs').insert(payload).select('*').single();
-        assertCurrent();
-        if (error) throw error;
-        return data;
+        return runOwnedMutation(async () => { await service.init(); return service.getClient(); },
+            client => client.from('export_logs').insert(payload).select('*').single(),
+            { ...options, context, ownerUserId: identity.userId, getIdentity: () => serviceMutationIdentity(service),
+                isCurrent: () => { assertCurrent(); return !options?.isCurrent || options.isCurrent(); } });
         });
     }
     };

@@ -1,3 +1,4 @@
+import { mutationClient } from './helpers/mutationClient.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { installSupabaseStudentWriteMethods } from '../js/supabaseStudentWriteMethods.js';
@@ -26,6 +27,7 @@ async function fixture(loadOperations = async () => operationModule) {
             }
         }
     };
+    service.client = mutationClient(service.client, 'student-1');
     installSupabaseStudentWriteMethods(service, { context, loadOperations });
     return { service, context, calls, signals };
 }
@@ -118,7 +120,7 @@ test('caller cancellation reaches an already dispatched economy transport', asyn
     const entered = deferred(), controller = new AbortController();
     const { service } = await fixture();
     let transportSignal;
-    service.client.rpc = () => ({ abortSignal(signal) {
+    service.client.rpc = () => ({ setHeader() { return this; }, abortSignal(signal) {
         transportSignal = signal; entered.resolve(); return this;
     }, then() { return new Promise(() => {}); } });
     const pending = service.acceptStudentGiftCoins({}, { signal: controller.signal });

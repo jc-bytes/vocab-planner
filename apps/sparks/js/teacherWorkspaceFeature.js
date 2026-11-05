@@ -33,6 +33,8 @@ export function createTeacherWorkspaceFeature(manager) {
     const classOptions = {
         getUserId, repository,
         getSchoolCalendar,
+        onProgressState: context => manager.setRoute({ view: 'students', ...context }, { replace: true }),
+        onGradebookState: context => manager.setRoute({ view: 'students', ...context }, { replace: true }),
         onClassesLoaded: classes => manager.updateTeacherClassOptions(classes),
         onNavigate: context => navigate(context.classId ? context.tab === 'students' ? 'students' : 'classes' : 'overview', context),
         onPublish: publish,

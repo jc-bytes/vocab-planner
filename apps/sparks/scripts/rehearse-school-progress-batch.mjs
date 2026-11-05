@@ -6,6 +6,7 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createClient } from '@supabase/supabase-js';
 import { resolveLocalDatabaseSource } from './lib/localDatabaseRehearsal.mjs';
+import { assertRehearsalJsonEqual } from './lib/rehearsalJsonEquality.mjs';
 
 // Optional manifest targets the already-isolated, capped investigation cluster.
 // Validate every resource name before any Docker or SQL action.
@@ -143,8 +144,8 @@ try {
     assert.equal(report.before.assigned_teacher.private_denied.error.code, '42501');
     assert.deepEqual(report.before.assigned_teacher.only_missing_summary.data, []);
     assert.equal(report.before.assigned_teacher.full_selected.data.length, 59);
-    assert.deepEqual(report.before.assigned_teacher.exact_limit, report.before.assigned_teacher.full_selected);
-    assert.deepEqual(report.before.assigned_teacher.reverse_selected, report.before.assigned_teacher.selected_class);
+    assertRehearsalJsonEqual(report.before.assigned_teacher.exact_limit, report.before.assigned_teacher.full_selected);
+    assertRehearsalJsonEqual(report.before.assigned_teacher.reverse_selected, report.before.assigned_teacher.selected_class);
     assert.equal(report.before.assigned_teacher.over_limit.error.message, 'A maximum of 200 students can be requested at once.');
     report.executionBefore = executionProof();
     assert.equal(snapshotCalls(report.executionBefore), 60, 'Baseline must actually construct each selected snapshot twice');
@@ -202,10 +203,10 @@ try {
         for (const [name, rpc] of requests.filter(([, rpc]) => !rpc.includes('.'))) {
             const direct = report.before[context.name][name];
             const http = report.httpBefore[context.name][name];
-            if (direct.error) assert.deepEqual(http.error, direct.error, `${context.name}/${name}: real gateway denial matches SQL`);
+            if (direct.error) assertRehearsalJsonEqual(http.error, direct.error, `${context.name}/${name}: real gateway denial matches SQL`);
             else {
                 assert.equal(http.status, 200, `${context.name}/${name}: real gateway success required`);
-                assert.deepEqual(http.data, direct.data, `${context.name}/${name}: real gateway JSON matches SQL`);
+                assertRehearsalJsonEqual(http.data, direct.data, `${context.name}/${name}: real gateway JSON matches SQL`);
             }
         }
     }
@@ -217,8 +218,8 @@ try {
     console.log("Candidate SQL role matrix complete.");
     report.httpAfter = await httpOutcomes();
     console.log("Candidate SDK role matrix complete.");
-    assert.deepEqual(report.after, report.before, 'Every SQL role result, error, nested field, null and array order must match');
-    assert.deepEqual(report.httpAfter, report.httpBefore, 'Actual SDK/PostgREST bodies and denial statuses must match');
+    assertRehearsalJsonEqual(report.after, report.before, 'Every SQL role result, error, nested field, null and array order must match');
+    assertRehearsalJsonEqual(report.httpAfter, report.httpBefore, 'Actual SDK/PostgREST bodies and denial statuses must match');
     const candidateDefinition = sql(`select pg_get_functiondef('${target}'::regprocedure)`);
     assert.notEqual(bodyOf(candidateDefinition), bodyOf(baselineDefinition), 'Candidate must change the batch query');
     report.executionAfter = executionProof();

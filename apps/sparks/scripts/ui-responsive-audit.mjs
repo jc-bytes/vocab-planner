@@ -234,11 +234,11 @@ async function auditTeacherStudentProfile(page, baseUrl) {
     await waitForApp(page);
     const home = page.locator('#teacher-overview-view');
     await home.getByRole('button', { name: /^Open class / }).first().click();
-    const classes = page.locator('#teacher-classes-view');
+    const students = page.locator('#teacher-class-students-view');
     if (process.env.UI_AUDIT_CLASS_ID) await page.getByLabel('Current class', { exact: true }).selectOption(process.env.UI_AUDIT_CLASS_ID);
+    // Students is a primary destination. Open the real mobile navigation first.
     if (!await page.locator('#tab-students').isVisible()) await page.locator('#teacher-mobile-menu-toggle').click();
     await page.locator('#tab-students').click();
-    const students = page.locator('#teacher-class-students-view');
     await students.getByRole('button', { name: /^Actions for / }).first().click();
     await page.getByRole('menuitem', { name: 'View profile', exact: true }).click();
     await page.waitForSelector('#teacher-student-profile-view:not(.hidden)', { timeout: 5000 });
@@ -252,8 +252,9 @@ async function auditTeacherStudentProfile(page, baseUrl) {
     if (!ok) throw new Error('Student profile did not expose routed profile navigation and tabs.');
 
     await page.locator('#student-profile-back-btn').click();
+    await students.waitFor({ state: 'visible' });
     await page.locator('#tab-students[aria-selected="true"]').waitFor({ state: 'attached' });
-    await students.getByRole('button', {name:/^Actions for /}).first().waitFor();
+    if (!new URL(page.url()).hash.startsWith('#/teacher/students?class=')) throw new Error('Profile Back did not restore the selected Students class.');
 }
 
 async function assertTeacherMobileMenu(page, baseUrl) {
@@ -358,6 +359,17 @@ async function assertDataAndSettingsTabs(page, baseUrl) {
         || settingsState.visiblePanels[0] !== 'data-subjects-section') {
         throw new Error(`Settings did not isolate its controls: ${JSON.stringify(settingsState)}`);
     }
+
+    // Calendar administration moved out of learning settings. Keep its real
+    // destination covered rather than expecting the hidden compatibility tab.
+    const calendarLink = page.getByRole('link', { name: 'Manage academic years and calendar in School settings', exact: true });
+    if (await calendarLink.getAttribute('href') !== '#/teacher/administration?tab=years') throw new Error('Calendar link lost its School settings destination.');
+    await calendarLink.click();
+    await page.locator('#teacher-administration-view.active:not(.hidden)').waitFor();
+    await page.getByRole('tab', { name: 'Academic years', selected: true }).waitFor();
+    await page.getByRole('table', { name: 'Academic years', exact: true }).waitFor();
+    if (new URL(page.url()).hash !== '#/teacher/administration?tab=years'
+        || await page.locator('#tab-administration').getAttribute('aria-selected') !== 'true') throw new Error('Calendar did not open in School settings.');
 
     await page.goto(`${baseUrl}/teacher.html#/teacher/data`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
@@ -596,11 +608,26 @@ async function main() {
         await loginTeacher(teacherPage, baseUrl);
         await loginStudent(studentPage, baseUrl);
 
+        // Class-scoped destinations require a real selected class. Auditing a
+        // bare route in a fresh session would otherwise measure the Home redirect.
+        await teacherPage.locator('#teacher-overview-view').getByRole('button', { name: /^Open class / }).first().click();
+        await teacherPage.locator('#teacher-classes-view.active:not(.hidden)').waitFor();
+        const teacherClassId = process.env.UI_AUDIT_CLASS_ID || await teacherPage.getByLabel('Current class', { exact: true }).inputValue();
+        if (!teacherClassId) throw new Error('Responsive teacher audit requires a selected class.');
+        if (process.env.UI_AUDIT_CLASS_ID) await teacherPage.getByLabel('Current class', { exact: true }).selectOption(teacherClassId);
+        const classQuery = encodeURIComponent(teacherClassId);
+        const teacherSection = (viewId, tabId) => ({ beforeAudit: async page => {
+            await page.locator(`#${viewId}.active:not(.hidden)`).waitFor();
+            await page.waitForFunction(id => document.getElementById(id)?.getAttribute('aria-busy') === 'false', viewId);
+            if (await page.locator(`#${tabId}`).getAttribute('aria-selected') !== 'true') throw new Error(`Wrong selected teacher section for ${viewId}.`);
+            if (await page.getByLabel('Current class', { exact: true }).inputValue() !== teacherClassId) throw new Error('Responsive route lost its selected class.');
+        } });
+
         const teacherRoutes = [
             ['Teacher Overview', `${baseUrl}/teacher.html#/teacher/overview`],
-            ['Teacher Students', `${baseUrl}/teacher.html#/teacher/students`],
+            ['Teacher Students', `${baseUrl}/teacher.html#/teacher/students?class=${classQuery}`, teacherSection('teacher-class-students-view', 'tab-students')],
             ['Teacher Vocabulary', `${baseUrl}/teacher.html#/teacher/vocabulary`],
-            ['Teacher Classes', `${baseUrl}/teacher.html#/teacher/classes`],
+            ['Teacher Classes', `${baseUrl}/teacher.html#/teacher/classes?class=${classQuery}&tab=work`, teacherSection('teacher-classes-view', 'tab-classes')],
             ['Teacher Sparks', `${baseUrl}/teacher.html#/teacher/sparks`],
             ['Teacher Quizzes', `${baseUrl}/teacher.html#/teacher/quizzes`],
             ['Teacher Data Redirect', `${baseUrl}/teacher.html#/teacher/data`],

@@ -24,6 +24,7 @@ try {
         const { teacherPageRegistry } = await import('/js/teacherPageRegistry.js');
         const sparksPage = teacherPageRegistry.get('sparks');
         const groupsPage = teacherPageRegistry.get('groups');
+        const studentsPage = teacherPageRegistry.get('students');
         const dataPage = teacherPageRegistry.get('data');
         const settingsPage = teacherPageRegistry.get('settings');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
@@ -62,6 +63,7 @@ try {
                 this.workflowCalls = [];
                 this.sparkLoads = 0;
                 this.progressLoads = 0;
+                this.classworkLoads = 0;
                 this.groupLoads = 0;
                 this.dataCalls = [];
             }
@@ -69,8 +71,8 @@ try {
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
             showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
-            showClassStudentsView(context) { this.workspaceContext = context; this.progressLoads += 1; this.switchView('teacher-class-students-view', { updateRoute: false }); }
-            showClassesView(context) { this.workspaceContext = context; if (context.tab === 'students') this.progressLoads += 1; this.switchView('teacher-classes-view', { updateRoute: false }); }
+            showClassesView(context) { this.workspaceContext = context; this.classworkLoads += 1; this.switchView('teacher-classes-view', { updateRoute: false }); }
+            showClassStudentsView(context) { this.workspaceContext = context; this.progressLoads += 1; this.switchView(studentsPage.viewId, { updateRoute: false }); }
             showAssignmentsView(context) { this.workspaceContext = context; this.switchView(`teacher-${context.mode}-view`, { updateRoute: false }); }
             showSparkEditor(context) { this.workspaceContext = context; this.switchView('teacher-spark-editor-view', { updateRoute: false }); }
             showGroupsView() { this.groupLoads += 1; this.switchView(groupsPage.viewId); }
@@ -276,17 +278,29 @@ try {
     const studentsDirect = await page.evaluate(async () => {
         const manager = window.teacherPageSmokeManager;
         const loadsBefore = manager.progressLoads;
+        const classworkLoadsBefore = manager.classworkLoads;
         history.replaceState(null, '', '#/teacher/students');
         await manager.handleRouteChange();
         return {
+            hash: window.location.hash,
+            context: manager.workspaceContext,
             activeView: document.querySelector('.view.active')?.id,
             activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
-            loadDelta: manager.progressLoads - loadsBefore
+            mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent,
+            topLabel: document.querySelector('#teacher-top-bar-section')?.textContent,
+            loadDelta: manager.progressLoads - loadsBefore,
+            classworkLoadDelta: manager.classworkLoads - classworkLoadsBefore
         };
     });
-    if (studentsDirect.activeView !== 'teacher-class-students-view'
+    if (studentsDirect.hash !== '#/teacher/students?class=class-a'
+        || studentsDirect.context.view !== 'students'
+        || studentsDirect.context.classId !== 'class-a'
+        || studentsDirect.activeView !== 'teacher-class-students-view'
         || studentsDirect.activeSection !== 'students'
-        || studentsDirect.loadDelta !== 1) {
+        || studentsDirect.mobileLabel !== 'Students'
+        || studentsDirect.topLabel !== 'Students'
+        || studentsDirect.loadDelta !== 1
+        || studentsDirect.classworkLoadDelta !== 0) {
         throw new Error(`Students direct route changed: ${JSON.stringify(studentsDirect)}`);
     }
 
@@ -298,6 +312,30 @@ try {
         && document.querySelector('.view.active')?.id === 'teacher-class-students-view'
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'students'
     ));
+
+    const legacyStudents = await page.evaluate(async () => {
+        const manager = window.teacherPageSmokeManager;
+        const studentsBefore = manager.progressLoads, classworkBefore = manager.classworkLoads;
+        history.replaceState(null, '', '#/teacher/classes?class=class-a&tab=students');
+        await manager.handleRouteChange();
+        return {
+            hash: window.location.hash,
+            context: manager.workspaceContext,
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            studentLoads: manager.progressLoads - studentsBefore,
+            classworkLoads: manager.classworkLoads - classworkBefore
+        };
+    });
+    if (legacyStudents.hash !== '#/teacher/students?class=class-a'
+        || legacyStudents.context.view !== 'students'
+        || legacyStudents.context.classId !== 'class-a'
+        || legacyStudents.activeView !== 'teacher-class-students-view'
+        || legacyStudents.activeSection !== 'students'
+        || legacyStudents.studentLoads !== 1
+        || legacyStudents.classworkLoads !== 0) {
+        throw new Error(`Legacy Students route did not normalize once: ${JSON.stringify(legacyStudents)}`);
+    }
 
     const groups = await page.evaluate(() => {
         const manager = window.teacherPageSmokeManager;
@@ -593,6 +631,7 @@ try {
         const manager = window.teacherPageSmokeManager;
         const routes = [
             { view: 'classes', classId: 'class/a', tab: 'work' },
+            { view: 'students', classId: 'class/a' },
             { view: 'assignments', classId: 'class-a' },
             { view: 'review', classId: 'class-a', assignmentId: 'assignment-a' },
             { view: 'spark-editor', materialId: 'spark-a' }

@@ -1,5 +1,48 @@
 # Teacher roster and profile feature
 
+## Class trimester progress
+
+Students has Roster and Trimester progress views for the selected class. Progress
+defaults to the school calendar's current trimester, or the most recent available
+trimester during a break. Custom inclusive dates can cross trimester boundaries.
+Dates select assignments by release time in the school's timezone; completion is
+current, including work finished after the selected dates. This is not a historical
+completion snapshot.
+
+The class summary uses `teacher_class_progress_v1` through `classroomRepository`.
+Its private implementation checks authenticated school/class teaching authority
+before reading active memberships, published version requirements, verified
+activity progress, responses and revision-aware teacher feedback. It returns only
+per-student required, completed, review and unknown counts. Future, withdrawn,
+retired and archived-class work is excluded; closed assignments still count.
+Optional vocabulary activities and optional/reading-only checks add no required
+tasks. Unknown requirements make the bar unavailable, including when all known
+tasks are complete. Empty periods show No required work. No answer or attempt
+history is loaded for the class summary.
+
+Bars fill continuously, with red/orange/yellow/yellow-green/green bands at
+0/20/40/60/80 percent. Unfinished results are floored below 100%; only exact
+completion is labelled Complete. Counts and percentages accompany colors.
+The mobile layout shows full-width bars beneath names without horizontal scrolling.
+
+Names open the existing assigned-work view with the same class and date range.
+Show all work expands to the selected class's school year. Back navigation, profile
+tab changes and previous/next student navigation retain the period. The route
+preserves search, sorting, unfinished filter, page and return scroll position.
+Changing date ranges cancels obsolete reads, and failed requests show unavailable
+progress with retry rather than zero completion.
+
+Apply migration `20261104043424_class_trimester_progress.sql` before publishing the
+frontend. No new storage tables or student writes are introduced. Validate with
+`npm run test:class-progress`, the existing student insight UI smoke, and
+`npm run test:student-insight:database`. The database rehearsal creates a disposable
+schema-only clone, installs missing migrations, compares summary counts with the
+individual model, checks permissions/date boundaries/review revisions, then removes
+the clone. The new checks are included in normal validation and the existing CI
+student-insight database gate.
+
+## Feature ownership
+
 The teacher shell retains two asynchronous view commands, a strict roster-data
 command, synchronous session reset, and synchronous snapshot readers. It does
 not install roster/profile/provisioning methods after a dynamic import.

@@ -2,6 +2,8 @@ import { canOpenSchoolSection } from './services/schoolScope.js';
 import { schoolSessionKey } from './services/schoolScope.js';
 import { parseHashLocation, writeHashLocation } from './services/hashRouting.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
+import { readProgressContext, writeProgressContext } from './teacherClassProgressModel.js';
+import { readGradebookContext, writeGradebookContext } from './teacherGradebookRoute.js';
 
 const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
@@ -32,9 +34,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 const tab = ['overview', 'assigned', 'activity', 'account'].includes(params.get('tab'))
                     ? params.get('tab')
                     : 'overview';
-                return { view: 'student-profile', studentId: parts[2], tab, ...(params.has('class') ? { classId: params.get('class') } : {}) };
+                return { view: 'student-profile', studentId: parts[2], tab, ...(params.has('class') ? { classId: params.get('class') } : {}), ...readProgressContext(params), ...readGradebookContext(params) };
             }
-            if (parts[1] === STUDENTS_PAGE.id) return { view: STUDENTS_PAGE.id, ...(params.has('class') ? { classId: params.get('class') } : {}) };
+            if (parts[1] === STUDENTS_PAGE.id) return { view: STUDENTS_PAGE.id, ...(params.has('class') ? { classId: params.get('class') } : {}), ...readProgressContext(params), ...readGradebookContext(params) };
             if (parts[1] === GROUPS_PAGE.id) return { view: GROUPS_PAGE.id, ...(params.has('class') ? { classId: params.get('class') } : {}) };
             if (parts[1] === 'word-hunt') return { view: VOCABULARY_PAGE.id, mode: 'review' };
             if (parts[1] === SPARKS_PAGE.id && parts[2] === 'editor') return { view: 'spark-editor', materialId: parts[3] || null };
@@ -95,11 +97,19 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 if (route.view === 'review' && !route.tab) params.set('tab', route.assignmentId ? 'student-work' : 'needs-review');
                 return `#/teacher/${route.view === 'review' ? 'assignments' : route.view}${params.size ? `?${params}` : ''}`;
             }
-            if (route.view === STUDENTS_PAGE.id) return `#/teacher/${STUDENTS_PAGE.id}${route.classId ? `?class=${encodeURIComponent(route.classId)}` : ''}`;
+            if (route.view === STUDENTS_PAGE.id) {
+                const params = new URLSearchParams();
+                if (route.classId) params.set('class', route.classId);
+                writeProgressContext(params, route.progressContext);
+                writeGradebookContext(params, route.gradebookContext);
+                return `#/teacher/${STUDENTS_PAGE.id}${params.size ? `?${params}` : ''}`;
+            }
             if (route.view === 'student-profile' && route.studentId) {
                 const params = new URLSearchParams();
                 if (route.tab && route.tab !== 'overview') params.set('tab', route.tab);
                 if (route.classId) params.set('class', route.classId);
+                writeProgressContext(params, route.progressContext);
+                writeGradebookContext(params, route.gradebookContext);
                 const query = params.toString();
                 return `#/teacher/${STUDENTS_PAGE.id}/${encodeURIComponent(route.studentId)}${query ? `?${query}` : ''}`;
             }
@@ -330,7 +340,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             await this.showClassStudentsView(routeToApply);
                             break;
                         case 'student-profile':
-                            await this.showStudentProfileById(routeToApply.studentId, { tab: routeToApply.tab });
+                            await this.showStudentProfileById(routeToApply.studentId, { tab: routeToApply.tab, progressContext: routeToApply.progressContext, gradebookContext: routeToApply.gradebookContext });
                             break;
                         case GROUPS_PAGE.id:
                             await this.showGroupsView({ classId: routeToApply.classId });

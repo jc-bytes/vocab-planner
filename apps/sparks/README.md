@@ -94,6 +94,17 @@ UI_AUDIT_PASSWORD="password" \
 npm run test:ui:responsive
 ```
 
+Run the real-entry progress and vocabulary-grading checks with synthetic HTTP
+responses. These open the actual teacher and student apps, including auth, routing,
+lazy features, published grades, retry controls, and phone layouts. They never
+publish real grades or contact a hosted backend:
+
+```bash
+npm run test:ui:progress-grading
+# After a current production build, verify the same flow against its emitted files:
+UI_PROGRESS_GRADING_DIST=1 npm run test:ui:progress-grading
+```
+
 Run the release hardening suite:
 
 ```bash

@@ -1,5 +1,7 @@
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
+import { schoolContext } from './schoolContext.js';
+import { runOwnedMutation, serviceMutationIdentity } from './ownedMutation.js';
 
 export function canonicalStudentPair(studentAId, studentBId) {
     const pair = [String(studentAId || ''), String(studentBId || '')].sort();
@@ -18,7 +20,8 @@ export function mapTeacherGroupRestriction(row) {
     };
 }
 
-export function createTeacherGroupRestrictionsRepository(getClient, getSchoolId = requireSchoolId) {
+export function createTeacherGroupRestrictionsRepository(getClient, getSchoolId = requireSchoolId, ownership = {}) {
+ const write = (build, options) => runOwnedMutation(getClient, build, { ...ownership, ...options });
  return {
     async list() {
         const schoolId = getSchoolId();
@@ -32,11 +35,10 @@ export function createTeacherGroupRestrictionsRepository(getClient, getSchoolId 
         return (data || []).map(mapTeacherGroupRestriction);
     },
 
-    async create(studentAId, studentBId) {
+    async create(studentAId, studentBId, options) {
         const schoolId = getSchoolId();
-        const client = await getClient();
         const pair = canonicalStudentPair(studentAId, studentBId);
-        const { data, error } = await client
+        const data = await write(client => client
             .from('teacher_group_pair_restrictions')
             .insert({
                 school_id: schoolId,
@@ -44,20 +46,17 @@ export function createTeacherGroupRestrictionsRepository(getClient, getSchoolId 
                 student_b_id: pair.studentBId
             })
             .select('id, school_id, teacher_id, student_a_id, student_b_id, created_at')
-            .single();
-        if (error) throw error;
+            .single(), options);
         return mapTeacherGroupRestriction(data);
     },
 
-    async remove(id) {
+    async remove(id, options) {
         const schoolId = getSchoolId();
-        const client = await getClient();
-        const { error } = await client
+        await write(client => client
             .from('teacher_group_pair_restrictions')
             .delete()
             .eq('id', id)
-            .eq('school_id', schoolId);
-        if (error) throw error;
+            .eq('school_id', schoolId), options);
     }
  };
 }
@@ -65,4 +64,4 @@ export function createTeacherGroupRestrictionsRepository(getClient, getSchoolId 
 export const teacherGroupRestrictionsRepository = createTeacherGroupRestrictionsRepository(async () => {
     await supabaseService.init();
     return supabaseService.getClient();
-});
+}, requireSchoolId, { getIdentity: () => serviceMutationIdentity(supabaseService), context: schoolContext });

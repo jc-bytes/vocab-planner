@@ -1,6 +1,7 @@
 import { schoolContext } from './schoolContext.js';
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
+import { serviceMutationIdentity } from './ownedMutation.js';
 import { cleanUndefined, timestampToIso, toClientTimestamp } from './supabaseValues.js';
 
 export function mapSubjectRow(row) {
@@ -37,15 +38,18 @@ export const subjectsRepository = {
     },
     async saveAll(subjects = [], options = {}) {
         const schoolId = requireSchoolId();
+        const identity = serviceMutationIdentity(supabaseService);
+        const snapshot = JSON.parse(JSON.stringify(subjects));
         const generation = schoolContext.getGeneration();
         const isCurrent = () => generation === schoolContext.getGeneration() && (!options.isCurrent || options.isCurrent());
         const assertCurrent = () => {
             options.signal?.throwIfAborted();
-            if (!isCurrent()) throw new DOMException('Subject save session changed', 'AbortError');
+            if (!isCurrent() || serviceMutationIdentity(supabaseService).userId !== identity.userId
+                || serviceMutationIdentity(supabaseService).generation !== identity.generation) throw new DOMException('Subject save session changed', 'AbortError');
         };
         assertCurrent();
         const { saveTeacherSubjects } = await import('./teacherSubjectWrites.js');
         assertCurrent();
-        return saveTeacherSubjects(supabaseService, subjects, schoolId, { ...options, isCurrent });
+        return saveTeacherSubjects(supabaseService, snapshot, schoolId, { ...options, isCurrent, ownerUserId: identity.userId });
     }
 };

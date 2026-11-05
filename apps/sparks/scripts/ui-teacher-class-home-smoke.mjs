@@ -14,7 +14,7 @@ try {
  await page.goto(`${baseUrl}/teacher.html`);
  const bootstrap = async()=>{
   const {supabaseService}=await import('/js/supabaseService.js');const {schoolContext}=await import('/js/services/schoolContext.js');
-  supabaseService.init=async()=>{};supabaseService.getClient=()=>({rpc(name){const data=name==='list_school_years_v1'?[{year:2026,label:'2026'}]:name==='my_school_access_v1'?{schools:[{id:'school-a',name:'Test school',active:true,roles:['teacher']}]}:[];const q={abortSignal(){return q;},then(resolve){return Promise.resolve({data,error:null}).then(resolve);}};return q;}});
+  supabaseService.getClient=()=>({rpc(name){const data=name==='list_school_years_v1'?[{year:2026,label:'2026'}]:name==='my_school_access_v1'?{schools:[{id:'school-a',name:'Test school',active:true,roles:['teacher']}]}:[];const q={abortSignal(){return q;},then(resolve){return Promise.resolve({data,error:null}).then(resolve);}};return q;}});
   await schoolContext.load('teacher-a');
   const {installTeacherShellMethods}=await import('/js/teacherShell.js');const {installTeacherRoutingMethods}=await import('/js/teacherRouting.js');
   const {installTeacherLazyFeatureMethods}=await import('/js/teacherLazyFeatures.js');const {installTeacherOverviewMethods}=await import('/js/teacherOverview.js');

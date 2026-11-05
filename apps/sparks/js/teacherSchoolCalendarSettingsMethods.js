@@ -388,7 +388,7 @@ export const teacherSchoolCalendarSettingsMethods = {
     },
 
     recalculateLocalVocabularyPlacements(calendar) {
-        const vocabs = this.getLocalVocabs();
+        const vocabs = this.getLocalVocabs({ strict: true });
         let updated = 0;
         let skipped = 0;
 

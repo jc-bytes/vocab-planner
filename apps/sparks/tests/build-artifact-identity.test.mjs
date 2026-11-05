@@ -72,6 +72,15 @@ for (const change of ['edited', 'added', 'deleted']) test(`${change} application
     await assert.rejects(verifyBuildArtifact(f.root, f.output, { env: f.env }), /stale.*inputs/i);
 });
 
+test('editing bundled Ember artwork invalidates the retained application artifact', async t => {
+    const f = await fixture(t);
+    const artwork = 'assets/ember/01-follow-this-step.webp';
+    await put(f.root, artwork, 'original bundled artwork');
+    await stamp(f);
+    await put(f.root, artwork, 'revised bundled artwork');
+    await assert.rejects(verifyBuildArtifact(f.root, f.output, { env: f.env }), /stale.*inputs/i);
+});
+
 test('documentation, tests, dependencies, unlisted archives and private env values do not stale runtime bytes', async t => {
     const f = await fixture(t); await stamp(f);
     for (const name of ['docs/notes.md', 'tests/probe.mjs', 'node_modules/library.js',

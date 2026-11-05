@@ -1,3 +1,4 @@
+import { mutationClient } from './helpers/mutationClient.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTeacherGroupRestrictionsRepository } from '../js/services/teacherGroupRestrictionsRepository.js';
@@ -6,7 +7,7 @@ function fakeClient(result = { data: [], error: null }) {
  const calls=[];
  const builder={ then(resolve,reject){return Promise.resolve(result).then(resolve,reject);} };
  for (const method of ['from','select','eq','order','insert','single','delete']) builder[method]=(...args)=>{calls.push([method,...args]);return builder;};
- return {client:{from:(...args)=>{calls.push(['from',...args]);return builder;}},calls};
+ return {client:mutationClient({from:(...args)=>{calls.push(['from',...args]);return builder;}}),calls};
 }
 
 test('pairing preference reads retain the initiating school across asynchronous client initialization', async () => {

@@ -138,16 +138,19 @@ test('timed-out shared class readers settle and an ignored late transport cannot
     assert.equal(f.selection.ready, true);
 });
 
-test('an old gate deadline cannot cancel a replacement class read', async () => {
+test('an old gate deadline cannot cancel a replacement class read', async t => {
+    t.mock.timers.enable({ apis: ['setTimeout'] });
     const gate = deferred(), replacement = deferred();
     let reads = 0;
     const f = fixture({ listMyClasses: () => ++reads === 1 ? Promise.resolve([]) : replacement.promise });
     f.sm.activities.refreshCurrentSparkGate = () => gate.promise;
     const old = prepareArcadeEligibility(f.sm, { timeoutMs: 20 });
+    const timedOut = assert.rejects(old, { code: 'REQUEST_TIMEOUT' });
     while (!f.selection.ready) await new Promise(resolve => setImmediate(resolve));
     const next = f.selection.load({ forceRefresh: true });
     const controller = f.selection.controller;
-    await assert.rejects(old, { code: 'REQUEST_TIMEOUT' });
+    t.mock.timers.tick(20);
+    await timedOut;
     assert.equal(controller.signal.aborted, false);
     assert.notEqual(f.selection.pending, null);
     replacement.resolve([]);

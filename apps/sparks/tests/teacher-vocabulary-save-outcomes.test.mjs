@@ -28,6 +28,34 @@ const clone = value => JSON.parse(JSON.stringify(value));
 const turn = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; };
 
+test('public Publish succeeds remotely when draft reads fail and never replaces the unreadable library', async () => {
+    const f = fixture(), getItem = localStorage.getItem;
+    try {
+        f.seedDraft();
+        localStorage.getItem = () => { throw new DOMException('Fixture draft read denied', 'SecurityError'); };
+        await f.owner.publishVocabulary();
+        assert.equal(f.events.cloud.length, 1); assert.deepEqual(f.events.fallbacks, []);
+        assert.equal(f.owner.vocabSet.source, 'cloud'); assert.equal(f.events.successes.length, 1);
+        assert.deepEqual(f.events.errors, []);
+        localStorage.getItem = getItem;
+        assert.equal(f.owner.getLocalVocabs()[0].name, 'Earlier durable draft');
+    } finally { localStorage.getItem = getItem; f.close(); }
+});
+
+test('public Publish handles cloud and draft-read failures without overwriting earlier drafts', async () => {
+    const f = fixture(), getItem = localStorage.getItem;
+    try {
+        f.seedDraft(); f.failCloud();
+        localStorage.getItem = () => { throw new DOMException('Fixture draft read denied', 'SecurityError'); };
+        await f.owner.publishVocabulary();
+        assert.equal(f.events.cloud.length, 1); assert.equal(f.events.fallbacks.length, 1);
+        assert.equal(f.events.statuses.at(-1).text, 'Save failed');
+        assert.match(f.events.errors[0], /could not keep a draft/);
+        localStorage.getItem = getItem;
+        assert.equal(f.owner.getLocalVocabs()[0].name, 'Earlier durable draft');
+    } finally { localStorage.getItem = getItem; f.close(); }
+});
+
 function fixture() {
     storage.clear(); quota = false;
     const original = { save: vocabularyRepository.save, success: notifications.success, error: notifications.error,

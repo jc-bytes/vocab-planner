@@ -26,10 +26,17 @@ async function fixture(t, respond) {
     return { url: `http://127.0.0.1:${server.address().port}`, calls };
 }
 
-test('all nine exact signatures resolve with only anonymous browser credentials and harmless dummy arguments', async t => {
+test('all fourteen exact signatures resolve with only anonymous browser credentials and harmless dummy arguments', async t => {
     const f = await fixture(t);
     assert.deepEqual((await verifyOwnedRpcReadiness({ url: f.url, key })).verified, Object.keys(OWNED_RPC_PROBES));
-    assert.equal(f.calls.length, 9);
+    assert.deepEqual(Object.keys(OWNED_RPC_PROBES), [
+        'save_class_response_owned_v1', 'check_class_spark_owned_v1', 'start_student_activity_attempt_owned_v1',
+        'submit_student_game_score_owned_v1', 'start_student_arcade_minute_owned_v1', 'recover_student_arcade_minute_owned_v1',
+        'list_student_identity_roster_by_ids_school_owned_v1', 'set_school_setting_owned_v1', 'set_school_year_owned_v1',
+        'teacher_set_assignment_grading_v1', 'teacher_publish_vocabulary_grades_v1',
+        'teacher_class_progress_v1', 'teacher_class_gradebook_v1', 'my_class_vocabulary_grades_v1'
+    ]);
+    assert.equal(f.calls.length, 14);
     for (const call of f.calls) {
         const name = call.path.split('/').at(-1);
         assert.equal(call.method, 'POST');
@@ -37,13 +44,18 @@ test('all nine exact signatures resolve with only anonymous browser credentials 
         assert.equal(call.headers.authorization, undefined);
         assert.equal(call.headers['x-expected-owner'], undefined);
         assert.deepEqual(call.body, OWNED_RPC_PROBES[name]);
-        assert.equal(call.body.p_expected_user_id, '00000000-0000-0000-0000-000000000000');
+        if (name === 'teacher_class_progress_v1' || name === 'teacher_class_gradebook_v1') {
+            assert.deepEqual(call.body, { p_school_id: '00000000-0000-0000-0000-000000000000',
+                p_class_id: '00000000-0000-0000-0000-000000000000', p_from: '2000-01-01', p_to: '2000-01-01' });
+        } else if (name === 'my_class_vocabulary_grades_v1') {
+            assert.deepEqual(call.body, { p_school_id: '00000000-0000-0000-0000-000000000000', p_class_id: '00000000-0000-0000-0000-000000000000' });
+        } else assert.equal(call.body.p_expected_user_id, '00000000-0000-0000-0000-000000000000');
     }
 });
 
 test('legacy anon keys are accepted and authenticated denial status is tolerated without using a user session', async t => {
     const f = await fixture(t, (_call, name) => ({ status: 403, body: { code: '42501', message: `permission denied for function ${name}` } }));
-    assert.equal((await verifyOwnedRpcReadiness({ url: f.url, key: jwt('anon') })).verified.length, 9);
+    assert.equal((await verifyOwnedRpcReadiness({ url: f.url, key: jwt('anon') })).verified.length, 14);
 });
 
 test('secret, service-role, signed-in and malformed keys reject before dispatch', async () => {
@@ -106,8 +118,22 @@ test('CLI logs only a count on success or a fixed diagnostic on failure', async 
     const f = await fixture(t);
     const lines = [], output = { log: value => lines.push(value), error: value => lines.push(value) };
     assert.equal(await runReadinessCli({ SUPABASE_URL: f.url, SUPABASE_PUBLISHABLE_KEY: key }, output), 0);
-    assert.deepEqual(lines, ['Verified anonymous execution denial for 9 required owned RPCs.']);
+    assert.deepEqual(lines, ['Verified anonymous execution denial for 14 required RPCs.']);
     const missing = await fixture(t, () => ({ status: 404, body: { code: key, message: `private ${key}` } }));
     assert.equal(await runReadinessCli({ SUPABASE_URL: missing.url, SUPABASE_PUBLISHABLE_KEY: key }, output), 1);
     assert.ok(lines.every(line => !line.includes(key) && !line.includes(f.url) && !line.includes('private')));
 });
+
+for (const missing of ['teacher_class_progress_v1', 'teacher_class_gradebook_v1', 'my_class_vocabulary_grades_v1']) {
+    test(`missing or anonymously exposed ${missing} blocks publishing even when grading writes exist`, async t => {
+        for (const result of [
+            { status: 404, body: { code: 'PGRST202', message: 'Missing exact read signature' } },
+            { status: 200, body: { grades: [] } }
+        ]) {
+            const f = await fixture(t, (_call, name) => name === missing ? result : undefined);
+            await assert.rejects(verifyOwnedRpcReadiness({ url: f.url, key }), error => error.message.startsWith(`Required RPC ${missing} `));
+            assert.ok(f.calls.some(call => call.path.endsWith('/teacher_publish_vocabulary_grades_v1')));
+            assert.equal(f.calls.at(-1).path, `/rest/v1/rpc/${missing}`);
+        }
+    });
+}

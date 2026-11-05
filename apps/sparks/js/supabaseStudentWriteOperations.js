@@ -1,3 +1,4 @@
+import { runOwnedMutation, serviceMutationIdentity } from './services/ownedMutation.js';
 import { mapScoreRow } from './services/supabaseValues.js';
 
 const firstRow = (data) => Array.isArray(data) ? data[0] : data;
@@ -167,49 +168,52 @@ export const studentWriteOperations = Object.freeze({
     },
     spendStudentCoins: async function spendStudentCoins(payload = {}, options = {}) {
         assertCoinOperationCurrent(options);
-        let query = this.client.rpc('spend_student_coins_v2', {
+        const params = {
             p_event_id: payload.eventId,
             p_amount: Number(payload.amount) || 0,
             p_source: payload.source || 'game',
             p_description: payload.description || 'Spent on game',
             p_client_id: payload.clientId || ''
+        };
+        const data = await runOwnedMutation(() => this.client, client => client.rpc('spend_student_coins_v2', params), {
+            getIdentity: () => serviceMutationIdentity(this), ownerUserId: options.ownerUserId,
+            signal: options.signal, isCurrent: options.isCurrent
         });
-        if (options.signal && typeof query.abortSignal === 'function') query = query.abortSignal(options.signal);
-        const { data, error } = await query;
         assertCoinOperationCurrent(options);
-        if (error) throw error;
         return firstRow(data);
     },
     acceptStudentGiftCoins: async function acceptStudentGiftCoins(payload = {}, options = {}) {
         assertCoinOperationCurrent(options);
-        let query = this.client.rpc('accept_student_gift_coins_v2', {
+        const params = {
             p_event_id: payload.eventId,
             p_client_id: payload.clientId || ''
+        };
+        const data = await runOwnedMutation(() => this.client, client => client.rpc('accept_student_gift_coins_v2', params), {
+            getIdentity: () => serviceMutationIdentity(this), ownerUserId: options.ownerUserId,
+            signal: options.signal, isCurrent: options.isCurrent
         });
-        if (options.signal && typeof query.abortSignal === 'function') query = query.abortSignal(options.signal);
-        const { data, error } = await query;
         assertCoinOperationCurrent(options);
-        if (error) throw error;
         return firstRow(data);
     },
     claimStudentWelcomeBonus: async function claimStudentWelcomeBonus(payload = {}, options = {}) {
         options.isCurrent?.();
-        const { data, error } = await this.client.rpc('claim_student_welcome_bonus_v2', {
+        const params = {
             p_event_id: payload.eventId,
             p_client_id: payload.clientId || ''
+        };
+        const data = await runOwnedMutation(() => this.client, client => client.rpc('claim_student_welcome_bonus_v2', params), {
+            getIdentity: () => serviceMutationIdentity(this), ownerUserId: options.ownerUserId,
+            signal: options.signal, isCurrent: options.isCurrent
         });
-        if (error) throw error;
         return firstRow(data);
     },
     giftStudentCoins: async function giftStudentCoins(payload = {}, options = {}) {
         options.isCurrent?.();
-        const { data, error } = await this.client.rpc('gift_student_coins_v2', {
-            p_event_id: payload.eventId,
-            p_student_id: payload.studentId,
-            p_amount: Number(payload.amount) || 0,
-            p_message: payload.message || 'Gift from teacher'
+        const params = { p_event_id: payload.eventId, p_student_id: payload.studentId,
+            p_amount: Number(payload.amount) || 0, p_message: payload.message || 'Gift from teacher' };
+        const data = await runOwnedMutation(() => this.client, client => client.rpc('gift_student_coins_v2', params), {
+            getIdentity: () => serviceMutationIdentity(this), signal: options.signal, isCurrent: options.isCurrent
         });
-        if (error) throw error;
         return firstRow(data);
     },
     submitStudentGameScore: async function submitStudentGameScore(payload = {}, options = {}) {

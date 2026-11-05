@@ -10,6 +10,7 @@ import { studentApi as supabaseService } from '../services/studentApi.js';
 import { requestWithTimeout } from '../services/requestReliability.js';
 import { SessionInitializationCoordinator } from '../services/sessionInitialization.js';
 import { serverStateQuery } from '../services/serverStateQuery.js';
+import { setLoginHint } from '../services/loginHint.js';
 import { StudentAuthUi } from '../studentAuthUiMethods.js';
 import {
     getActiveStudentStorageOwner,
@@ -134,7 +135,7 @@ export class StudentAuth {
         }
         setActiveStudentStorageOwner(user.uid);
         this.sm.currentUser = user;
-        localStorage.setItem('was_logged_in', 'true');
+        setLoginHint(true);
         // Restore the last verified local snapshot before making any network call.
         // This keeps the signed-in shell useful when the device starts offline.
         if (!sameUser || ownerChanged) this.sm.progress.loadLocalProgress({ ownerUserId: user.uid });
@@ -280,7 +281,7 @@ export class StudentAuth {
         };
         this.sm.progress.resetSessionState();
         setActiveStudentStorageOwner('local-dev');
-        localStorage.removeItem('was_logged_in');
+        setLoginHint(false);
         this.updateGuestStatus(true);
         this.setAuthStatus('Signed out');
         this.sm.authInitialized = false;

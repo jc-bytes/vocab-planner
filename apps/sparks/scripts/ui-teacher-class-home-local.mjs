@@ -17,17 +17,19 @@ try{
  await page.goto(`${baseUrl}/teacher.html`);
  await page.locator('#teacher-email').fill(AUDIT_TEACHER_EMAIL);await page.locator('#teacher-password').fill(AUDIT_PASSWORD);
  await page.locator('#teacher-login-form button[type=submit]').click();
- const home=page.locator('#teacher-overview-view'),classes=page.locator('#teacher-classes-view');
+ const home=page.locator('#teacher-overview-view'),classes=page.locator('#teacher-classes-view'),students=page.locator('#teacher-class-students-view');
  await home.getByRole('button',{name:/^Open class /}).first().waitFor({timeout:30000});
  await page.waitForFunction(()=>document.querySelector('main.teacher-main').getBoundingClientRect().left>=document.querySelector('#teacher-tab-shell').getBoundingClientRect().right-1);
  await assertNoAccessibilityViolations(page,'Authenticated class home',{include:['#teacher-overview-view','#teacher-class-switcher','#teacher-tab-shell']});
  await page.screenshot({path:`${output}/home-desktop.png`,fullPage:true});
  await home.getByRole('button',{name:/^Open class /}).first().click();
- await classes.getByRole('tab',{name:'Classwork',exact:true}).waitFor();
+ await classes.getByRole('button',{name:'Current',exact:true}).waitFor();
  await page.waitForFunction(()=>document.querySelector('#teacher-classes-view').getAttribute('aria-busy')==='false');
  const classId=await page.getByLabel('Current class',{exact:true}).inputValue();assert.ok(classId);
- await classes.getByRole('tab',{name:'Students',exact:true}).click();
- await page.waitForFunction(()=>document.querySelector('#teacher-classes-view').getAttribute('aria-busy')==='false');
+ await page.locator('#tab-students').click();
+ await page.waitForFunction(()=>document.querySelector('#teacher-class-students-view.active')?.getAttribute('aria-busy')==='false');
+ assert.equal(await page.locator('#tab-students').getAttribute('aria-selected'),'true');
+ assert.equal(await students.getByRole('tab').count(),0);
  await page.screenshot({path:`${output}/students-desktop.png`,fullPage:true});
  await page.locator('#tab-assignments').click();await page.waitForFunction(()=>document.querySelector('#teacher-assignments-view').getAttribute('aria-busy')==='false');
  assert.match(await page.evaluate(()=>location.hash),new RegExp(`class=${classId}`));
@@ -35,7 +37,7 @@ try{
  assert.equal(await page.getByLabel('Current class',{exact:true}).inputValue(),classId);
  await page.locator('#tab-classes').click();await page.waitForFunction(()=>document.querySelector('#teacher-classes-view').getAttribute('aria-busy')==='false');
  assert.equal(await page.getByLabel('Current class',{exact:true}).inputValue(),classId);
- await page.reload();await classes.getByRole('tab',{name:'Classwork',exact:true}).waitFor();
+ await page.reload();await classes.getByRole('button',{name:'Current',exact:true}).waitFor();
  assert.equal(await page.getByLabel('Current class',{exact:true}).inputValue(),classId);
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});

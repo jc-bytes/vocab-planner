@@ -9,15 +9,17 @@ const aborted = () => new DOMException('The unit menu changed.', 'AbortError');
 
 export class StudentActivityMenu {
     constructor(activities, { load = () => import('./studentUnitWorkspace.js'), loadStyles = loadMenuStyles,
-        loadReportGenerator = () => import('../reportGenerator.js'), timeoutMs = 10000 } = {}) {
+        loadReportGenerator = () => import('../reportGenerator.js'), loadGradePanel = () => import('./studentVocabularyGradePanel.js'), timeoutMs = 10000 } = {}) {
         this.activities = activities; this.sm = activities.sm;
         this.load = load; this.loadStyles = loadStyles; this.loadReportGenerator = loadReportGenerator; this.timeoutMs = timeoutMs;
         this.epoch = 0; this.controller = new AbortController(); this.workspace = null; this.module = null; this.presentationReady = false;
         this.renderGeneration = 0; this.isPreparing = false;
+        this.loadGradePanel = loadGradePanel; this.gradePanel = null;
     }
     resetForSession() {
         this.epoch++; this.controller.abort(); this.controller = new AbortController();
         this.workspace?.dispose(); this.workspace = null; this.module = null; this.presentationReady = false;
+        this.gradePanel?.dispose(); this.gradePanel = null;
         this.renderGeneration++; this.isPreparing = false;
     }
     capture() {
@@ -85,6 +87,8 @@ export class StudentActivityMenu {
         const view = document.getElementById('activity-menu-view');
         const grid = view?.querySelector('.activities-grid');
         if (!view || !grid) return;
+        this.gradePanel?.dispose(); this.gradePanel = null;
+        view.querySelector('.student-vocabulary-grade-error')?.remove();
         this.isPreparing = true;
         setStudentPageLoading(view, true);
         grid.innerHTML = getStudentPageSkeleton('unit', 'Loading unit');
@@ -97,7 +101,10 @@ export class StudentActivityMenu {
         this.sm.switchView('activity-menu-view');
         try {
             const workspace = await this.prepare(lease);
-            if (current()) workspace.render(this.snapshot(lease), options);
+            if (current()) {
+                workspace.render(this.snapshot(lease), options);
+                void this.showPublishedGrade(lease, current, view);
+            }
         } catch (error) {
             if (!current()) return;
             grid.innerHTML = '<div role="alert" class="unit-menu-load-error"><h2>Unit did not load</h2><p>Check Wi-Fi and try again. If retrying does not help, reload the page.</p><button type="button" class="btn primary-btn" data-unit-menu-retry>Try again</button></div>';
@@ -105,6 +112,29 @@ export class StudentActivityMenu {
         } finally {
             if (generation === this.renderGeneration) this.isPreparing = false;
             if (current()) setStudentPageLoading(view, false);
+        }
+    }
+    async showPublishedGrade(lease, current, view) {
+        const vocab = this.sm.currentVocab;
+        if (!vocab?.assignmentId || this.sm.authDisabled || this.sm.isTeacherUnitPreview === true) return;
+        const selection = this.activities.vocabularyData?.classSelection;
+        const classId = vocab.classId || selection?.selectedId;
+        if (!classId) return;
+        const classGeneration = selection?.generation;
+        const currentGrade = () => current() && classId === (this.sm.currentVocab?.classId || this.activities.vocabularyData?.classSelection?.selectedId)
+            && (!selection || selection === this.activities.vocabularyData?.classSelection && classGeneration === selection.generation);
+        try {
+            const module = await this.loadGradePanel();
+            if (!currentGrade()) return;
+            this.gradePanel?.dispose();
+            this.gradePanel = module.mountStudentVocabularyGradePanel({ root: view, assignmentId: vocab.assignmentId, classId,
+                isCurrent: currentGrade, signals: [lease.lifecycle, lease.navigation].filter(Boolean),
+                ...(selection?.repository ? { repository: selection.repository } : {}) });
+        } catch {
+            if (!currentGrade()) return;
+            const message = document.createElement('p'); message.className = 'student-vocabulary-grade-error';
+            message.textContent = 'Published grades could not be loaded. Reopen this vocabulary to try again.';
+            view.querySelector('.activities-grid')?.before(message);
         }
     }
     refreshVisible() {

@@ -1,6 +1,6 @@
 # Sparks architecture
 
-This is the practical map for extending Sparks. It describes current ownership and the shortest safe path for common changes. Detailed decisions and completed migrations are recorded in `docs/architecture-remediation.md`. The current audit and repair evidence is in `docs/architecture-audit-2026-10-26-pass4.md`, following `docs/architecture-audit-2026-10-25-pass3.md` and the earlier passes. Earlier assessments remain in `docs/architecture-audit-2026-10-07.md` and `docs/architecture-audit-2026-08-30.md`.
+This is the practical map for extending Sparks. It describes current ownership and the shortest safe path for common changes. Detailed decisions and completed migrations are recorded in `docs/architecture-remediation.md`. The current audit and repair evidence is in `docs/architecture-audit-2026-11-04.md`. Previous passes remain in `docs/architecture-audit-2026-10-26-pass4.md`, `docs/architecture-audit-2026-10-25-pass3.md` and the earlier dated audits.
 
 The repository and classroom system are called Sparks. The currently shipped HTML titles, npm package, Tauri product, and desktop bundle retain the historical product name Vocabulary Master; changing those together is a separate product-release decision.
 
@@ -47,6 +47,12 @@ Sparks is a vanilla JavaScript multi-page Vite application with three entries:
 | Selected profile exports with captured actor, school and global ordering | `js/services/teacherExportRepository.js`, `list_student_identity_roster_by_ids_school_owned_v1`; see `docs/selected-profile-export.md` |
 | Teacher lazy-feature composition | `js/teacherLazyFeatures.js` |
 | Private teacher roster/profile UI and lifecycle | `js/teacherStudentProgressFeature.js` |
+| Teacher class progress periods and gradebook screen selection | `js/teacherClassWorkspace.js`, `js/teacherClassProgressModel.js`, `js/teacherClassProgressView.js`, and lazy `js/teacherVocabularyGradebook.js` |
+| Opt-in grading settings, live calculations and immutable publications | `js/teacherVocabularyGradingSettings.js`, `js/vocabularyGrading.js`, and the private grading SQL; see `docs/vocabulary-grading-audit-2026-11-04.md` |
+| Student display of server-published vocabulary grades | `js/student/studentVocabularyGradePanel.js`, prepared by the assigned activity menu |
+| Captured account/session/school for repository mutations | `js/services/ownedMutation.js`; credentials belong to one request, never shared client headers |
+| Teacher profile actions across confirmations and prompts | `js/teacherStudentProgressOwner.js` |
+| Optional login presentation hints | `js/services/loginHint.js`; authentication and sign-out do not depend on storage |
 | Strict teacher roster data bridge and synchronous reset epoch | `js/teacherStudentProgress.js`; view navigation never swallows data errors |
 | Top-level teacher page IDs and view IDs | `js/teacherPageRegistry.js` |
 | Teacher route parsing and application | `js/teacherRouting.js` |
@@ -165,6 +171,19 @@ First-party UI does not build Supabase queries. Use these boundaries:
 `serverStateQuery.js` captures account lifetime and school generation before asynchronous work. Reads default to school scope; use `scope: 'account'` only for data shared across that account's schools, such as the wallet summary. Cleanup invalidates old account lifetimes before awaiting cancellation. Keep ownership checks before dispatch and after awaited results; a cache key alone cannot protect a dynamically scoped repository request.
 
 Do not wrap every repository. Add a new interface only for a real security boundary, alternate implementation, platform boundary, or needed test double. For transactional multi-record behavior, add a domain RPC instead of a generic client batch.
+
+Mutating repositories use `runOwnedMutation` with a synchronous production identity
+getter and school context. Capture before the first await, snapshot mutable inputs,
+and retain caller generations and abort signals. Custom adapters with replaceable
+clients must provide their initiating identity or `ownerUserId`; otherwise their
+first resolved session defines the actor. Existing server-owned RPCs keep their
+expected-user argument. A request already sent can commit as its original actor,
+so a cancelled result is not rollback proof and must not trigger automatic replay.
+
+Optional catalogue draft reads may recover from denied storage. Read-modify-write
+operations require strict reads so unavailable or malformed storage cannot erase
+an existing library. Let the save coordinator handle failed local writes alongside
+independent cloud publication.
 
 Environment URLs and browser-key validation live in `config/supabase-config.js`. Browser builds accept publishable or legacy anonymous keys and reject secret/service-role keys. Local Supabase CLI identity and deployment credentials remain separate authorities.
 

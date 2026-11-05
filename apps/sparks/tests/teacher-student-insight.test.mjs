@@ -35,7 +35,7 @@ test('zero scores stay zero and old untimed zeros stay unavailable',()=>{
 
 test('reading-only and optional checks do not create invented missing required submissions',()=>{
  const result=buildStudentInsight({assignments:[assignment({kind:'spark',content:{checkMode:'reading_only'}}),assignment({kind:'spark',content:{checkMode:'optional'}})]},now);
- assert.equal(result.summary.required,0);assert.equal(result.summary.unknown,2);
+ assert.equal(result.summary.required,0);assert.equal(result.summary.unknown,0);
 });
 
 test('attention reasons are evidence-based and long foreground time alone produces no concern',()=>{

@@ -1,3 +1,4 @@
+import { mutationClient } from './helpers/mutationClient.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
@@ -151,6 +152,8 @@ test('real coin service forwards cancellation without adding client predicates t
         const call = { name, args }; calls.push(call);
         return { abortSignal(signal) { call.signal = signal; return this; }, then(resolve) { return Promise.resolve({ data: wallet, error: null }).then(resolve); } };
     } } };
+    service.currentUser = { uid: 'student-a' };
+    service.client = mutationClient(service.client, 'student-a');
     installSupabaseStudentWriteMethods(service);
     const controller = new AbortController();
     for (const method of ['acceptStudentGiftCoins', 'spendStudentCoins']) {

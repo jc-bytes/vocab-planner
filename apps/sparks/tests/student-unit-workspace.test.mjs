@@ -40,6 +40,35 @@ test('warm workspace is retained across units, with a fresh per-render snapshot'
     menu.resetForSession(); assert.equal(calls.disposals, 1);
 });
 
+test('published grade presentation is lazy and rejects a held import after the student changes', async () => {
+    const held = deferred(); let mounts = 0;
+    const f = fixture({ loadGradePanel: () => held.promise });
+    f.sm.currentVocab.classId = 'class-a';
+    const lease = f.menu.capture();
+    const pending = f.menu.showPublishedGrade(lease, lease.current, {});
+    f.sm.currentUser = { uid: 'b' };
+    held.resolve({ mountStudentVocabularyGradePanel() { mounts++; } });
+    await pending;
+    assert.equal(mounts, 0);
+});
+
+test('published grade panel receives the actual assignment class and is disposed on reset', async () => {
+    let captured, disposals = 0;
+    const f = fixture({ loadGradePanel: async () => ({ mountStudentVocabularyGradePanel(options) {
+        captured = options; return { dispose() { disposals++; } };
+    } }) });
+    f.sm.currentVocab.classId = 'actual-class';
+    f.activities.vocabularyData = { classSelection: { selectedId: 'different-class', generation: 1 } };
+    const lease = f.menu.capture();
+    await f.menu.showPublishedGrade(lease, lease.current, {});
+    assert.equal(captured.classId, 'actual-class');
+    assert.equal(captured.assignmentId, 'unit-a');
+    assert.equal(captured.isCurrent(), true);
+    f.menu.resetForSession();
+    assert.equal(disposals, 1);
+    assert.equal(captured.isCurrent(), false);
+});
+
 for (const change of ['account', 'unit', 'session', 'cloud', 'school', 'navigation-roundtrip', 'reset']) {
     test(`held Menu preparation cannot create UI after ${change}`, async () => {
         const held = deferred(); const f = fixture({ load: () => held.promise });

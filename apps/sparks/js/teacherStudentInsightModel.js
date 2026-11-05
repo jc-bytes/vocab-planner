@@ -11,7 +11,7 @@ export function buildStudentInsight({ assignments = [] } = {}, now = Date.now())
         const configured = assignment.content?.activitySettings?.requiredActivities;
         const checkMode = assignment.content?.checkMode ?? assignment.content?.check_mode;
         const readingRequired = assignment.kind === 'spark' && checkMode === 'required';
-        const known = assignment.kind === 'spark' ? readingRequired : Array.isArray(configured);
+        const known = assignment.kind === 'spark' ? ['required', 'optional', 'reading_only'].includes(checkMode) : Array.isArray(configured);
         const required = new Set(Array.isArray(configured) ? configured : []);
         const recorded = new Map((assignment.progress || []).map(p => [p.activity_type, p]));
         const activities = assignment.kind === 'spark' ? [] : [...new Set([...required, ...recorded.keys()])].map(type => {

@@ -1,5 +1,12 @@
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
+import { schoolContext } from './schoolContext.js';
+import { runOwnedMutation, serviceMutationIdentity } from './ownedMutation.js';
+
+const write = (build, options) => runOwnedMutation(async () => {
+    await supabaseService.init();
+    return supabaseService.getClient();
+}, build, { getIdentity: () => serviceMutationIdentity(supabaseService), context: schoolContext, ...options });
 import { cleanUndefined, normalizeTextArray, timestampToIso, toClientTimestamp } from './supabaseValues.js';
 import { normalizeSparkCheckMode, normalizeSparkQuestions } from '../sparkCheckModel.js';
 import { readCollection } from './readCollection.js';
@@ -65,22 +72,16 @@ export const sparksRepository = {
         if (error) throw error;
         return (data || []).map(mapSparkRow);
     },
-    async save(id, spark = {}) {
+    async save(id, spark = {}, options) {
         const schoolId = requireSchoolId();
-        await supabaseService.init();
-        const payload = sparkPayload({ ...spark, updatedAt: spark.updatedAt || new Date().toISOString() }, id);
-        const { error } = await supabaseService.getClient()
-            .from('weekly_sparks').upsert({ ...payload, school_id: schoolId }, { onConflict: 'id' });
-        if (error) throw error;
+        const payload = JSON.parse(JSON.stringify(sparkPayload({ ...spark, updatedAt: spark.updatedAt || new Date().toISOString() }, id)));
+        await write(client => client.from('weekly_sparks').upsert({ ...payload, school_id: schoolId }, { onConflict: 'id' }), options);
         return { id, ...spark };
     },
-    async update(id, patch = {}) {
+    async update(id, patch = {}, options) {
         const schoolId = requireSchoolId();
-        await supabaseService.init();
-        const { id: _id, ...payload } = sparkPayload({ ...patch, updatedAt: patch.updatedAt || new Date().toISOString() }, id);
-        const { data, error } = await supabaseService.getClient()
-            .from('weekly_sparks').update(payload).eq('school_id', schoolId).eq('id', id).select('*').maybeSingle();
-        if (error) throw error;
+        const { id: _id, ...payload } = JSON.parse(JSON.stringify(sparkPayload({ ...patch, updatedAt: patch.updatedAt || new Date().toISOString() }, id)));
+        const data = await write(client => client.from('weekly_sparks').update(payload).eq('school_id', schoolId).eq('id', id).select('*').maybeSingle(), options);
         if (data) return mapSparkRow(data);
         throw new Error('This material is unavailable in the selected school.');
     }

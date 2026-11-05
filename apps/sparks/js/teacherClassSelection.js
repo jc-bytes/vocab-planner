@@ -45,7 +45,7 @@ export function installTeacherClassSelectionMethods(TeacherManager, { sessionKey
             const classId = route.classId || this.getSelectedTeacherClassId();
             if (!classId) return { view: 'overview' };
             this.selectTeacherClass(classId);
-            if (route.view === 'students' || (route.view === 'classes' && route.tab === 'students')) return { view: 'students', classId };
+            if (route.view === 'students' || (route.view === 'classes' && route.tab === 'students')) return { view: 'students', classId, ...(route.progressContext ? { progressContext: route.progressContext } : {}), ...(route.gradebookContext ? { gradebookContext: route.gradebookContext } : {}) };
             return { ...route, classId, ...(route.view === 'classes' ? { tab: route.tab === 'students' ? 'students' : 'work' } : {}) };
         },
         updateTeacherClassOptions(classes) {
@@ -70,7 +70,7 @@ export function installTeacherClassSelectionMethods(TeacherManager, { sessionKey
                 return;
             }
             const next = !classId ? { view: 'overview' }
-                : route.view === 'students' || route.view === 'student-profile' || (route.view === 'classes' && route.tab === 'students') ? { view: 'students', classId }
+                : route.view === 'students' || route.view === 'student-profile' || (route.view === 'classes' && route.tab === 'students') ? { view: 'students', classId, ...(route.progressContext ? { progressContext: { ...route.progressContext, offset: 0, scroll: 0 } } : {}), ...(route.gradebookContext ? { gradebookContext: { ...route.gradebookContext, offset: 0, scroll: 0, studentId: '' } } : {}) }
                 : route.view === 'classes' ? { view: 'classes', classId, tab: 'work' }
                 : ['assignments', 'review'].includes(route.view) ? { view: 'assignments', classId, tab: route.listTab || (route.assignmentId ? 'current' : route.tab) }
                 : route.view === 'groups' ? { view: 'groups', classId }

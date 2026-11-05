@@ -6,14 +6,18 @@ import { readCollection } from '../js/services/readCollection.js';
 
 // Exercise real repository paths, not only the timeout helper in isolation.
 test('classroom read RPC deadlines abort held transport without replay', async () => {
-    let transport, calls = 0;
-    const repository = createClassroomRepository(async () => ({ rpc() {
-        calls++;
-        return { abortSignal(signal) { transport = signal; return new Promise(() => {}); } };
-    } }), () => 'school-a');
-    await assert.rejects(repository.listClasses({ timeoutMs: 10 }), error => error.code === 'REQUEST_TIMEOUT');
-    assert.equal(calls, 1);
-    assert.equal(transport.aborted, true);
+    for (const method of ['listClasses', 'classProgress', 'classGradebook']) {
+        let transport, calls = 0;
+        const repository = createClassroomRepository(async () => ({ rpc() {
+            calls++;
+            return { abortSignal(signal) { transport = signal; return new Promise(() => {}); } };
+        } }), () => 'school-a');
+        const pending = method === 'listClasses' ? repository[method]({ timeoutMs: 10 })
+            : repository[method]('class-a', '2026-09-01', '2026-12-31', { timeoutMs: 10 });
+        await assert.rejects(pending, error => error.code === 'REQUEST_TIMEOUT');
+        assert.equal(calls, 1);
+        assert.equal(transport.aborted, true);
+    }
 });
 
 test('a held school-access read cancels even when its transport ignores abort', async () => {

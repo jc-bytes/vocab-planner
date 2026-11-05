@@ -85,7 +85,6 @@ try {
     await page.evaluate(async () => {
         const { schoolContext } = await import('/js/services/schoolContext.js');
         const { supabaseService } = await import('/js/supabaseService.js');
-        supabaseService.init=async()=>{};
         window.originalGetClient = supabaseService.getClient;
         supabaseService.getClient = () => ({rpc: () => {const q = {abortSignal(){return q;},then(resolve){return Promise.resolve({data:{schools:[{id:'school-a',roles:['school_admin'],active:true}]},error:null}).then(resolve);}};return q;}});
         await schoolContext.load('teacher-a');
@@ -329,7 +328,7 @@ try {
     await page.evaluate(()=>window.loadingResolvers.students.resolve([{studentId:'stale',name:'Stale student',email:'stale@example.org'}]));
     assert.equal(await page.getByText('Stale student',{exact:true}).count(),0);
     await page.evaluate(()=>window.loadingResolvers.work.reject(new Error('Work request failed')));
-    await page.getByRole('alert').getByText('Could not load classes. Check your connection and try again.',{exact:true}).waitFor();
+    await page.getByText('Work request failed',{exact:true}).waitFor();
     assert.equal(await page.locator('.class-workspace-loading').count(),0);
     assert.equal(await page.locator('main').getAttribute('aria-busy'),'false');
     await page.getByRole('button',{name:'Try again',exact:true}).click();

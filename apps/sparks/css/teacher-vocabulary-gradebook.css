@@ -1,0 +1,79 @@
+/* Vocabulary grading is scoped to this workspace and its own dialogs. */
+.vocabulary-gradebook { display: grid; gap: 1rem; min-width: 0; }
+.vocabulary-gradebook-heading h3 { margin: 0; font-size: 1.25rem; font-weight: 650; letter-spacing: -.025em; }
+.vocabulary-gradebook-heading p, .vocabulary-gradebook-footnote { margin: .3rem 0 0; color: var(--color-text-muted); font-size: .8rem; line-height: 1.55; }
+.vocabulary-gradebook-toolbar { display: grid; grid-template-columns: minmax(9rem, 11rem) minmax(12rem, 22rem) max-content; align-items: end; justify-content: start; gap: .75rem; padding: .25rem 0 1rem; border-bottom: 1px solid var(--color-border); }
+.vocabulary-gradebook-toolbar label, .vocabulary-gradebook-dates label, .vocabulary-gradebook-mobile > label { display: grid; gap: .35rem; margin: 0; font-size: .75rem; color: var(--color-text-muted); }
+.classrooms .vocabulary-gradebook input:not([type="checkbox"]), .classrooms .vocabulary-gradebook select { box-sizing: border-box; width: 100%; max-width: none; min-width: 0; min-height: 2.75rem; margin: 0; padding: .55rem .75rem; border: 1px solid var(--color-border-interactive, var(--color-border)); border-radius: .5rem; background-color: var(--color-surface); color: var(--color-text); font: inherit; font-size: .85rem; }
+.vocabulary-gradebook-options { position: relative; }
+.classrooms .vocabulary-gradebook-options > summary { display: flex; align-items: center; justify-content: center; list-style: none; min-height: 2.75rem; padding: .55rem 1rem; border: 1px solid var(--color-border-interactive, var(--color-border)); border-radius: .5rem; color: var(--color-text); font-size: .85rem; cursor: pointer; }
+.vocabulary-gradebook-options > summary::-webkit-details-marker { display: none; }
+.vocabulary-gradebook-options > summary::after { content: '⌄'; margin-left: .65rem; color: var(--color-text-muted); }
+.vocabulary-gradebook-options-body { position: absolute; z-index: 8; top: calc(100% + .5rem); right: 0; display: grid; gap: 1rem; width: 15rem; max-width: calc(100vw - 3rem); padding: 1rem; border: 1px solid var(--color-border); border-radius: .65rem; background: var(--color-surface-container-high, #222a3d); box-shadow: 0 .5rem 1.5rem rgb(0 0 0 / .2); }
+.classrooms label.vocabulary-gradebook-check { display: flex; align-items: center; gap: .6rem; font-size: .85rem; color: var(--color-text); }
+.classrooms .vocabulary-gradebook input[type="checkbox"], .classrooms.vocabulary-grade-dialog input[type="checkbox"] { appearance: auto; width: 1rem; height: 1rem; min-height: 1rem; flex: 0 0 1rem; padding: 0; margin: 0; accent-color: var(--primary-color, #818cf8); }
+.vocabulary-gradebook-dates { display: grid; grid-template-columns: minmax(8rem, 12rem) minmax(8rem, 12rem) max-content; gap: .75rem; align-items: end; }
+.vocabulary-gradebook-status { margin: 0; font-size: .8rem; color: var(--color-text-muted); }
+.vocabulary-gradebook-surface { min-width: 0; border: 1px solid var(--color-border); border-radius: .65rem; background: var(--color-surface); }
+.vocabulary-gradebook-surface > p { padding: 1rem; margin: 0; }
+.vocabulary-gradebook-scroll { max-width: 100%; overflow: auto; max-height: 65vh; border-radius: .65rem; }
+.classrooms .vocabulary-gradebook-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: .8rem; }
+.vocabulary-gradebook-table th, .vocabulary-gradebook-table td { box-sizing: border-box; min-width: 10.5rem; max-width: 14rem; padding: .65rem .75rem; text-align: center; vertical-align: middle; border-bottom: 1px solid var(--color-border); border-right: 1px solid var(--color-border); }
+.vocabulary-gradebook-table thead th { position: sticky; top: 0; z-index: 2; background: var(--color-surface-container-high, #222a3d); color: var(--color-text-muted); font-size: .75rem; font-weight: 500; }
+.vocabulary-gradebook-table .vocabulary-grade-student { position: sticky; left: 0; z-index: 1; width: 13rem; min-width: 13rem; max-width: 13rem; text-align: left; background: var(--color-surface-container-low, #131b2e); }
+.vocabulary-gradebook-table thead .vocabulary-grade-student, .vocabulary-gradebook-table thead .vocabulary-grade-total-column { z-index: 3; }
+.vocabulary-gradebook-table .vocabulary-grade-total-column { position: sticky; right: 0; z-index: 1; background: var(--color-surface-container-low, #131b2e); }
+.vocabulary-gradebook-table tbody tr:last-child th, .vocabulary-gradebook-table tbody tr:last-child td { border-bottom: 0; }
+.classrooms .vocabulary-gradebook button.vocabulary-grade-student-link, .classrooms .vocabulary-gradebook button.vocabulary-grade-assignment { display: block; min-width: 0; min-height: 2rem; width: 100%; padding: 0; margin: 0; border: 0; border-radius: 0; box-shadow: none; background: none; color: var(--color-text); font: inherit; font-weight: 600; text-align: inherit; white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
+.vocabulary-grade-assignment small { display: block; margin-top: .2rem; font-size: .7rem; font-weight: 400; color: var(--color-text-muted); }
+.vocabulary-grade-student-link:hover, .vocabulary-grade-assignment:hover { text-decoration: underline; text-underline-offset: .2rem; }
+.classrooms .vocabulary-gradebook button.vocabulary-grade-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; width: 100%; min-height: 3.25rem; margin: 0; padding: .35rem; border: 1px solid transparent; border-radius: .45rem; box-shadow: none; background: transparent; color: var(--color-text); text-align: center; line-height: 1.4; cursor: pointer; }
+.classrooms .vocabulary-gradebook button.vocabulary-grade-cell:hover { border-color: var(--color-border-interactive, #818cf8); background: var(--color-surface-subtle); }
+.vocabulary-grade-mark { display: inline-block; padding: .2rem .45rem; border-radius: .35rem; background: var(--color-surface-subtle); font-size: .95rem; font-variant-numeric: tabular-nums; }
+.vocabulary-grade-percent, .vocabulary-grade-empty { color: var(--color-text-muted); font-size: .8rem; }
+.vocabulary-grade-bonus { color: #9cdbb8; font-size: .7rem; }
+.vocabulary-grade-publication { color: var(--color-text-muted); font-size: .67rem; }
+.vocabulary-grade-total { display: grid; gap: .2rem; font-variant-numeric: tabular-nums; }
+.vocabulary-grade-total strong { font-size: 1rem; }
+.vocabulary-grade-total small { white-space: normal; overflow-wrap: anywhere; font-size: .67rem; color: var(--color-text-muted); }
+.vocabulary-gradebook-footer { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: .75rem; font-size: .75rem; color: var(--color-text-muted); }
+.vocabulary-gradebook-footer > div { display: flex; gap: .5rem; margin-right: auto; }
+.vocabulary-gradebook-mobile { display: none; }
+.vocabulary-gradebook [hidden] { display: none !important; }
+.vocabulary-grade-dialog { max-width: min(38rem, calc(100vw - 2rem)); }
+.vocabulary-grade-dialog form { display: grid; gap: 1rem; }
+.vocabulary-grade-dialog fieldset { display: grid; gap: .85rem; padding: 1rem; border: 1px solid var(--color-border); border-radius: .5rem; }
+.vocabulary-grade-dialog fieldset legend { padding: 0 .35rem; color: var(--color-text-muted); font-size: .8rem; }
+.vocabulary-grade-dialog fieldset:disabled { opacity: .6; }
+.vocabulary-grade-dialog label { display: grid; gap: .35rem; font-size: .85rem; }
+.vocabulary-grade-dialog input:not([type="checkbox"]) { width: 100%; box-sizing: border-box; }
+.vocabulary-grade-section-label { margin: 1rem 0 .5rem; font-size: .75rem; font-weight: 600; color: var(--color-text-muted); }
+.vocabulary-grade-detail-score { font-size: 1.25rem; font-weight: 650; }
+.vocabulary-grade-breakdown { display: grid; grid-template-columns: 1fr auto; gap: .5rem; margin: .75rem 0; font-size: .85rem; }
+.vocabulary-grade-breakdown dt { color: var(--color-text-muted); }
+.vocabulary-grade-breakdown dd { margin: 0; }
+.vocabulary-grade-activities { margin: .75rem 0; padding-left: 1.25rem; font-size: .8rem; line-height: 1.7; }
+.vocabulary-grade-dialog .modal-footer { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.vocabulary-gradebook button:focus-visible, .vocabulary-gradebook summary:focus-visible { outline: 2px solid var(--color-focus, #adc6ff); outline-offset: 3px; }
+@media (max-width: 600px) {
+    .classrooms.class-detail:has(> .vocabulary-gradebook) > .class-detail-header { flex-wrap: nowrap; gap: .65rem; }
+    .classrooms.class-detail:has(> .vocabulary-gradebook) > .class-detail-header .class-detail-title { order: 0; flex: 1 1 auto; }
+    .vocabulary-gradebook-toolbar { grid-template-columns: minmax(0, 1fr) auto; }
+    .vocabulary-gradebook-toolbar > label:nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+    .vocabulary-gradebook-options { grid-column: 2; grid-row: 1; }
+    .vocabulary-gradebook-dates { grid-template-columns: minmax(0, 1fr); }
+    .vocabulary-gradebook-scroll { display: none; }
+    .vocabulary-gradebook-mobile { display: grid; gap: .75rem; padding: .85rem; }
+    .vocabulary-grade-mobile-row { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: .5rem; padding: .85rem 0; border-bottom: 1px solid var(--color-border); }
+    .vocabulary-grade-mobile-row > div:first-child { min-width: 0; }
+    .vocabulary-grade-mobile-row > div > small { display: block; margin-top: .25rem; color: var(--color-text-muted); font-size: .7rem; }
+    .vocabulary-grade-mobile-row .vocabulary-grade-total { text-align: right; }
+    .classrooms .vocabulary-gradebook .vocabulary-grade-mobile-row button.vocabulary-grade-assignment { overflow-wrap: break-word; word-break: normal; }
+    .classrooms .vocabulary-gradebook .vocabulary-grade-mobile-row button.vocabulary-grade-cell { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; justify-content: stretch; min-width: 0; min-height: 0; padding: .35rem 0; text-align: left; }
+    .vocabulary-grade-mobile-row .vocabulary-grade-mark { justify-self: start; }
+    .vocabulary-grade-mobile-row .vocabulary-grade-percent { justify-self: end; }
+    .vocabulary-grade-mobile-row .vocabulary-grade-bonus, .vocabulary-grade-mobile-row .vocabulary-grade-publication { grid-column: 1 / -1; white-space: normal; overflow-wrap: break-word; }
+    .vocabulary-grade-mobile-row:has(> .vocabulary-grade-total) { display: flex; justify-content: space-between; }
+    .vocabulary-grade-dialog .modal-footer { flex-direction: column; }
+    .vocabulary-grade-dialog .modal-footer button { width: 100%; }
+}
