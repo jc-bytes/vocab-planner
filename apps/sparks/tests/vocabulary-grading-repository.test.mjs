@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createClassroomRepository, assignmentVocabulary } from '../js/services/classroomRepository.js';
+import { installStudentAssignedFlowFixture } from '../scripts/lib/student-assigned-flow-fixture.mjs';
 
 test('grading reads remain class/school scoped and writes retain the initiating principal', async () => {
     const calls = [];
@@ -21,4 +22,16 @@ test('grading reads remain class/school scoped and writes retain the initiating 
 test('assigned vocabulary preserves actual class metadata for own published grades', () => {
     const result = assignmentVocabulary({ id: 'assignment-a', class_id: 'class-a', kind: 'vocabulary', materialId: 'vocab-a', title: 'Vocabulary', content: { activitySettings: { grading: { enabled: true } } } });
     assert.equal(result.classId, 'class-a'); assert.equal(result.assignmentId, 'assignment-a'); assert.equal(result.activitySettings.grading.enabled, true);
+});
+
+test('the assigned-flow network fixture preserves assignment ownership and an empty published-grade response', async () => {
+    let handleRequest;
+    const fixture = await installStudentAssignedFlowFixture({ async addInitScript() {}, on() {},
+        async route(_pattern, handler) { handleRequest = handler; } });
+    assert.equal(assignmentVocabulary(fixture.detail).classId, fixture.ids.class);
+    let body;
+    await handleRequest({ request: () => ({ url: () => 'https://fixture.supabase.co/rest/v1/rpc/my_class_vocabulary_grades_v1',
+        method: () => 'POST', postDataJSON: () => ({ p_school_id: fixture.ids.school, p_class_id: fixture.ids.class }) }),
+        async fulfill(response) { body = JSON.parse(response.body); } });
+    assert.deepEqual(body, { grades: [] });
 });

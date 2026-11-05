@@ -413,3 +413,49 @@ all six scenarios in source and compiled modes. Evidence:
 - These are local architecture judgments. Hosted migration parity, deployed Auth
   flows, physical-device acceptance and sustained production capacity have no new
   acceptance evidence from this task. Local fixtures are not real student grades.
+
+
+## Release integration follow-up
+
+The release candidate starts from current production `main` in an isolated
+worktree. It preserves the already-published preview CSP/text safety, private
+catalogue, section recovery, read deadlines, dashboard acceptance, and CI gates.
+The local audit receipt above describes the earlier working tree; release CI
+verifies this reconciled candidate independently. Runtime Ember assets now
+participate in source freshness fingerprints, with a failing edited-asset control
+and 21 passing artifact controls.
+
+Release acceptance exposed two connected grade-panel issues. The fictional
+assignment response omitted the real RPC's `class_id`; it now preserves that
+field and returns the actual empty issued-grade shape when no grades exist.
+A controlled browser read also reproduced a runtime failure: refreshing the same
+class while a published-grade response was held left the current assignment's
+panel stuck loading. The panel used the selector's transport generation as an
+additional owner even though its assignment already supplied a fixed class.
+
+Assignment-pinned grades now retain their owner across independent class reads.
+The menu still captures account, school, vocabulary, assignment, cloud, load and
+navigation lifetimes, and the actual assignment class must still match. A panel
+using only the older selector fallback retains its selector object/generation
+guards. Independent review found no cross-account, school, class or navigation
+regression.
+
+The original held-request browser control fails before repair and passes after.
+The enhanced real-entry flow proves the issued grade renders before the
+independent class snapshot returns and survives an actual same-class refresh
+during a held grade read. All original publication/retry/mobile assertions remain.
+Forty focused tests, the enhanced source flow and the student workspace browser
+gate pass. Evidence: `/tmp/sparks-gradeflow-held-refresh-red.log`,
+`/tmp/sparks-grade-generation-final.log`, `/tmp/sparks-gradeflow-source-final.log`,
+and `/tmp/sparks-grade-fixture-unit-workspace.log`.
+
+The two existing November migrations were applied to the hosted project only
+after schema/application-data backups and an exact dry run. All 14 anonymous RPC
+readiness probes, real authenticated-role reads/denials, new grants/RLS/index
+checks and strict hosted schema lint pass. Counts and metadata digests are
+unchanged across eight existing application tables, including progress, published
+material versions and reward receipts. No real grade publication was performed.
+Hosted advisors report two Auth configuration warnings: leaked-password
+protection is disabled and MFA options are insufficient. These migrations do not
+change Auth configuration. The operator receipt records deployment and live
+verification separately from the historical local audit.

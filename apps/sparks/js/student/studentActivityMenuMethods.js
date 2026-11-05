@@ -118,11 +118,14 @@ export class StudentActivityMenu {
         const vocab = this.sm.currentVocab;
         if (!vocab?.assignmentId || this.sm.authDisabled || this.sm.isTeacherUnitPreview === true) return;
         const selection = this.activities.vocabularyData?.classSelection;
-        const classId = vocab.classId || selection?.selectedId;
+        const assignmentClassId = vocab.classId;
+        const classId = assignmentClassId || selection?.selectedId;
         if (!classId) return;
         const classGeneration = selection?.generation;
         const currentGrade = () => current() && classId === (this.sm.currentVocab?.classId || this.activities.vocabularyData?.classSelection?.selectedId)
-            && (!selection || selection === this.activities.vocabularyData?.classSelection && classGeneration === selection.generation);
+            // An assignment owns its class independently of selector refresh requests.
+            // The menu lease still owns account, school, vocabulary and navigation.
+            && (Boolean(assignmentClassId) || !selection || selection === this.activities.vocabularyData?.classSelection && classGeneration === selection.generation);
         try {
             const module = await this.loadGradePanel();
             if (!currentGrade()) return;

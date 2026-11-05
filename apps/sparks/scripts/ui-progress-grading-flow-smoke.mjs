@@ -36,6 +36,7 @@ function liveGrade() {
 const reply = (route, json, status = 200) => route.fulfill({ status, headers, json });
 const settledTeacher = page => page.waitForFunction(() => window.teacherApp?.isAuthenticated && teacherApp.routeReady && !teacherApp.isApplyingRoute);
 const noOverflow = page => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; };
 let server, browser;
 try {
     server = await ensureViteServer({ baseUrl, probePath: '/teacher.html', host: '127.0.0.1', port,
@@ -111,8 +112,19 @@ try {
     await isolateBackend(studentContext, 'https://fixture.supabase.co');
     const student = await studentContext.newPage();
     const studentFixture = await installStudentAssignedFlowFixture(student, { completeRequiredActivities: true });
-    const studentRequests = []; student.on('request', request => studentRequests.push(new URL(request.url()).pathname));
-    await student.route('https://fixture.supabase.co/rest/v1/rpc/my_class_vocabulary_grades_v1', route => {
+    assert.equal(studentFixture.detail.class_id, studentFlowIds.class, 'the fixture preserves the real assignment RPC class_id');
+    const studentRequests = [], studentResponses = [], studentRequestFailures = [];
+    student.on('request', request => studentRequests.push(new URL(request.url()).pathname));
+    student.on('response', response => studentResponses.push({ path: new URL(response.url()).pathname, status: response.status() }));
+    student.on('requestfailed', request => studentRequestFailures.push({ path: new URL(request.url()).pathname, error: request.failure()?.errorText }));
+    const classReadRelease = deferred(), gradeReadRelease = deferred();
+    let classReadReached = false, holdClassRead = true, holdGradeRead = false;
+    await student.route('https://fixture.supabase.co/rest/v1/rpc/my_teaching_classes_v1', async route => {
+        if (holdClassRead) { classReadReached = true; await classReadRelease.promise; }
+        return route.fallback();
+    });
+    await student.route('https://fixture.supabase.co/rest/v1/rpc/my_class_vocabulary_grades_v1', async route => {
+        if (holdGradeRead) await gradeReadRelease.promise;
         const args = route.request().postDataJSON(); assert.equal(args.p_school_id, studentFlowIds.school); assert.equal(args.p_class_id, studentFlowIds.class);
         return failStudent ? reply(route, { message: 'Controlled published-grade read failure' }, 503)
             : reply(route, { grades: published?.enabled ? [structuredClone(published)] : [] });
@@ -120,6 +132,43 @@ try {
     const studentUrl = `${baseUrl}/student.html#/unit/assignment.${assignmentId}`;
     await student.goto(studentUrl);
     const panel = student.getByRole('region', { name: 'Published vocabulary grade' });
+    try {
+        await panel.getByText('30 / 50', { exact: true }).waitFor();
+    } catch (error) {
+        const state = await student.evaluate(() => {
+            const app = window.studentApp;
+            return { hash: location.hash, authInitialized: app?.authInitialized, authenticated: Boolean(app?.currentUser),
+                currentView: app?.currentView, assignmentId: app?.currentVocab?.assignmentId, assignmentClassId: app?.currentVocab?.classId,
+                classReady: app?.activities?.vocabularyData?.classSelection?.ready, classGeneration: app?.activities?.vocabularyData?.classSelection?.generation,
+                text: document.body.innerText.slice(0, 3000),
+                panelCount: document.querySelectorAll('[aria-label="Published vocabulary grade"]').length };
+        }).catch(() => ({ unavailable: true }));
+        console.error('Student issued-grade render diagnostics:', JSON.stringify({ state,
+            fixtureErrors: studentFixture.errors.slice(-8), requests: studentRequests.slice(-45),
+            responses: studentResponses.slice(-35), failedRequests: studentRequestFailures.slice(-8), published: Boolean(published?.enabled) }));
+        throw error;
+    }
+    assert.equal(classReadReached, true, 'the actual independent class snapshot request is held');
+    assert.equal(await student.evaluate(() => studentApp.activities.vocabularyData.classSelection.ready), false,
+        'the assignment-pinned grade renders before the independent class snapshot returns');
+    holdClassRead = false; classReadRelease.resolve();
+    await student.waitForFunction(() => studentApp.activities.vocabularyData.classSelection.ready);
+    // A genuine same-class refresh may start while a published-grade read is held.
+    // Its transport generation must not invalidate the assignment's grade owner.
+    holdGradeRead = true;
+    const pendingGradeRead = student.waitForRequest(request => new URL(request.url()).pathname === '/rest/v1/rpc/my_class_vocabulary_grades_v1');
+    await panel.getByRole('button', { name: 'Check for updates', exact: true }).click();
+    await pendingGradeRead;
+    const classRefresh = await student.evaluate(async () => {
+        const data = studentApp.activities.vocabularyData, selection = data.classSelection;
+        const before = selection.generation;
+        await data.prepareClassData({ forceRefresh: true });
+        return { before, after: selection.generation, selectedId: selection.selectedId, assignmentClassId: studentApp.currentVocab.classId };
+    });
+    assert.ok(classRefresh.after > classRefresh.before, 'the real background class read advances its request generation');
+    assert.equal(classRefresh.selectedId, studentFlowIds.class);
+    assert.equal(classRefresh.assignmentClassId, studentFlowIds.class);
+    holdGradeRead = false; gradeReadRelease.resolve();
     await panel.getByText('30 / 50', { exact: true }).waitFor();
     assert.ok(studentRequests.includes(modulePath('js/student/studentVocabularyGradePanel.js')), 'real unit route requested its lazy published-grade module');
     assert.equal(await noOverflow(student), true, 'student published grade fits a phone viewport');
@@ -166,6 +215,6 @@ try {
     assert.equal(await noOverflow(teacher), true, 'editor grading defaults fit a phone viewport');
     assert.deepEqual(forbidden, [], 'all backend traffic stays within the synthetic fixtures');
     assert.deepEqual(teacherFixture.errors, []); assert.deepEqual(studentFixture.errors, []);
-    console.log(`Real-entry progress/grading flow passed (${built ? 'final built output' : 'source'}): routes/reloads, read retries, captured-principal save/publish, immutable issued grade, explicit ungrading, editor defaults, lazy requests and mobile.`);
+    console.log(`Real-entry progress/grading flow passed (${built ? 'final built output' : 'source'}): independent class snapshot, same-class refresh during held grade read, routes/reloads, read retries, captured-principal save/publish, immutable issued grade, explicit ungrading, editor defaults, lazy requests and mobile.`);
     await studentContext.close(); await teacherContext.close();
 } finally { await browser?.close(); server?.kill(); }

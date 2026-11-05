@@ -9,7 +9,7 @@ export async function installStudentAssignedFlowFixture(page, { startEnrolled = 
     await seedReturningStudentGuidePreferences(page, ids.user);
     const user = { id: ids.user, aud: 'authenticated', role: 'authenticated', email: 'student@fixture.invalid', app_metadata: {}, user_metadata: {} };
     const words = ['Source', 'Hoax', 'Evidence', 'Verify', 'Claim', 'Author', 'Fact', 'Opinion', 'Reliable', 'Bias'].map(word => ({ word, definition: `Meaning of ${word.toLowerCase()}`, emoji: '📘' }));
-    const detail = { id: ids.assignment, kind: 'vocabulary', school_id: ids.school, materialId: ids.vocabulary,
+    const detail = { id: ids.assignment, kind: 'vocabulary', school_id: ids.school, class_id: ids.class, materialId: ids.vocabulary,
         release_at: '2026-10-01T12:00:00Z', vocabularyPlacement: { trimester: 'IIIT', month: 'october', assignedDate: '2026-10-01' }, title: 'G9 T3 W05 - Hoaxes and Fakes', className: 'Technology 9A',
         content: { words, activitySettings: { requiredActivities: ['flashcards', 'matching', 'fill-in-blank'] } } };
     const assignment = { id: ids.assignment, class_id: ids.class, kind: 'vocabulary', title: detail.title, release_at: '2026-10-01T12:00:00Z', due_at: null, close_at: null };
@@ -40,6 +40,7 @@ export async function installStudentAssignedFlowFixture(page, { startEnrolled = 
         else if (name === 'accept_class_invitation_v1') { enrolled = true; data = { classId: ids.class }; }
         else if (name === 'read_class_assignment_v1') { if (holdRead) await new Promise(resolve => { releaseRead = resolve; }); data = detail; }
         else if (name === 'get_own_student_progress_v2' || name === 'get_own_student_progress_summary_v2') data = progress;
+        else if (name === 'my_class_vocabulary_grades_v1') data = { grades: [] };
         else if (name === 'get_own_arcade_time_v1') data = { seconds: 0, balance: 0 };
         else if (name === 'start_student_activity_attempt_owned_v1') data = { attemptId: '66666666-6666-4666-8666-666666666666', minimumSeconds: 0 };
         else if (/invitations/.test(name)) data = [];

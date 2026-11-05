@@ -69,6 +69,41 @@ test('published grade panel receives the actual assignment class and is disposed
     assert.equal(captured.isCurrent(), false);
 });
 
+test('an assignment-pinned grade survives a background class read during import and response', async () => {
+    const held = deferred(); let captured;
+    const f = fixture({ loadGradePanel: () => held.promise });
+    f.sm.currentVocab.classId = 'actual-class';
+    const selection = { selectedId: null, generation: 1 };
+    f.activities.vocabularyData = { classSelection: selection };
+    const lease = f.menu.capture();
+    const pending = f.menu.showPublishedGrade(lease, lease.current, {});
+    selection.generation++;
+    held.resolve({ mountStudentVocabularyGradePanel(options) { captured = options; return { dispose() {} }; } });
+    await pending;
+    assert.ok(captured, 'the assignment grade mounts while the independent selector read is pending');
+    selection.selectedId = 'actual-class'; selection.generation++;
+    assert.equal(captured.isCurrent(), true, 'a same-class selector refresh does not discard the grade response');
+    f.sm.currentVocab.classId = 'other-class';
+    assert.equal(captured.isCurrent(), false, 'the pinned assignment class cannot be replaced');
+});
+
+for (const change of ['class', 'read-generation', 'selection-object']) {
+    test(`a grade using only the class-selector fallback rejects a held import after ${change}`, async () => {
+        const held = deferred(); let mounts = 0;
+        const f = fixture({ loadGradePanel: () => held.promise });
+        const selection = { selectedId: 'class-a', generation: 1 };
+        f.activities.vocabularyData = { classSelection: selection };
+        const lease = f.menu.capture();
+        const pending = f.menu.showPublishedGrade(lease, lease.current, {});
+        if (change === 'class') selection.selectedId = 'class-b';
+        if (change === 'read-generation') selection.generation++;
+        if (change === 'selection-object') f.activities.vocabularyData.classSelection = { ...selection };
+        held.resolve({ mountStudentVocabularyGradePanel() { mounts++; } });
+        await pending;
+        assert.equal(mounts, 0);
+    });
+}
+
 for (const change of ['account', 'unit', 'session', 'cloud', 'school', 'navigation-roundtrip', 'reset']) {
     test(`held Menu preparation cannot create UI after ${change}`, async () => {
         const held = deferred(); const f = fixture({ load: () => held.promise });
