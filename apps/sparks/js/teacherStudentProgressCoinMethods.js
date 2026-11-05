@@ -1,6 +1,7 @@
 import { $ } from './main.js';
 import { supabaseService } from './supabaseService.js';
 import { setInlineStatus } from './ui/inlineStatus.js';
+import { captureTeacherProgressOwner } from './teacherStudentProgressOwner.js';
 
 class TeacherStudentProgressCoinMethods {
     updateCoinStatus(message, state = 'muted') {
@@ -133,17 +134,17 @@ class TeacherStudentProgressCoinMethods {
             return;
         }
 
+        const isCurrent = captureTeacherProgressOwner(this);
+        const selectedStudentIds = Array.from(this.selectedStudents);
         const confirmed = confirm(
-            `Add ${amount} coins to ${this.selectedStudents.size} selected student${this.selectedStudents.size > 1 ? 's' : ''}?`
+            `Add ${amount} coins to ${selectedStudentIds.length} selected student${selectedStudentIds.length > 1 ? 's' : ''}?`
         );
 
-        if (!confirmed) return;
-        const generation = this.studentProgressSessionGeneration || 0;
-        const selectedStudentIds = Array.from(this.selectedStudents);
+        if (!confirmed || !isCurrent()) return;
 
         try {
             for (const studentId of selectedStudentIds) {
-                if (generation !== (this.studentProgressSessionGeneration || 0)) return;
+                if (!isCurrent()) return;
                 const student = this.allStudentData.find(s => s.id === studentId);
                 if (!student) continue;
 
@@ -152,7 +153,7 @@ class TeacherStudentProgressCoinMethods {
                     amount,
                     message: 'Bulk gift from teacher'
                 });
-                if (generation !== (this.studentProgressSessionGeneration || 0)) return;
+                if (!isCurrent()) return;
 
                 // Update local data
                 student.coins = progress.coinData?.balance ?? progress.coins ?? student.coins ?? 0;
@@ -165,7 +166,7 @@ class TeacherStudentProgressCoinMethods {
             }
 
             await this.invalidateStudentProgressQueries();
-            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
+            if (!isCurrent()) return;
 
             alert(`Successfully gifted ${amount} coins to ${selectedStudentIds.length} student${selectedStudentIds.length > 1 ? 's' : ''}! They will receive a notification when they log in.`);
 
@@ -173,7 +174,7 @@ class TeacherStudentProgressCoinMethods {
             this.clearSelection();
             this.renderProgressTable();
         } catch (error) {
-            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
+            if (!isCurrent()) return;
             console.error('Bulk coin adjustment failed:', error);
             alert('Failed to update coins. Please try again.');
         }

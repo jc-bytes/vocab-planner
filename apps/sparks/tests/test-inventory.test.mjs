@@ -45,15 +45,15 @@ test('default validation keeps established script checks, insight, and worker up
     const expected = [
         'ui-school-admin-smoke', 'ui-school-shell-smoke', 'ui-teacher-loading-smoke', 'ui-school-account-access-smoke',
         'ui-student-class-selector-smoke', 'ui-student-loading-smoke', 'ui-student-school-context-smoke', 'ui-student-units-flow-smoke', 'ui-student-spark-library-smoke',
-        'ui-teacher-class-workspace-smoke', 'ui-teacher-class-home-smoke', 'ui-teacher-assignments-smoke',
+        'ui-teacher-class-workspace-smoke', 'ui-teacher-class-home-smoke', 'ui-teacher-assignments-smoke', 'ui-teacher-class-progress-smoke', 'ui-teacher-vocabulary-gradebook-smoke', 'ui-vocabulary-grading-settings-smoke', 'ui-progress-grading-flow-smoke',
         'ui-weekly-vocabulary-smoke', 'ui-teacher-data-management-smoke', 'ui-teacher-student-progress-smoke',
         'ui-teacher-groups-smoke', 'ui-teacher-quiz-smoke', 'ui-teacher-sparks-smoke', 'ui-teacher-student-libraries-smoke',
         'ui-teacher-word-hunt-smoke', 'ui-library-toolbar-startup-smoke', 'ui-teacher-pages-smoke', 'ui-teacher-unit-preview-smoke', 'ui-teacher-preview-startup-smoke', 'ui-activity-registry-smoke',
         'package-refactor-tests', 'galactic-breaker-tests', 'student-shell-regression-tests',
-        'ui-smoke', 'ui-game-sandbox-smoke', 'ui-teacher-student-insight-smoke', 'ui-student-worker-lifecycle-smoke', 'ui-auth-layout-smoke',
+        'ui-smoke', 'ui-game-sandbox-smoke', 'ui-teacher-student-insight-smoke', 'ui-student-worker-lifecycle-smoke', 'ui-auth-layout-smoke', 'ui-loading-first-paint-smoke',
         'ui-activity-startup-recovery-smoke', 'ui-arcade-purchase-recovery-smoke', 'ui-password-session-isolation',
         'ui-student-active-runtime-smoke', 'ui-teacher-catalog-delivery-smoke', 'ui-teacher-progress-feature-smoke', 'ui-student-units-lazy-smoke', 'ui-student-navigation-recovery-smoke', 'ui-student-arcade-eligibility-smoke', 'ui-student-arcade-layout-smoke',
-        'ui-word-hunt-evidence-smoke', 'ui-student-word-hunt-evidence-smoke', 'ui-teacher-quiz-replacement-smoke', 'ui-student-unit-workspace-smoke', 'ui-student-home-spark-scope-smoke', 'ui-student-home-presentation-smoke', 'ui-student-library-styles-smoke', 'ui-teacher-vocabulary-browser-smoke', 'ui-teacher-vocabulary-saves-smoke', 'ui-teacher-local-copies-smoke', 'ui-teacher-material-actions-smoke', 'ui-teacher-preview-layout-smoke', 'ui-teacher-preview-content-security-smoke', 'ui-section-recovery-smoke', 'ui-loading-first-paint-smoke'
+        'ui-word-hunt-evidence-smoke', 'ui-student-word-hunt-evidence-smoke', 'ui-teacher-quiz-replacement-smoke', 'ui-student-unit-workspace-smoke', 'ui-student-home-spark-scope-smoke', 'ui-student-home-presentation-smoke', 'ui-student-library-styles-smoke', 'ui-teacher-vocabulary-browser-smoke', 'ui-teacher-vocabulary-saves-smoke', 'ui-teacher-local-copies-smoke', 'ui-teacher-material-actions-smoke', 'ui-teacher-preview-layout-smoke', 'ui-teacher-preview-content-security-smoke', 'ui-section-recovery-smoke'
     ].map(name => `node scripts/${name}.mjs`);
     assert.deepEqual([...checks].sort(), expected.sort());
     const defaults = reachableScripts(scripts, 'test');

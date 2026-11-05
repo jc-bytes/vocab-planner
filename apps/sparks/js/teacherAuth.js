@@ -8,6 +8,7 @@ import { SessionInitializationCoordinator } from './services/sessionInitializati
 import { teacherAuthApi } from './services/teacherAuthApi.js';
 import { serverStateQuery } from './services/serverStateQuery.js';
 import { requestWithTimeout } from './services/requestReliability.js';
+import { setLoginHint } from './services/loginHint.js';
 
 export const TEACHER_AUTH_REQUEST_TIMEOUT_MS = 8000;
 
@@ -137,7 +138,7 @@ class TeacherAuthMethods {
             this.currentRole = this.schoolAccess.hasRole('teacher') ? 'teacher' : 'school_member';
             this.isAuthenticated = true;
             this.currentUser = user;
-            localStorage.setItem('was_logged_in', 'true');
+            setLoginHint(true);
             this.updateAuthUI(user);
             await this.bindSchoolSession(this);
             if (!context.isCurrent()) return false;

@@ -2,6 +2,7 @@ import { bindFloatingActionMenu } from './ui/floatingActionMenu.js';
 import { $, $$, setupModal } from './main.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 import { getKeyboardNavigatedTab } from './ui/tabNavigation.js';
+import { setLoginHint } from './services/loginHint.js';
 
 const TEACHER_RESIZE_DEBOUNCE_MS = 120;
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
@@ -45,7 +46,7 @@ function bindTeacherAuthListeners(manager) {
             manager.clearStudentProgressSessionState?.();
             manager.clearTeacherSettingsSessionState?.();
             manager.clearTeacherVocabularySessionState?.();
-            localStorage.removeItem('was_logged_in');
+            setLoginHint(false);
             manager.schoolContextUnsubscribe?.();
             manager.schoolAccess?.clear();
             manager.isAuthenticated = false;

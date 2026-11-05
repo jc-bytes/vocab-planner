@@ -12,6 +12,7 @@ import '../css/compact-workspace-table.css';
 import { compactFilter, sortAssignments, assignmentDate, assignmentWhen, assignmentSortOptions, assignmentStatusOptions, assignmentTypeOptions } from './compactAssignmentControls.js';
 import { assignmentTrimester, assignmentTrimesterLabel, assignmentTrimesterOptions } from './assignmentTrimester.js';
 import { assignmentStatus } from './teacherAssignmentResults.js';
+import { mountClassProgress } from './teacherClassProgressView.js';
 import '../css/teacher-class-workspace.css';
 
 function element(tag, text, className) {
@@ -24,7 +25,7 @@ function element(tag, text, className) {
 // Navigation and publication are injected so this workspace can move without
 // bringing another screen's data, drafts or lifecycle along with it.
 export function createTeacherClassWorkspace({ root, getUserId, repository = classroomRepository, schoolRepository: schoolData = schoolRepository,
-    onNavigate, onPublish, onReview, onGroups, onStudent, onClassesLoaded, headerRoot = null, getSchoolCalendar = async () => null }) {
+    onNavigate, onPublish, onReview, onGroups, onStudent, onClassesLoaded, onProgressState, onGradebookState, headerRoot = null, getSchoolCalendar = async () => null }) {
     let generation = 0, destroyed = false, controller, closeDialog;
     let route = { classId: null, tab: 'work' };
     const workStates = new Map(), studentStates = new Map();
@@ -204,6 +205,40 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         }
     }
     async function renderStudents(active, id, owner, signal) {
+        const views = element('div', undefined, 'class-detail-tabs');
+        views.setAttribute('aria-label', 'Student views');
+        for (const [label, contextKey] of [['Roster', null], ['Trimester progress', 'progressContext'], ['Grades', 'gradebookContext']]) {
+            const control = button(label, () => navigate({ classId: active.id, tab: 'students', ...(contextKey ? { [contextKey]: studentStates.get(`${contextKey}:${active.id}`) || {} } : {}) }));
+            const selected = contextKey ? Boolean(route[contextKey]) : !route.progressContext && !route.gradebookContext;
+            control.className = 'class-detail-tab'; control.setAttribute('aria-pressed', String(selected)); views.append(control);
+        }
+        root.append(views);
+        if (route.gradebookContext) {
+            const [{ mountVocabularyGradebook }, calendar] = await Promise.all([import('./teacherVocabularyGradebook.js'), getSchoolCalendar({ signal })]);
+            if (!current(id, owner)) return;
+            return mountVocabularyGradebook({ root, active, calendar, timeZone: schoolContext.getSchool()?.timezone || 'UTC', repository, signal,
+                ownerUserId: String(owner).split(':')[0],
+                isCurrent: () => current(id, owner), initial: Object.keys(route.gradebookContext).length ? route.gradebookContext : undefined,
+                onStateChange: context => {
+                    studentStates.set(`gradebookContext:${active.id}`, context); route.gradebookContext = context;
+                    onGradebookState?.({ classId: active.id, gradebookContext: context });
+                }, onStudent: context => {
+                    const { progressContext: unusedPeriod, ...studentContext } = context;
+                    onStudent?.({ ...studentContext, gradebookContext: { ...route.gradebookContext } });
+                } });
+        }
+        if (route.progressContext) {
+            const [roster, calendar] = await Promise.all([
+                repository.getRoster(active.id, { signal }), getSchoolCalendar({ signal })
+            ]);
+            if (!current(id, owner)) return;
+            return mountClassProgress({ root, active, roster, calendar, timeZone: schoolContext.getSchool()?.timezone || 'UTC', repository, signal,
+                isCurrent: () => current(id, owner), initial: Object.keys(route.progressContext).length ? route.progressContext : undefined,
+                onStateChange: context => {
+                    studentStates.set(`progressContext:${active.id}`, context); route.progressContext = context;
+                    onProgressState?.({ classId: active.id, progressContext: context });
+                }, onStudent });
+        }
         const [roster, invitations] = await Promise.all([
             repository.getRoster(active.id, { signal }), repository.listInvitations(active.id, { signal })
         ]);
@@ -399,7 +434,7 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         for (const control of [trimester, states, types, sort]) control.addEventListener('change', () => { offset = 0; render(); });
         block.append(viewBar, viewHelp, toolbar, advanced, scroll, footer); root.append(block); render();
     }
-    async function show({ classId = null, tab = 'work', workView, resetWork = false, refresh = false } = {}) {
+    async function show({ classId = null, tab = 'work', workView, progressContext, gradebookContext, resetWork = false, refresh = false } = {}) {
         if (destroyed) return;
         clearHeader();
         closeDialog?.(); closeDialog = null;
@@ -408,7 +443,7 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         if (stateOwner !== owner) { workStates.clear(); studentStates.clear(); directoryState = {}; stateOwner = owner; }
         if (resetWork) workStates.delete(classId);
         const changedClass = route.classId !== classId;
-        route = { classId, tab: tab === 'students' ? 'students' : 'work' };
+        route = { classId, tab: tab === 'students' ? 'students' : 'work', ...(progressContext ? { progressContext } : {}), ...(gradebookContext ? { gradebookContext } : {}) };
         root.classList.add('classrooms');
         root.classList.toggle('class-detail', Boolean(classId));
         root.replaceChildren(element('h2', classId ? (route.tab === 'students' ? 'Students' : 'Classwork') : 'My classes', classId ? 'classrooms-page-title' : 'teacher-class-home-title'), status);
@@ -443,7 +478,7 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
                 if (!current(id, owner)) return;
                 const panel = root.lastElementChild;
                 panel.setAttribute('role', 'region');
-                panel.setAttribute('aria-label', route.tab === 'students' ? 'Class students' : 'Class work');
+                if (!panel.hasAttribute('aria-label')) panel.setAttribute('aria-label', route.tab === 'students' ? 'Class students' : 'Class work');
             }
             if (current(id, owner)) status.textContent = '';
         } catch (error) {

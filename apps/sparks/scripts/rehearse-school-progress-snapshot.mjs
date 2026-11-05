@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createClient } from '@supabase/supabase-js';
 import { resolveLocalDatabaseSource } from './lib/localDatabaseRehearsal.mjs';
+import { assertRehearsalJsonEqual } from './lib/rehearsalJsonEquality.mjs';
 
 const source = resolveLocalDatabaseSource(readFileSync(new URL('../supabase/config.toml', import.meta.url), 'utf8'), process.env);
 const suffix = randomBytes(8).toString('hex');
@@ -160,8 +161,8 @@ try {
     assert.deepEqual(metadata(), originalMetadata, 'Function owner, ACL, signature and execution properties must remain exact');
     assert.equal(protectedDefinitions(), originalProtected, 'Every other function definition and ACL, including account-self snapshots, must remain untouched');
     report.after = outcomes(); report.httpAfter = await httpOutcomes();
-    assert.deepEqual(report.after, report.before, 'Every SQL role result, error, nested field, null and array order must match');
-    assert.deepEqual(report.httpAfter, report.httpBefore, 'Actual SDK/PostgREST bodies and denial statuses must match');
+    assertRehearsalJsonEqual(report.after, report.before, 'Every SQL role result, error, nested field, null and array order must match');
+    assertRehearsalJsonEqual(report.httpAfter, report.httpBefore, 'Actual SDK/PostgREST bodies and denial statuses must match');
     const candidateDefinition = sql(`select pg_get_functiondef('${target}'::regprocedure)`);
     assert.equal(bodyOf(candidateDefinition).split('    select (jsonb_build_object(')[0], bodyOf(baselineDefinition).split('    select (jsonb_build_object(')[0], 'Educational CTEs must remain byte-for-byte identical');
     report.planAfter = plan(candidateDefinition, originalMetadata.owner);

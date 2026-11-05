@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFile } from 'node:fs/promises';
+import { readFile, mkdtemp, rm } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { GATED_TESTS, reachableScripts } from '../scripts/lib/testInventory.mjs';
 
 const scripts = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')).scripts;
@@ -21,6 +24,8 @@ test('actual CI reaches every registered database gate and the new ownership reh
 
 test('built fault and ownership checks run after the actual CI build and in the local release command', () => {
     const required = [
+        ['LOADING_FIRST_PAINT_DIST', 'test:ui:loading-first-paint'],
+        ['UI_PROGRESS_GRADING_DIST', 'test:ui:progress-grading'],
         ['PRIVATE_CLASSROOM_UI_DIST', 'test:private-classrooms'],
         ['UI_STUDENT_NAVIGATION_DIST', 'test:ui:student-navigation-recovery'],
         ['UI_AUTH_SMOKE_DIST', 'test:ui:auth-smoke'],
@@ -143,4 +148,31 @@ test('compiled Word Hunt acceptance never starts the source-only component serve
         'source validation must keep the real application evidence acceptance');
     assert.match(scripts['test:ui:word-hunt-evidence'], /node scripts\/ui-word-hunt-evidence-smoke\.mjs && node scripts\/ui-student-word-hunt-evidence-smoke\.mjs/,
         'the established source command retains both controls');
+});
+
+
+test('CI preserves production public configuration from the final build through compiled checks', async t => {
+    const steps = validation.split('\n      - name: ');
+    const configure = steps.findIndex(step => step.startsWith('Align compiled checks with hosted build configuration\n'));
+    const build = steps.findIndex(step => step.includes('run: npm run desktop:build:web'));
+    assert.ok(configure > 0 && configure < build, 'production configuration must precede the final build');
+    const step = steps[configure];
+    assert.match(step, /VITE_SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL \}\}/);
+    assert.match(step, /VITE_SUPABASE_PUBLISHABLE_KEY: \$\{\{ secrets\.SUPABASE_PUBLISHABLE_KEY \}\}/);
+    const script = step.split('        run: |\n')[1].split('\n').filter(Boolean).map(line => line.slice(10)).join('\n');
+    const directory = await mkdtemp(join(tmpdir(), 'sparks-workflow-env-'));
+    t.after(() => rm(directory, { recursive: true, force: true }));
+    const envFile = join(directory, 'github-env');
+    const production = { VITE_SUPABASE_URL: 'https://production.fixture.invalid', VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_production_fixture' };
+    execFileSync('bash', ['-eu', '-c', script], { env: { ...process.env, ...production, GITHUB_ENV: envFile } });
+    // GitHub applies GITHUB_ENV in later steps, superseding the earlier local build values.
+    const inherited = { VITE_SUPABASE_URL: 'http://127.0.0.1:54321', VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_local_fixture' };
+    for (const line of (await readFile(envFile, 'utf8')).trim().split('\n')) {
+        const index = line.indexOf('='); inherited[line.slice(0, index)] = line.slice(index + 1);
+    }
+    assert.deepEqual(inherited, production);
+    for (const later of steps.slice(configure + 1)) {
+        assert.doesNotMatch(later, /VITE_SUPABASE_(?:URL|PUBLISHABLE_KEY|ANON_KEY)/, 'later build/check steps must inherit the same public configuration');
+        assert.doesNotMatch(later, /GITHUB_ENV/, 'later steps must not replace the persisted build configuration');
+    }
 });

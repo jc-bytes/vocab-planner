@@ -354,27 +354,27 @@ test('private classes enforce ownership and verified enrollment through real aut
                 const homeView = teacherPage.locator('#teacher-overview-view');
                 await homeView.getByRole('heading', { name: 'My classes', exact: true }).waitFor();
                 const teacherView = teacherPage.locator('#teacher-classes-view');
+                const teacherStudents = teacherPage.locator('#teacher-class-students-view');
                 const classCard = homeView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: '6A', exact: true }) });
                 await classCard.waitFor({ state: 'visible' });
                 assert.equal(await classCard.count(), 1, 'Only this teacher’s matching class is listed');
                 await classCard.getByText('Technology · 2026', { exact: true }).waitFor();
                 await classCard.getByRole('button', { name: 'Open class 6A', exact: true }).click();
                 await teacherPage.locator('#tab-students').click();
-                const studentsView = teacherPage.locator('#teacher-class-students-view');
-                await studentsView.getByRole('region', { name: 'Class students', exact: true }).waitFor();
-                assert.equal(await teacherPage.getByLabel('Current class', { exact: true }).inputValue(), ca.id, 'Students retains the class selected in Classwork');
-                await studentsView.getByRole('button', { name: 'Invite students', exact: true }).click();
+                await teacherStudents.waitFor({ state: 'visible' });
+                await teacherStudents.getByRole('button', { name: 'Invite students', exact: true }).click();
                 const inviteDialog = teacherPage.getByRole('dialog', { name: 'Invite students', exact: true });
                 await inviteDialog.getByLabel('Student emails', { exact: true }).fill(neither.email);
                 await inviteDialog.getByRole('button', { name: 'Invite students', exact: true }).click();
                 await inviteDialog.waitFor({ state: 'detached' });
-                await studentsView.locator('.class-pending-invitations summary').click();
-                await studentsView.getByText(neither.email + ' · Invited', { exact: false }).waitFor();
+                await teacherStudents.locator('.class-pending-invitations summary').click();
+                await teacherStudents.getByText(neither.email + ' · Invited', { exact: false }).waitFor();
                 await teacherPage.locator('#tab-classes').click();
+                await teacherView.waitFor({ state: 'visible' });
                 const baseline = await a.repo.listAssignments(ca.id);
                 async function publishSavedMaterial(label) {
                     await teacherPage.locator('#tab-classes').click();
-                    assert.equal(await teacherPage.getByLabel('Current class', { exact: true }).inputValue(), ca.id, 'Classwork retains the class selected in Students');
+                    await teacherView.waitFor({ state: 'visible' });
                     await teacherView.getByRole('button', { name: 'Assign material', exact: true }).click();
                     const dialog = teacherPage.getByRole('dialog', { name: 'Assign material', exact: true });
                     await dialog.locator('select[name=material]').selectOption({ label });
@@ -382,11 +382,13 @@ test('private classes enforce ownership and verified enrollment through real aut
                     assert.equal(await dialog.locator('input[name=classIds]:checked').count(), 1);
                     await dialog.getByRole('button', { name: 'Assign material', exact: true }).click();
                     await dialog.waitFor({ state: 'detached' });
-                    await teacherView.waitFor({ state: 'visible' });
-                    await teacherView.getByRole('rowheader', { name: label.split(' · ').slice(1).join(' · '), exact: true }).waitFor();
+                    await teacherPage.locator('#teacher-classes-view:not(.hidden)').waitFor();
+                    const currentWork = teacherView.getByRole('button', { name: 'Current', exact: true });
+                    await currentWork.waitFor();
+                    assert.equal(await currentWork.getAttribute('aria-pressed'), 'true');
                 }
                 await publishSavedMaterial('Vocabulary · Cell practice');
-                await teacherView.getByRole('rowheader', { name: 'Cell practice', exact: true }).waitFor();
+                await teacherView.getByText('Cell practice', { exact: true }).first().waitFor();
                 await publishSavedMaterial('Spark · Private reflection');
                 const afterPublication = await a.repo.listAssignments(ca.id);
                 assert.equal(afterPublication.filter(row => row.title === 'Cell practice').length,
@@ -417,6 +419,7 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await sparkView.getByText('Answer saved. Your teacher will review it.', { exact: true }).waitFor();
                 await teacherPage.locator('#tab-assignments').click();
                 const reviewView = teacherPage.locator('#teacher-assignments-view');
+                await reviewView.getByRole('tab', { name: 'Needs review', selected: true }).waitFor();
                 await teacherPage.getByLabel('Current class', { exact: true }).selectOption(ca.id);
                 await reviewView.getByRole('button', { name: `Open Private reflection · ${ca.name}`, exact: true }).click();
                 await reviewView.getByText('My class response is private.', { exact: true }).waitFor();

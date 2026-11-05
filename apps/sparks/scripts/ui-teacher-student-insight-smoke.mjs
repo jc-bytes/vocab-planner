@@ -184,5 +184,17 @@ try {
   f.setFailure(false);document.querySelector('#student-insight-retry').click();return {staleIgnored,failed};
  });assert.deepEqual(checks,{staleIgnored:true,failed:true});
  await page.getByText('Required work includes vocabulary activities and reading checks.',{exact:false}).waitFor();
+ const periodChecks=await page.evaluate(async()=>{
+  const {loadStudentInsight}=await import('/js/teacherStudentInsightView.js');const f=window.insightFixture;
+  f.manager.studentProgressPeriod={period:'custom',from:'2026-01-01',to:'2026-01-01'};
+  await loadStudentInsight(f.manager,'student');
+  const selectedCount=document.querySelectorAll('.student-insight-assignment').length;
+  const selectedText=document.querySelector('#student-profile-assigned-work').textContent;
+  [...document.querySelectorAll('button')].find(b=>b.textContent==='Show all work').click();
+  const allCount=document.querySelectorAll('.student-insight-assignment').length;
+  [...document.querySelectorAll('button')].find(b=>b.textContent==='Show selected period').click();
+  const restoredCount=document.querySelectorAll('.student-insight-assignment').length;
+  return {selectedCount,allCount,restoredCount,label:selectedText.includes('Assigned between 2026-01-01 and 2026-01-01')};
+ });assert.deepEqual(periodChecks,{selectedCount:2,allCount:3,restoredCount:2,label:true});
  console.log('Student Insight: progress bars, accuracy trends, graph values, activity switching, empty history, delayed graph response, graph retry, profile totals, answers, mistakes, timing, saved notes, review revisions, pagination, mobile and stale profile guards passed.');
 } finally {await browser?.close();server?.kill();}

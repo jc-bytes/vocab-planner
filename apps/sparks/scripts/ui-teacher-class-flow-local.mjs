@@ -38,12 +38,13 @@ try {
   return page;
  }
  const waitClass=()=>teacher.waitForFunction(()=>document.querySelector('#teacher-classes-view.active')?.getAttribute('aria-busy')==='false');
+ const waitStudents=()=>teacher.waitForFunction(()=>document.querySelector('#teacher-class-students-view.active')?.getAttribute('aria-busy')==='false');
  async function teacherHome(){await teacher.locator('#tab-overview').click();await teacher.locator('#teacher-overview-view .teacher-class-card').first().waitFor();}
  teacher=await newSession();
  await teacher.goto(`${baseUrl}/teacher.html`);
  await teacher.locator('#teacher-email').fill(AUDIT_TEACHER_EMAIL);await teacher.locator('#teacher-password').fill(AUDIT_PASSWORD);
  await teacher.locator('#teacher-login-form button[type=submit]').click();
- const home=teacher.locator('#teacher-overview-view'),classes=teacher.locator('#teacher-classes-view'),review=teacher.locator('#teacher-assignments-view');
+ const home=teacher.locator('#teacher-overview-view'),classes=teacher.locator('#teacher-classes-view'),students=teacher.locator('#teacher-class-students-view'),review=teacher.locator('#teacher-assignments-view');
  await home.getByRole('heading',{name:'My classes',exact:true}).waitFor();mark('Real teacher password login and school access');
  if(!beforeClasses.some(c=>c.name===className)){
   await home.getByRole('button',{name:'Create class',exact:true}).click();const dialog=teacher.getByRole('dialog',{name:'Create class',exact:true});
@@ -57,8 +58,8 @@ try {
  mark('Create/reopen dedicated class through Home card');
  let roster=await repo.getRoster(classId);
  if(!roster.some(s=>s.email===AUDIT_STUDENT_EMAIL)){
-  await classes.getByRole('tab',{name:'Students',exact:true}).click();await waitClass();
-  await classes.getByRole('button',{name:'Invite students',exact:true}).click();const dialog=teacher.getByRole('dialog',{name:'Invite students',exact:true});
+  await teacher.locator('#tab-students').click();await waitStudents();
+  await students.getByRole('button',{name:'Invite students',exact:true}).click();const dialog=teacher.getByRole('dialog',{name:'Invite students',exact:true});
   await dialog.getByLabel('Student emails',{exact:true}).fill(AUDIT_STUDENT_EMAIL);
   await dialog.getByRole('button',{name:'Invite students',exact:true}).click();await dialog.waitFor({state:'detached'});
  }
@@ -118,11 +119,11 @@ try {
  const file=await download;await file.saveAs(`${output}/assignment-results.csv`);const csv=await readFile(`${output}/assignment-results.csv`,'utf8');
  assert.ok(csv.includes(className)&&csv.includes(answer)&&!csv.includes('Audit 6A'));await exportDialog.getByRole('button',{name:'Cancel',exact:true}).click();mark('Download class-scoped CSV with actual student answer');
  await teacher.getByLabel('Current class',{exact:true}).selectOption(original.id);
- await teacher.locator('#teacher-assignments-view').getByRole('tab',{name:'Current',exact:true}).click();
+ await teacher.locator('#teacher-assignments-view').getByRole('tab',{name:'Current work',exact:true}).click();
  assert.equal(await review.getByRole('button',{name:`Open ${spark.title} · ${className}`,exact:true}).count(),0);
  await teacher.getByLabel('Current class',{exact:true}).selectOption(classId);await teacher.locator('#tab-classes').click();await waitClass();
- await classes.getByRole('tab',{name:'Students',exact:true}).click();await waitClass();
- await classes.getByRole('button',{name:'Make groups',exact:true}).click();await teacher.waitForFunction(id=>document.querySelector('#group-class-select')?.value===id,classId);
+ await teacher.locator('#tab-students').click();await waitStudents();
+ await students.getByRole('button',{name:'Make groups',exact:true}).click();await teacher.waitForFunction(id=>document.querySelector('#group-class-select')?.value===id,classId);
  if(roster.length<2){
   assert.equal(await teacher.locator('#randomize-groups-btn').isDisabled(),true);
   await teacher.locator('#group-student-list label.group-student-toggle').first().click();
@@ -130,8 +131,8 @@ try {
   await teacher.locator('#group-student-list label.group-student-toggle').first().click();
  }else{await teacher.locator('#randomize-groups-btn').click();await teacher.locator('#group-results .random-group-card').first().waitFor();}
  mark('Switch classes without leaking work; Groups uses selected roster and minimum-size guard');
- await teacher.locator('#tab-classes').click();await waitClass();await classes.getByRole('tab',{name:'Students',exact:true}).click();await waitClass();
- await classes.getByRole('button',{name:/^Actions for /}).first().click();await teacher.getByRole('menuitem',{name:'Assigned work',exact:true}).click();
+ await teacher.locator('#tab-classes').click();await waitClass();await teacher.locator('#tab-students').click();await waitStudents();
+ await students.getByRole('button',{name:/^Actions for /}).first().click();await teacher.getByRole('menuitem',{name:'Assigned work',exact:true}).click();
  await teacher.locator('#student-profile-assigned-work [data-assignment-card]').first().waitFor();
  const profileIds=await teacher.locator('#student-profile-assigned-work [data-assignment-card]').evaluateAll(nodes=>nodes.map(n=>n.dataset.assignmentCard));
  assert.deepEqual(new Set(profileIds),new Set([vocab.id,spark.id]));mark('Student profile lists only selected class assignments');
@@ -140,7 +141,7 @@ try {
  await home.getByRole('button',{name:`Open class ${className}`,exact:true}).click();await waitClass();
  for(const width of [1440,768,390,320]){await teacher.setViewportSize({width,height:1000});assert.equal(await teacher.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`Teacher fits ${width}px`);}
  await teacher.screenshot({path:`${output}/classwork-mobile.png`,animations:'disabled'});
- await teacher.reload();await classes.getByRole('tab',{name:'Classwork',exact:true}).waitFor();assert.equal(await teacher.getByLabel('Current class',{exact:true}).inputValue(),classId);
+ await teacher.reload();await classes.getByRole('button',{name:'Current',exact:true}).waitFor();assert.equal(await teacher.getByLabel('Current class',{exact:true}).inputValue(),classId);
  await assertNoAccessibilityViolations(teacher,'Real mobile classwork',{include:['#teacher-classes-view','#teacher-class-switcher']});
  assert.deepEqual(backendErrors,[]);assert.deepEqual(errors,[]);
  const result={environment:built?'local production build':'local source',stages,classId,assignmentIds:[vocab.id,spark.id],originalClassAssignmentsPreserved:originalWork.length,screenshots:output};

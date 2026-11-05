@@ -57,11 +57,53 @@ try {
         });
         const pageErrors = [];
         page.on('pageerror', error => pageErrors.push(error.message));
+        const loginRequests = [];
+        const recordLoginRequest = item => { loginRequests.push(item); if (loginRequests.length > 40) loginRequests.shift(); };
+        const loginPath = url => {
+            const path = new URL(url).pathname;
+            return /^\/(?:auth|rest)\/v1\//.test(path) ? path : null;
+        };
+        const loginResponse = response => {
+            const path = loginPath(response.url());
+            if (path) recordLoginRequest({ path, status: response.status() });
+        };
+        const loginRequestFailed = request => {
+            const path = loginPath(request.url());
+            if (path) recordLoginRequest({ path, failed: true });
+        };
+        page.on('response', loginResponse);
+        page.on('requestfailed', loginRequestFailed);
         await page.goto(`${baseUrl}/student.html`, { waitUntil: 'domcontentloaded' });
         await page.locator('#login-email').fill(AUDIT_STUDENT_EMAIL);
         await page.locator('#login-password').fill(AUDIT_PASSWORD);
         await page.locator('#student-login-form button[type="submit"]').click();
-        await page.waitForFunction(() => window.studentApp?.authInitialized);
+        try { await page.waitForFunction(() => window.studentApp?.authInitialized); }
+        catch (error) {
+            // Paths/statuses and boolean states only. Never log credentials,
+            // sessions, request bodies, response bodies or backend error text.
+            console.error(`${scenario}: login did not initialize`, {
+                requests: loginRequests, pageErrorCount: pageErrors.length,
+                ...await page.evaluate(() => {
+                    const app = window.studentApp, coordinator = app?.auth?.sessionCoordinator;
+                    const visible = selector => {
+                        const node = document.querySelector(selector);
+                        return Boolean(node && node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden');
+                    };
+                    return {
+                        appCreated: Boolean(app), listenersInitialized: Boolean(app?.listeners?.initialized),
+                        authInitialized: Boolean(app?.authInitialized), hasCurrentUser: Boolean(app?.currentUser),
+                        initializationPending: Boolean(coordinator?.inFlight), initializationCompleted: Boolean(coordinator?.completedKey),
+                        startupRecovery: Boolean(app?.auth?.startupRecovery), startupRecoveryVisible: visible('[data-startup-recovery]'),
+                        loginVisible: visible('#login-view'), loginErrorVisible: visible('#login-error'),
+                        forcedPasswordVisible: visible('#force-password-modal'), activeView: document.querySelector('.view.active')?.id || null
+                    };
+                })
+            });
+            throw error;
+        } finally {
+            page.off('response', loginResponse);
+            page.off('requestfailed', loginRequestFailed);
+        }
         await page.evaluate(id => studentApp.navigateTo({ view: 'unit', unitId: `assignment.${id}` }), seeded.vocabularyAssignmentId);
         await page.waitForFunction(id => studentApp.currentVocab?.assignmentId === id && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false', seeded.vocabularyAssignmentId);
         await page.locator('#activity-menu-view [data-activity="flashcards"]').click();

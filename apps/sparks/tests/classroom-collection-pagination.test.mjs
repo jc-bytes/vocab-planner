@@ -52,7 +52,7 @@ test('assignments beyond 1000 survive a lower server cap, tie ordering and captu
         assert.deepEqual(call.filters, [['school_id', 'school-a']]);
         assert.deepEqual(call.orders, [['release_at', false], ['id', false]]);
         assert.ok(call.signal instanceof AbortSignal);
-            assert.equal(call.signal.aborted, false);
+        assert.equal(call.signal.aborted, false);
     }
     assert.equal(f.calls.filter(call => call.count === 'exact').length, 1);
 });
@@ -93,6 +93,7 @@ test('later-page cancellation rejects instead of returning partial results', asy
     f.tables.class_assignments = rows(1200);
     await assert.rejects(f.repository.listAssignments(undefined, { signal: f.controller.signal }), { name: 'AbortError' });
     assert.equal(f.calls.length, 2);
+    assert.equal(f.calls.at(-1).signal.aborted, true, 'caller cancellation aborts the active page transport');
 });
 
 test('later-page failures reject instead of returning partial results', async () => {

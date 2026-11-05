@@ -1,3 +1,4 @@
+import { mutationClient } from './helpers/mutationClient.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSchoolContext } from '../js/services/schoolContext.js';
@@ -46,15 +47,18 @@ test('school selection notifies subscribers and suspended school has no teaching
     unsubscribe(); context.select('one'); assert.equal(count, 1);
 });
 test('repository binds target school and caller-selected roles explicitly; propagates server denial', async () => {
-    const calls = []; const repository = createSchoolRepository(async () => ({ rpc(name, args) { calls.push({ name, args }); return Promise.resolve({ data: null, error: new Error('denied') }); } }));
+    const calls = []; const repository = createSchoolRepository(async () => mutationClient({ rpc(name, args) { calls.push({ name, args }); return Promise.resolve({ data: null, error: new Error('denied') }); } }));
     await assert.rejects(repository.setMember('school-a', 'user-b', ['teacher'], false), /denied/);
     assert.deepEqual(calls[0], { name: 'set_school_member_v1', args: { p_school_id: 'school-a', p_user_id: 'user-b', p_roles: ['teacher'], p_active: false } });
 });
 test('repository forwards cancellation and never dispatches an already cancelled operation', async () => {
-    const controller = new AbortController(); let signal, calls = 0;
-    const repository = createSchoolRepository(async () => ({ rpc() { calls++; return { abortSignal(value) { signal = value; return Promise.resolve({ data: { schools: [] }, error: null }); } }; } }));
-    await repository.getAccess({ signal: controller.signal }); assert.ok(signal instanceof AbortSignal); assert.equal(signal.aborted, false);
-    controller.abort(); await assert.rejects(repository.getAccess({ signal: controller.signal }), { name: 'AbortError' }); assert.equal(calls, 1);
+    const controller = new AbortController(), entered = deferred(); let signal, calls = 0;
+    const repository = createSchoolRepository(async () => ({ rpc() { calls++; return { abortSignal(value) { signal = value; entered.resolve(); return new Promise(() => {}); } }; } }));
+    const pending = repository.getAccess({ signal: controller.signal });
+    await entered.promise;
+    assert.ok(signal instanceof AbortSignal); assert.equal(signal.aborted, false);
+    controller.abort(); await assert.rejects(pending, { name: 'AbortError' }); assert.equal(signal.aborted, true);
+    await assert.rejects(repository.getAccess({ signal: controller.signal }), { name: 'AbortError' }); assert.equal(calls, 1);
 });
 
 test('academic years retain explicit school scope and numeric year across create and archive', async () => {
@@ -71,7 +75,7 @@ test('academic years retain explicit school scope and numeric year across create
 
 test('new school creation requests first administrator by email with a stable retry key', async () => {
     const calls = [];
-    const repository = createSchoolRepository(async () => ({ rpc(name, args) { calls.push({ name, args }); return Promise.resolve({ data: { id: 'pending', active: false }, error: null }); } }));
+    const repository = createSchoolRepository(async () => mutationClient({ rpc(name, args) { calls.push({ name, args }); return Promise.resolve({ data: { id: 'pending', active: false }, error: null }); } }));
     await repository.createSchool({ name: ' New school ', timezone: 'America/Panama', adminEmail: ' Admin@Example.org ', requestId: 'retry-key' });
     assert.deepEqual(calls, [{ name: 'create_school_with_admin_invitation_v1', args: { p_name: 'New school', p_timezone: 'America/Panama', p_admin_email: 'admin@example.org', p_request_id: 'retry-key' } }]);
 });

@@ -23,7 +23,8 @@ export function initTeacherProgressListeners(manager, { controller = new AbortCo
     });
 
     on($('#student-profile-back-btn'), 'click', () => {
-        manager.showTeacherSection(STUDENTS_PAGE.id);
+        manager.showTeacherSection(STUDENTS_PAGE.id, { classId: manager.getSelectedTeacherClassId?.(),
+            ...(manager.studentGradebookReturn ? { gradebookContext: manager.studentGradebookReturn } : manager.studentProgressPeriod ? { progressContext: manager.studentProgressPeriod } : {}) });
     });
     on($('#student-profile-previous-btn'), 'click', () => manager.moveStudentProfile(-1));
     on($('#student-profile-next-btn'), 'click', () => manager.moveStudentProfile(1));

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ember spotlight · Local prototype</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/buttons.css">
+  <link rel="stylesheet" href="../css/student.css">
+  <link rel="stylesheet" href="../css/student-features.css">
+  <link rel="stylesheet" href="./ember-spotlight.css">
+  <style>
+    body { margin: 0; padding: 24px; min-height: 100vh; overflow: auto; background: #0b1428; color: #eef3ff; font-family: Inter, sans-serif; }
+    header { max-width: 940px; margin: 0 auto 24px; position: sticky; top: 0; z-index: 10; padding: 12px 0; background: #0b1428; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    header h1 { margin: 0 0 4px; }
+    header p { margin: 0; font-size: .85rem; }
+    .preview-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .preview-actions button { min-height: 44px; }
+    h1 { font-size: 1.4rem; }
+    #activity-view { height: auto; overflow: visible; }
+    @media(max-width:480px) { body { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header><div><h1>Flashcards with Ember</h1><p>Spotlight guide with sample words.</p></div><nav class="preview-actions" aria-label="Activity help"><button id="restart" type="button" class="btn secondary-btn">Start again</button><button id="show-guide" type="button" class="btn primary-btn" aria-haspopup="dialog">What’s next?</button></nav></header>
+  <section id="activity-view"><div id="activity-container"></div></section>
+  <script type="module" src="./ember-flashcards.js"></script>
+</body>
+</html>

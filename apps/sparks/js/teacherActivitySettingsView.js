@@ -1,5 +1,6 @@
 import { $, createElement } from './main.js';
 import { VOCAB_ACTIVITY_OPTIONS, VOCAB_ACTIVITY_SETTING_KEYS } from './teacherVocabularyEditorConstants.js';
+import { renderVocabularyGradingSettings } from './teacherVocabularyGradingSettings.js';
 
 export function renderActivitySettings() {
         const container = $('#activity-flow-settings');
@@ -20,6 +21,7 @@ export function renderActivitySettings() {
                 presets.append(button);
             }
         }
+        renderVocabularyGradingSettings(this);
         container.innerHTML = '';
 
         VOCAB_ACTIVITY_OPTIONS.forEach(activity => {

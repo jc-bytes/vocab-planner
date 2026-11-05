@@ -19,10 +19,11 @@
 .class-settings-dialog button { width: auto; }
 @media (max-width: 600px) { .class-detail-header { align-items: flex-start; } .class-detail-title { order: -1; flex-basis: 100%; } }
 .class-detail-tabs { display: flex; gap: 1.5rem; border-bottom: 1px solid var(--color-border); }
-.classrooms .class-detail-tab { appearance: none; background: none; box-shadow: none; border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: var(--color-text-muted, #aab6d0); margin: 0; padding: .65rem 0; font-size: .9rem; font-weight: 600; width: auto; }
+.classrooms .class-detail-tab { appearance: none; background: none; box-shadow: none; border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: var(--color-text-muted, #aab6d0); margin: 0; padding: .65rem 0; min-height: var(--touch-target, 2.75rem); font-size: .9rem; font-weight: 600; width: auto; }
 .classrooms .class-detail-tab[aria-selected="true"] { border-bottom-color: #8e9bff; color: var(--color-text); }
 .classrooms .class-back-link, .classrooms .class-table-link { background: none; border: 0; border-radius: 0; box-shadow: none; color: var(--color-text); width: auto; }
 .classrooms .class-back-link { font-size: 1.65rem; padding: .2rem .4rem; margin: 0; line-height: 1; }
+.classrooms .class-back-link, .classrooms .floating-action-menu-trigger { min-width: var(--touch-target, 2.75rem); }
 .classrooms .class-table-link { color: #b9c8ff; text-decoration: underline; text-underline-offset: .2rem; }
 .class-detail-tab:focus-visible, .class-back-link:focus-visible, .class-table-link:focus-visible { outline: 2px solid #8e9bff; outline-offset: 3px; }
 .class-settings-panel { display: grid; align-content: start; gap: .75rem; max-width: 40rem; }

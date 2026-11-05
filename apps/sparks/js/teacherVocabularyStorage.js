@@ -31,12 +31,13 @@ class TeacherVocabularyStorageMethods {
         }
     }
 
-    getLocalVocabs() {
-        const stored = localStorage.getItem(`teacher_vocab_library:${this.authDisabled ? 'demo' : schoolSessionKey(this.currentUser?.uid || this.currentUser?.id)}`);
-        if (!stored) return [];
+    getLocalVocabs({ strict = false } = {}) {
         try {
+            const stored = localStorage.getItem(`teacher_vocab_library:${this.authDisabled ? 'demo' : schoolSessionKey(this.currentUser?.uid || this.currentUser?.id)}`);
+            if (!stored) return [];
             const vocabularies = validateVocabularyCollection(JSON.parse(stored));
             if (!vocabularies) {
+                if (strict) throw new Error('Local vocabulary drafts do not match the expected format.');
                 console.warn('Local vocabulary drafts do not match the expected format.');
                 return [];
             }
@@ -45,6 +46,9 @@ class TeacherVocabularyStorageMethods {
                 subjectSlug: getVocabSubjectSlug(vocab)
             }));
         } catch (error) {
+            // Presentation may omit unavailable drafts. Read-modify-write callers
+            // must stop so a failed read cannot erase existing local work.
+            if (strict) throw error;
             console.warn('Could not read local vocabulary drafts:', error);
             return [];
         }
@@ -52,7 +56,7 @@ class TeacherVocabularyStorageMethods {
 
     removeLocalVocab(id) {
         if (!id) return false;
-        const before = this.getLocalVocabs();
+        const before = this.getLocalVocabs({ strict: true });
         const after = before.filter(vocab => vocab.id !== id);
         if (after.length === before.length) return false;
 
@@ -68,7 +72,7 @@ class TeacherVocabularyStorageMethods {
             subjectSlug: getVocabSubjectSlug(rest)
         };
 
-        let vocabs = this.getLocalVocabs();
+        let vocabs = this.getLocalVocabs({ strict: true });
         const index = vocabs.findIndex(v => v.id === vocab.id);
 
         if (index >= 0) {

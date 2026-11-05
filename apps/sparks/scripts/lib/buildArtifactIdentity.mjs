@@ -71,7 +71,7 @@ async function hashes(root, names) {
 export async function fingerprintBuildInputs(root) {
     if ((await lstat(root)).isSymbolicLink()) throw new Error('Artifact input root cannot be a symbolic link.');
     const names = [...ROOT_FILES, ...BUILD_FILES];
-    for (const directory of ['js', 'css', 'config', 'images']) {
+    for (const directory of ['js', 'css', 'config', 'images', 'assets']) {
         names.push(...await regularFiles(root, directory, { inputs: true }));
     }
     const catalog = await loadVocabularyCatalogBundle(root);

@@ -94,5 +94,6 @@ test('cancellation during a later page rejects instead of returning partial Spar
     await fixture(async f => {
         await assert.rejects(sparksRepository.list({ signal: f.controller.signal }), { name: 'AbortError' });
         assert.equal(f.calls.length, 2);
+        assert.equal(f.calls.at(-1).signal.aborted, true, 'caller cancellation aborts the active page transport');
     }, { beforePage: (call, controller) => { if (call.start > 0) controller.abort(); } });
 });

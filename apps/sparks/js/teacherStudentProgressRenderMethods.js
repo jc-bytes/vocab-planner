@@ -1,6 +1,7 @@
 import { $, $$, createElement, escapeHtml, notifications } from './main.js';
 import { supabaseService } from './supabaseService.js';
 import { buildStudentProfileModel } from './teacherStudentProfileModel.js';
+import { captureTeacherProgressOwner } from './teacherStudentProgressOwner.js';
 
 class TeacherStudentProgressRenderMethods {
     renderProgressTable() {
@@ -178,8 +179,12 @@ class TeacherStudentProgressRenderMethods {
         void this.applyRoute(route);
     }
 
-    async showStudentProfileById(studentId, { tab = 'overview' } = {}) {
+    async showStudentProfileById(studentId, { tab = 'overview', progressContext, gradebookContext } = {}) {
         if (!this.ensureAuthenticated(false) || !studentId) return false;
+        this.studentProgressPeriod = gradebookContext || progressContext || null;
+        this.studentGradebookReturn = gradebookContext || null;
+        const backButton = $('#student-profile-back-btn');
+        if (backButton) backButton.textContent = gradebookContext ? 'Back to grades' : progressContext ? 'Back to trimester progress' : 'Back to Students';
         const classId = this.getSelectedTeacherClassId?.();
         const navigation = this.captureTeacherNavigation?.();
         const generation = this.studentProgressSessionGeneration || 0;
@@ -422,7 +427,7 @@ class TeacherStudentProgressRenderMethods {
             $(`#student-profile-${name}-panel`)?.classList.toggle('hidden', name !== activeTab);
         });
         if (updateRoute && this.activeStudentId) {
-            this.setRoute({ view: 'student-profile', studentId: this.activeStudentId, tab: activeTab, classId: this.getSelectedTeacherClassId?.() });
+            this.setRoute({ view: 'student-profile', studentId: this.activeStudentId, tab: activeTab, classId: this.getSelectedTeacherClassId?.(), ...(this.studentGradebookReturn ? { gradebookContext: this.studentGradebookReturn } : this.studentProgressPeriod ? { progressContext: this.studentProgressPeriod } : {}) });
         }
     }
 
@@ -448,7 +453,9 @@ class TeacherStudentProgressRenderMethods {
         const route = {
             view: 'student-profile',
             studentId: button.dataset.studentId,
-            tab: this.activeStudentProfileTab || 'overview'
+            tab: this.activeStudentProfileTab || 'overview',
+            classId: this.getSelectedTeacherClassId?.(),
+            ...(this.studentGradebookReturn ? { gradebookContext: this.studentGradebookReturn } : this.studentProgressPeriod ? { progressContext: this.studentProgressPeriod } : {})
         };
         this.setRoute(route);
         void this.applyRoute(route);
@@ -460,11 +467,12 @@ class TeacherStudentProgressRenderMethods {
     }
 
     async handleActivityLateOverride(student, button) {
-        const generation = this.studentProgressSessionGeneration || 0;
+        const ownerCurrent = captureTeacherProgressOwner(this);
         const studentId = student?.id;
+        const isCurrent = () => ownerCurrent() && this.activeStudentId === studentId;
         const attemptId = String(button?.dataset?.attemptId || '');
         const currentlyExcused = button?.dataset?.excused === 'true';
-        if (!attemptId) return;
+        if (!attemptId || !isCurrent()) return;
 
         let reason = '';
         if (currentlyExcused) {
@@ -479,17 +487,16 @@ class TeacherStudentProgressRenderMethods {
             }
         }
 
+        if (!isCurrent()) return;
         button.disabled = true;
         try {
             const updatedAttempt = await supabaseService.setStudentActivityLateOverride(attemptId, {
                 excused: !currentlyExcused,
                 reason
             });
-            if (generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId) return;
+            if (!isCurrent()) return;
             await this.invalidateStudentProgressQueries();
-            if (generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId) return;
+            if (!isCurrent()) return;
             for (const unit of Object.values(student.units || {})) {
                 for (const score of Object.values(unit.scores || {})) {
                     if (score.latestAttempt?.attemptId === attemptId) score.latestAttempt = updatedAttempt;
@@ -499,12 +506,11 @@ class TeacherStudentProgressRenderMethods {
             notifications.success(currentlyExcused ? 'Late excuse removed.' : 'Late activity excused.');
             this.renderStudentProfile(student);
             const { loadStudentInsight } = await import('./teacherStudentInsightView.js');
-            if (generation === (this.studentProgressSessionGeneration || 0) && this.activeStudentId === studentId) {
+            if (isCurrent()) {
                 await loadStudentInsight(this, studentId);
             }
         } catch (error) {
-            if (generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId) return;
+            if (!isCurrent()) return;
             console.error('Could not update late-work status:', error);
             notifications.error(error.message || 'Could not update late-work status.');
             button.disabled = false;
@@ -519,12 +525,13 @@ class TeacherStudentProgressRenderMethods {
     async handlePasswordReset() {
         if (!this.activeStudentId) return;
         const studentId = this.activeStudentId;
-        const generation = this.studentProgressSessionGeneration || 0;
+        const ownerCurrent = captureTeacherProgressOwner(this);
+        const isCurrent = () => ownerCurrent() && this.activeStudentId === studentId;
         const student = this.allStudentData.find(s => s.id === studentId)
             || (this.activeStudentProfile?.id === studentId ? this.activeStudentProfile : null);
         const name = student?.studentProfile?.name || student?.email || 'this student';
         const confirmed = confirm(`Reset the password for ${name}?`);
-        if (!confirmed) return;
+        if (!confirmed || !isCurrent()) return;
         const resetGeneration = (this.studentPasswordResetGeneration || 0) + 1;
         this.studentPasswordResetGeneration = resetGeneration;
 
@@ -541,13 +548,9 @@ class TeacherStudentProgressRenderMethods {
             if (tempOutput) tempOutput.style.display = 'none';
 
             const result = await supabaseService.resetStudentPassword(studentId);
-            if (generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId
-                || resetGeneration !== this.studentPasswordResetGeneration) return;
+            if (!isCurrent() || resetGeneration !== this.studentPasswordResetGeneration) return;
             await this.invalidateStudentProgressQueries();
-            if (generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId
-                || resetGeneration !== this.studentPasswordResetGeneration) return;
+            if (!isCurrent() || resetGeneration !== this.studentPasswordResetGeneration) return;
             if (status) {
                 status.style.color = result.warning ? '#b45309' : 'var(--success-color)';
                 status.textContent = result.warning || 'Temporary password created.';
@@ -565,16 +568,14 @@ class TeacherStudentProgressRenderMethods {
                     : 'Required';
             }
         } catch (error) {
-            if (generation !== (this.studentProgressSessionGeneration || 0)
-                || this.activeStudentId !== studentId
-                || resetGeneration !== this.studentPasswordResetGeneration) return;
+            if (!isCurrent() || resetGeneration !== this.studentPasswordResetGeneration) return;
             console.error('Password reset failed:', error);
             if (status) {
                 status.style.color = 'var(--danger-color)';
                 status.textContent = error.message || 'Could not reset password.';
             }
         } finally {
-            if (generation === (this.studentProgressSessionGeneration || 0)
+            if (ownerCurrent()
                 && resetGeneration === this.studentPasswordResetGeneration
                 && button) {
                 button.disabled = false;

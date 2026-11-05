@@ -1,3 +1,4 @@
+import { mutationClient } from './helpers/mutationClient.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
@@ -316,6 +317,10 @@ const { schoolContext } = await import('../js/services/schoolContext.js');
 const { saveTeacherSubjects } = await import('../js/services/teacherSubjectWrites.js');
 
 async function subjectWriteFixture(t) {
+    const originalUser = supabaseService.currentUser;
+    const originalGeneration = supabaseService.authIdentityGeneration;
+    supabaseService.currentUser = { uid: 'teacher-a' };
+    t.after(() => { supabaseService.currentUser = originalUser; supabaseService.authIdentityGeneration = originalGeneration; });
     t.mock.method(supabaseService, 'init', async () => {});
     t.mock.method(supabaseService, 'getClient', () => ({ rpc: () => ({ abortSignal: async () => ({ data: { schools: [
         { id: 'school-a', roles: ['teacher'] }, { id: 'school-b', roles: ['teacher'] }
@@ -323,7 +328,7 @@ async function subjectWriteFixture(t) {
     await schoolContext.load('teacher-a');
     t.after(() => schoolContext.clear());
     const requests = [];
-    t.mock.method(supabaseService, 'getClient', () => ({ from: () => ({
+    t.mock.method(supabaseService, 'getClient', () => mutationClient({ from: () => ({
         update(payload) { this.payload = payload; return this; },
         insert(payload) { this.payload = payload; return this; },
         eq() { return this; }, select() { return this; },
@@ -333,7 +338,7 @@ async function subjectWriteFixture(t) {
             requests.push(request);
             return { abortSignal(signal) { request.signal = signal; return this; }, then: (...args) => pending.promise.then(...args) };
         }
-    }) }));
+    }) }, 'teacher-a'));
     const manager = createManager();
     manager.subjects = [
         { id: '11111111-1111-1111-1111-111111111111', name: 'Subject one' },
@@ -381,13 +386,14 @@ test('subject caller and repository cancel account/school changes before the fir
 });
 
 test('subject batches preserve committed items and stop subsequent account or school writes', async (t) => {
-    for (const replacement of ['account', 'school']) {
+    for (const replacement of ['account', 'school', 'generation']) {
         await t.test(replacement, async subtest => {
             const { manager, requests } = await subjectWriteFixture(subtest);
             const saving = manager.saveSubjectSettings();
             await waitForSubjectRequest(requests);
             if (replacement === 'account') manager.currentUser = { uid: 'teacher-b' };
-            else schoolContext.select('school-b');
+            else if (replacement === 'school') schoolContext.select('school-b');
+            else supabaseService.authIdentityGeneration = (supabaseService.authIdentityGeneration || 0) + 1;
             clearTeacherSettingsSessionState(manager);
             manager.subjects = [{ slug: 'replacement-draft', name: 'Replacement draft' }];
             finishSubject(requests[0]);
@@ -402,7 +408,7 @@ test('subject batches preserve committed items and stop subsequent account or sc
 test('subject writes recheck ownership after initialization and forward cancellation', async (t) => {
     const initialized = deferred();
     let current = true, dispatched = 0;
-    const service = { init: () => initialized.promise, getClient: () => { dispatched++; return {}; } };
+    const service = { currentUser: { uid: 'teacher-a' }, init: () => initialized.promise, getClient: () => { dispatched++; return {}; } };
     const pending = saveTeacherSubjects(service, [{}], 'school-a', { isCurrent: () => current });
     current = false;
     initialized.resolve();
@@ -412,7 +418,7 @@ test('subject writes recheck ownership after initialization and forward cancella
     const controller = new AbortController();
     const saving = subjectsRepository.saveAll(manager.subjects, { signal: controller.signal });
     await waitForSubjectRequest(requests);
-    assert.equal(requests[0].signal, controller.signal);
+    assert.equal(requests[0].signal.aborted, false);
     controller.abort();
     finishSubject(requests[0]);
     await assert.rejects(saving, error => error.name === 'AbortError');

@@ -1,3 +1,4 @@
+import { mutationClient } from './helpers/mutationClient.mjs';
 import { schoolContext } from '../js/services/schoolContext.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -171,6 +172,9 @@ test('profile, progress, and score rows preserve existing application shapes', (
 async function withFakeClient(client, run) {
     const originalInit = supabaseService.init;
     const originalGetClient = supabaseService.getClient;
+    const originalUser = supabaseService.currentUser;
+    supabaseService.currentUser = { uid: 'teacher-test' };
+    client = mutationClient(client);
     supabaseService.init = async () => supabaseService;
     supabaseService.getClient = () => ({ ...client, rpc(name, args) {
         if (name === 'my_school_access_v1') return { abortSignal() { return Promise.resolve({ data: { schools: [{ id: 'school-a', name: 'A', roles: ['teacher'] }, { id: 'school-b', name: 'B', roles: ['teacher'] }] }, error: null }); } };
@@ -181,6 +185,7 @@ async function withFakeClient(client, run) {
         schoolContext.clear();
         supabaseService.init = originalInit;
         supabaseService.getClient = originalGetClient;
+        supabaseService.currentUser = originalUser;
     });
 }
 
@@ -217,6 +222,28 @@ test('navigable teacher repository reads forward cancellation signals', async ()
         rpc(name) { vocabularyCalls.push(['rpc', name]); return vocabularyBuilder; }
     }, () => vocabularyRepository.listMetadata({ signal }));
     assert.ok(vocabularyCalls.some(call => call[0] === 'abortSignal' && call[1] instanceof AbortSignal && !call[1].aborted));
+});
+
+test('teacher read cancellation reaches held transport and pre-cancelled reads do not dispatch', async () => {
+    for (const [repository, method] of [[sparksRepository, 'list'], [vocabularyRepository, 'listMetadata']]) {
+        const controller = new AbortController(), entered = Promise.withResolvers();
+        let transport, dispatched = 0;
+        const builder = createReadBuilder(null, []);
+        builder.abortSignal = signal => { transport = signal; return builder; };
+        builder.then = () => { dispatched++; entered.resolve(); return new Promise(() => {}); };
+        await withFakeClient({ from: () => builder, rpc: () => builder }, async () => {
+            const pending = repository[method]({ signal: controller.signal });
+            await entered.promise;
+            assert.ok(transport instanceof AbortSignal);
+            assert.equal(transport.aborted, false);
+            controller.abort();
+            await assert.rejects(pending, { name: 'AbortError' });
+            assert.equal(transport.aborted, true);
+            assert.equal(dispatched, 1);
+            await assert.rejects(repository[method]({ signal: controller.signal }), { name: 'AbortError' });
+            assert.equal(dispatched, 1, 'an already cancelled read cannot dispatch another request');
+        });
+    }
 });
 
 test('student Spark response reads are scoped to the requested Spark ids', async () => {
@@ -310,7 +337,7 @@ test('student progress repository preserves missing-record and realtime teardown
 });
 
 
-test('a delayed material save retains its captured school when the user switches', async () => {
+test('a delayed material save rejects a replaced school before dispatch', async () => {
     const writes = [];
     await withFakeClient({ from: () => ({ upsert: async payload => { writes.push(payload); return { error: null }; } }) }, async () => {
         const init = supabaseService.init;
@@ -319,7 +346,7 @@ test('a delayed material save retains its captured school when the user switches
         const saving = vocabularyRepository.save('material-a', { name: 'Original school', words: [] });
         schoolContext.select('school-b');
         release();
-        try { await saving; } finally { supabaseService.init = init; }
-        assert.equal(writes[0].school_id, 'school-a');
+        try { await assert.rejects(saving, { name: 'AbortError' }); } finally { supabaseService.init = init; }
+        assert.equal(writes.length, 0);
     });
 });

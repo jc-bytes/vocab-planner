@@ -1,3 +1,4 @@
+import { runOwnedMutation, serviceMutationIdentity } from './services/ownedMutation.js';
 import { normalizeProfile, toClientTimestamp } from './services/supabaseValues.js';
 import { DEFAULT_COIN_DATA } from './studentProgressDefaults.js';
 
@@ -123,12 +124,10 @@ export const teacherProfileOperations = Object.freeze({
     async setStudentActivityLateOverride(operation, attemptId, { excused, reason = '' } = {}) {
         const schoolId = operation.schoolId;
         operation.assertCurrent();
-        const { data, error } = await runTeacherRpc(this, operation, 'set_student_activity_late_override_v1', {
-            p_attempt_id: attemptId,
-            p_excused: Boolean(excused),
-            p_reason: String(reason || '').trim()
+        const params = { p_attempt_id: attemptId, p_excused: Boolean(excused), p_reason: String(reason || '').trim() };
+        const data = await runOwnedMutation(() => this.client, client => client.rpc('set_student_activity_late_override_v1', params), {
+            getIdentity: () => serviceMutationIdentity(this), signal: operation.signal, isCurrent: operation.assertCurrent
         });
-        if (error) throw error;
         return Array.isArray(data) ? data[0] : data;
     },
     async getStudentsProgressForTeacher(operation, userIds = [], { signal } = {}) {

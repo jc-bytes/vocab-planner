@@ -1509,3 +1509,21 @@ The remediation backlog is complete. Future work should use the extension paths 
 ### Architecture and reliability audit, 2026-10-24
 
 The active evidence and before-repair baseline are in [architecture-audit-2026-10-24.md](architecture-audit-2026-10-24.md). This follow-up preserves existing uncommitted work and remains local. Issues 1-9 and the dependency patch are verified; Arcade receipt recovery and final integrated release verification are in progress. The current source passes original delivery budgets without raising them. Hosted schema inspection was denied with403, so production incident causation remains unverified and no production deployment is claimed.
+
+
+### Architecture and reliability audit, 2026-11-04
+
+The current [audit and verification receipt](architecture-audit-2026-11-04.md)
+records the sequential repairs, original failures, independent review and final
+local 9/10 judgments across all eight requested categories. All confirmed
+urgent/high findings in the audited scope are resolved. `npm run test:release`
+passes end to end, including 1,626 portable tests, source/compiled browser
+acceptance, disposable PostgreSQL/PostgREST rehearsals, build budgets,
+cross-browser/responsive checks, strict lint and all-type advisors. Final app
+input/configuration/output identity is independently verified afterward.
+
+The pass preserves existing uncommitted work and remains local. No commit, push,
+hosted migration, deployment or real grade publication is claimed. Scores apply
+to the current architecture and classroom scope; hosted/device acceptance and
+sustained production capacity remain unverified. Medium debt and earlier
+intermittent failures are retained explicitly in the audit.

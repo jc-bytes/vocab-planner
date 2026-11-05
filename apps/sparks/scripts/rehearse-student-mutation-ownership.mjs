@@ -8,6 +8,7 @@ import { createClient } from '@supabase/supabase-js';
 import { installSupabaseStudentWriteMethods } from '../js/supabaseStudentWriteMethods.js';
 import { createClassroomRepository } from '../js/services/classroomRepository.js';
 import { resolveLocalDatabaseSource } from './lib/localDatabaseRehearsal.mjs';
+import { rehearsePinnedMutations } from './lib/pinnedMutationRehearsal.mjs';
 
 // Only local definitions are cloned. All users, content, JWTs and responses below
 // are disposable fixtures, including the gateway used for the real SDK race.
@@ -38,6 +39,15 @@ try {
     const oldACL = legacyACL();
     sql(readFileSync(new URL(`../supabase/migrations/${migration}`, import.meta.url), 'utf8'), database, migrationOwner);
     assert.equal(legacyACL(), oldACL, 'Existing endpoints keep their original ACL');
+    // Feature-read readiness is proved against the same disposable gateway.
+    for (const [name, signature] of [
+        ['20261104043424_class_trimester_progress.sql', 'public.teacher_class_progress_v1(uuid,uuid,date,date)'],
+        ['20261104045454_vocabulary_grading_and_gradebook.sql', 'public.teacher_class_gradebook_v1(uuid,uuid,date,date)']
+    ]) {
+        if (sql(`select to_regprocedure('${signature}') is not null`) !== 't') {
+            sql(readFileSync(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8'), database, migrationOwner);
+        }
+    }
 
     const [teacher, studentA, studentB, school, subject, classId, responseAssignment, checkAssignment, vocabularyAssignment, responseVersion, checkVersion, vocabularyVersion] = Array.from({ length: 12 }, randomUUID);
     for (const id of [teacher, studentA, studentB]) {
@@ -163,6 +173,8 @@ try {
     assert.equal(sql(`select count(*) from public.scores where user_id='${studentB}'`), '0');
     assert.equal(legacyACL(), oldACL);
     console.log('Normal original-owner save/check/start/score passed; replacement student work unchanged; anonymous denials and legacy ACL preserved.');
+    await rehearsePinnedMutations({ sql, base, jwt, teacher, studentA, studentB, school, subject, classId,
+        vocabularyId, vocabularyAssignment, reflectionId, attemptId: started.attemptId });
 } catch (error) {
     console.error(error.message);
     if (error.stderr) console.error(String(error.stderr).slice(-2000));

@@ -206,7 +206,7 @@ class TeacherShellMethods {
                         ? 'subjects'
                         : undefined;
                 this.setRoute(
-                    { view: primaryPage.id, classId: options.classId, assignmentId: options.assignmentId, listTab: options.listTab, returnTo: options.returnTo, tab: options.tab || defaultTab },
+                    { view: primaryPage.id, classId: options.classId, assignmentId: options.assignmentId, listTab: options.listTab, returnTo: options.returnTo, ...(options.progressContext ? { progressContext: options.progressContext } : {}), ...(options.gradebookContext ? { gradebookContext: options.gradebookContext } : {}), tab: options.tab || defaultTab },
                     { replace: options.replaceRoute === true }
                 );
             }

@@ -1,3 +1,4 @@
+import { mutationClient } from './helpers/mutationClient.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -20,6 +21,8 @@ function createService(responses = {}) {
             }
         }
     };
+    service.currentUser = { uid: 'student-1' };
+    service.client = mutationClient(service.client, 'student-1');
     installSupabaseStudentWriteMethods(service);
     return { service, calls };
 }

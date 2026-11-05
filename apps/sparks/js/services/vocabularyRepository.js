@@ -1,6 +1,13 @@
 import { readSectionQuery } from './sectionRead.js';
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
+import { schoolContext } from './schoolContext.js';
+import { runOwnedMutation, serviceMutationIdentity } from './ownedMutation.js';
+
+const write = (build, options) => runOwnedMutation(async () => {
+    await supabaseService.init();
+    return supabaseService.getClient();
+}, build, { getIdentity: () => serviceMutationIdentity(supabaseService), context: schoolContext, ...options });
 import { cleanUndefined, timestampToIso, toClientTimestamp } from './supabaseValues.js';
 
 export function mapVocabularyRow(row) {
@@ -78,28 +85,21 @@ export const vocabularyRepository = {
         if (error) throw error;
         return mapVocabularyRow(data);
     },
-    async save(id, vocabulary = {}) {
+    async save(id, vocabulary = {}, options) {
         const schoolId = requireSchoolId();
-        await supabaseService.init();
-        const payload = vocabularyPayload({ ...vocabulary, updatedAt: vocabulary.updatedAt || new Date().toISOString() }, id);
-        const { error } = await supabaseService.getClient()
-            .from('vocabularies').upsert({ ...payload, school_id: schoolId }, { onConflict: 'id' });
-        if (error) throw error;
+        const payload = JSON.parse(JSON.stringify(vocabularyPayload({ ...vocabulary, updatedAt: vocabulary.updatedAt || new Date().toISOString() }, id)));
+        await write(client => client.from('vocabularies').upsert({ ...payload, school_id: schoolId }, { onConflict: 'id' }), options);
         return { id, ...vocabulary };
     },
-    async update(id, patch = {}) {
+    async update(id, patch = {}, options) {
         const schoolId = requireSchoolId();
-        await supabaseService.init();
-        const { id: _id, ...payload } = vocabularyPayload({ ...patch, updatedAt: patch.updatedAt || new Date().toISOString() }, id);
-        const { data, error } = await supabaseService.getClient()
-            .from('vocabularies').update(payload).eq('school_id', schoolId).eq('id', id).select('*').maybeSingle();
-        if (error) throw error;
+        const { id: _id, ...payload } = JSON.parse(JSON.stringify(vocabularyPayload({ ...patch, updatedAt: patch.updatedAt || new Date().toISOString() }, id)));
+        const data = await write(client => client.from('vocabularies').update(payload).eq('school_id', schoolId).eq('id', id).select('*').maybeSingle(), options);
         if (data) return mapVocabularyRow(data);
         throw new Error('This material is unavailable in the selected school.');
     },
-    async updateVocabularyPlacements(updates = []) {
+    async updateVocabularyPlacements(updates = [], options) {
         const schoolId = requireSchoolId();
-        await supabaseService.init();
         const payload = updates.map(update => ({
             id: update.id,
             assigned_date: update.assignedDate || null,
@@ -111,21 +111,18 @@ export const vocabularyRepository = {
             updated_at: timestampToIso(update.updatedAt)
         }));
         if (payload.length === 0) return { requested: 0, updated: 0 };
-        const { data, error } = await supabaseService.getClient().rpc('update_vocabulary_placements_school_v1', {
+        const data = await write(client => client.rpc('update_vocabulary_placements_school_v1', {
             p_school_id: schoolId,
             p_updates: payload
-        });
-        if (error) throw error;
+        }), options);
         const result = Array.isArray(data) ? data[0] : data;
         return {
             requested: Number(result?.requested) || 0,
             updated: Number(result?.updated) || 0
         };
     },
-    async remove(id) {
+    async remove(id, options) {
         const schoolId = requireSchoolId();
-        await supabaseService.init();
-        const { error } = await supabaseService.getClient().from('vocabularies').delete().eq('school_id', schoolId).eq('id', id);
-        if (error) throw error;
+        await write(client => client.from('vocabularies').delete().eq('school_id', schoolId).eq('id', id), options);
     }
 };
