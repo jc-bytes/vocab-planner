@@ -37,6 +37,10 @@ published_commit=$(git -C "$publish_dir" rev-parse HEAD)
 # GITHUB_TOKEN pushes do not automatically build branch-based Pages sites.
 gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" > "$publish_dir/build-request.json"
 for attempt in $(seq 1 60); do
+  # The legacy build endpoint can remain "building" after a successful deployment.
+  # Match the deployment to the exact artifact-branch commit as well.
+  deployment=$(gh api "repos/$GITHUB_REPOSITORY/pages/deployments/$published_commit" 2>/dev/null || printf '{}')
+  if test "$(jq -r '.status // empty' <<< "$deployment")" = succeed; then break; fi
   build=$(gh api "repos/$GITHUB_REPOSITORY/pages/builds/latest")
   if test "$(jq -r .commit <<< "$build")" = "$published_commit"; then
     status=$(jq -r .status <<< "$build")
