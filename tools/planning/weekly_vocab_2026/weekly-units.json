@@ -96,7 +96,7 @@
   {
     "id": "grade6_t3_2026_w03_weekly_v1",
     "name": "G6 T3 W03 - Tables and story data",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "6"
     ],
@@ -165,11 +165,12 @@
         "B": "2026-09-29",
         "C": "2026-09-30"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -377,7 +378,7 @@
   {
     "id": "grade6_t3_2026_w08_weekly_v1",
     "name": "G6 T3 W08 - Check your measured model",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "6"
     ],
@@ -442,11 +443,12 @@
       "releaseDates": {
         "C": "2026-11-06"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -466,7 +468,7 @@
   {
     "id": "grade6_t3_2026_w09_weekly_v1_ab",
     "name": "G6 T3 W09 - Measured model review",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "6"
     ],
@@ -533,11 +535,12 @@
         "A": "2026-11-09",
         "B": "2026-11-11"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -741,7 +744,7 @@
   {
     "id": "grade6_t3_2026_w11_weekly_v1",
     "name": "G6 T3 W11 - Explain and improve saved work",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "6"
     ],
@@ -810,11 +813,12 @@
         "B": "2026-11-24",
         "C": "2026-11-25"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -834,7 +838,7 @@
   {
     "id": "grade6_t3_2026_w12_weekly_v1",
     "name": "G6 T3 W12 - Complete the improvement",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "6"
     ],
@@ -903,11 +907,12 @@
         "B": "2026-12-01",
         "C": "2026-12-04"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -1019,7 +1024,7 @@
   {
     "id": "grade7_t3_2026_w03_weekly_v1",
     "name": "G7 T3 W03 - Interpret charts and calculations",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "7"
     ],
@@ -1086,11 +1091,12 @@
         "A": "2026-09-30",
         "B": "2026-10-01"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -1294,7 +1300,7 @@
   {
     "id": "grade7_t3_2026_w08_weekly_v1",
     "name": "G7 T3 W08 - Compare a Scratch change",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "7"
     ],
@@ -1361,11 +1367,12 @@
         "A": "2026-11-06",
         "B": "2026-11-06"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -1477,7 +1484,7 @@
   {
     "id": "grade7_t3_2026_w10_weekly_v1",
     "name": "G7 T3 W10 - Rehearse and demonstrate the warning",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "7"
     ],
@@ -1544,11 +1551,12 @@
         "A": "2026-11-18",
         "B": "2026-11-19"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -1568,7 +1576,7 @@
   {
     "id": "grade7_t3_2026_w11_weekly_v1",
     "name": "G7 T3 W11 - Improve the warning",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "7"
     ],
@@ -1635,11 +1643,12 @@
         "A": "2026-11-25",
         "B": "2026-11-26"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -1659,7 +1668,7 @@
   {
     "id": "grade7_t3_2026_w12_weekly_v1",
     "name": "G7 T3 W12 - Finish the feedback improvement",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "7"
     ],
@@ -1726,11 +1735,12 @@
         "A": "2026-12-04",
         "B": "2026-12-03"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -1842,7 +1852,7 @@
   {
     "id": "grade8_t3_2026_w03_weekly_v1",
     "name": "G8 T3 W03 - Explain and improve LunchApp",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "8"
     ],
@@ -1909,11 +1919,12 @@
         "A": "2026-09-30",
         "B": "2026-09-28"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -2117,7 +2128,7 @@
   {
     "id": "grade8_t3_2026_w09_weekly_v1",
     "name": "G8 T3 W09 - Scratch controls",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "8"
     ],
@@ -2184,11 +2195,12 @@
         "A": "2026-11-11",
         "B": "2026-11-09"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -2300,7 +2312,7 @@
   {
     "id": "grade8_t3_2026_w11_weekly_v1",
     "name": "G8 T3 W11 - Rehearse and demonstrate the game",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "8"
     ],
@@ -2367,11 +2379,12 @@
         "A": "2026-11-25",
         "B": "2026-11-23"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -2391,7 +2404,7 @@
   {
     "id": "grade8_t3_2026_w12_weekly_v1",
     "name": "G8 T3 W12 - Improve one game rule",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "8"
     ],
@@ -2458,11 +2471,12 @@
         "A": "2026-12-03",
         "B": "2026-11-30"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -2850,7 +2864,7 @@
   {
     "id": "grade9_t3_2026_w09_weekly_v1",
     "name": "G9 T3 W09 - Rehearse online-safety decisions",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "9"
     ],
@@ -2917,11 +2931,12 @@
         "A": "2026-11-09",
         "B": "2026-11-09"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",
@@ -2941,7 +2956,7 @@
   {
     "id": "grade9_t3_2026_w10_weekly_v1",
     "name": "G9 T3 W10 - Present and explain safety decisions",
-    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
     "grades": [
       "9"
     ],
@@ -3008,11 +3023,12 @@
         "A": "2026-11-16",
         "B": "2026-11-16"
       },
-      "reviewOnly": true,
-      "requiredActivities": [],
-      "additionalActivities": [
+      "reviewOnly": false,
+      "requiredActivities": [
         "flashcards",
-        "matching",
+        "matching"
+      ],
+      "additionalActivities": [
         "fill-in-blank",
         "illustration",
         "quiz",

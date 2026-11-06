@@ -35,8 +35,8 @@ try {
  const app=window.studentApp;app.studentProfile={grade:'6',group:'C'};
  const v=await(await fetch('/vocabularies/grade6/grade6_t3_2026_w08_weekly_v1.json')).json();app.activities.vocabularyData.applyVocabularyData(v);await app.activities.showActivityMenu();
  return {required:app.activities.getActivityFlowConfig().required,unlocked:app.activities.isActivityUnlocked('matching'),available:app.activities.isStudentVocabularyAvailable(v,new Date('2026-11-06T12:00:00'))};
- });assert.deepEqual(review,{required:[],unlocked:true,available:true});
- console.log('Optional review opens without new requirements on its group release date.');
+ });assert.deepEqual(review,{required:['flashcards','matching'],unlocked:false,available:true});
+ console.log('Review vocabulary requires Flashcards and Matching on its group release date.');
  const archive=await page.evaluate(async()=>{
   const app=window.studentApp;app.studentProfile={grade:'6',group:'A'};
   app.activities.manifest=await(await fetch('/vocabularies/manifest.json')).json();

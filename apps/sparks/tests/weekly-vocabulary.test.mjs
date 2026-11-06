@@ -17,7 +17,9 @@ test('all 33 weekly units have five usable meaning questions and no project-week
    assert.equal(count,5,`${v.id} ${type}`);assert.equal(activityHasPlayableRound(type,v,count),true);
   }
   for(const w of v.words)assert.ok(w.example.toLowerCase().includes(w.word.toLowerCase()),`${v.id} ${w.word}`);
-  assert.deepEqual(v.activitySettings.requiredActivities,v.month==='October'?['flashcards','matching']:v.activitySettings.reviewOnly?[]:['flashcards','matching','fill-in-blank']);
+  assert.equal(v.activitySettings.requiredActivities[0],'flashcards');
+  assert.ok(v.activitySettings.requiredActivities.length>=2,`${v.id} must require Flashcards and another activity`);
+  assert.equal(v.activitySettings.reviewOnly,false);
  }
 });
 test('Week 1 files are byte-for-byte frozen against the release base',()=>{

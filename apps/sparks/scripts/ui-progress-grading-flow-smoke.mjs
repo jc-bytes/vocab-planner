@@ -155,6 +155,7 @@ try {
     await student.waitForFunction(() => studentApp.activities.vocabularyData.classSelection.ready);
     // A genuine same-class refresh may start while a published-grade read is held.
     // Its transport generation must not invalidate the assignment's grade owner.
+    await panel.locator('.student-vocabulary-grade-score').click();
     holdGradeRead = true;
     const pendingGradeRead = student.waitForRequest(request => new URL(request.url()).pathname === '/rest/v1/rpc/my_class_vocabulary_grades_v1');
     await panel.getByRole('button', { name: 'Check for updates', exact: true }).click();
@@ -173,6 +174,7 @@ try {
     assert.ok(studentRequests.includes(modulePath('js/student/studentVocabularyGradePanel.js')), 'real unit route requested its lazy published-grade module');
     assert.equal(await noOverflow(student), true, 'student published grade fits a phone viewport');
     await student.reload(); await panel.getByText('30 / 50', { exact: true }).waitFor();
+    await panel.locator('.student-vocabulary-grade-score').click();
     failStudent = true;
     await panel.getByRole('button', { name: 'Check for updates', exact: true }).click();
     await panel.getByRole('button', { name: 'Retry grade', exact: true }).waitFor();
@@ -194,7 +196,7 @@ try {
     await teacher.getByRole('button', { name: 'Publish ungraded status', exact: true }).click();
     await teacher.getByRole('dialog').waitFor({ state: 'detached' });
     await panel.getByRole('button', { name: 'Check for updates', exact: true }).click();
-    await panel.getByText('No grade has been published for this vocabulary.', { exact: true }).waitFor();
+    await student.locator('.student-vocabulary-grade').waitFor({ state: 'hidden' });
     assert.equal(writes.length, 4); assert.equal(revision, 4);
 
     await teacher.goto(`${baseUrl}/teacher.html#/teacher/vocabulary`); await settledTeacher(teacher);

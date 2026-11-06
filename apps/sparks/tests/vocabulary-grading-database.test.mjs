@@ -130,6 +130,8 @@ test('vocabulary grades require explicit opt-in, verified completion and explici
  setup+=`insert into public.student_unit_progress(user_id,unit_key) select m.student_id,'assignment:'||a.id from public.class_memberships m cross join public.class_assignments a where m.class_id='${perfClass}' and a.class_id='${perfClass}';
  insert into public.student_activity_progress(user_id,unit_key,assignment_id,activity_type,score,is_complete,verified) select m.student_id,'assignment:'||a.id,a.id,'flashcards',100,true,true from public.class_memberships m cross join public.class_assignments a where m.class_id='${perfClass}' and a.class_id='${perfClass}';`;
  sql(setup);
+ // Bulk fixture inserts need current statistics; autovacuum timing varies in CI.
+ sql('analyze public.student_activity_progress;');
  const started=performance.now();
  const workload=JSON.parse(as(teacher,`select public.teacher_class_gradebook_v1('${school}','${perfClass}','${from}','${to}')`));
  const elapsed=performance.now()-started;

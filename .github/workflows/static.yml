@@ -99,6 +99,8 @@ jobs:
             echo "Container registry throttled the download; retrying with cached images in 30 seconds."
             sleep 30
           done
+      - name: Verify student insight and feedback database regressions
+        run: npm run test:student-insight:database
       - name: Smoke test app shells
         run: npm run test:ui:smoke
       - name: Configure local worker lifecycle builds
@@ -110,8 +112,6 @@ jobs:
         run: npm test
       - name: Verify school authorization and database regressions
         run: npm run test:school-platform:rest
-      - name: Verify student insight and feedback database regressions
-        run: npm run test:student-insight:database
       - name: Verify database authorization, receipts and progress contracts
         run: npm run test:arcade-purchase:database && npm run test:student-mutation-ownership:database && npm run test:school-setting-ownership:database && npm run test:school-progress-snapshot:database && npm run test:selected-profile-export:database && npm run test:student-queue-order:database && npm run test:school-progress-batch:database && npm run test:school-progress-permissions:database && npm run test:school-progress-groups:database && npm run test:policy-request-identity:database && npm run test:progress-lint-compatibility:database
       - name: Supabase authorization acceptance tests
