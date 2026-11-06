@@ -1,7 +1,7 @@
 {
   "id": "grade7_t3_2026_w08_weekly_v1",
   "name": "G7 T3 W08 - Compare a Scratch change",
-  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
   "grades": [
     "7"
   ],
@@ -68,11 +68,12 @@
       "A": "2026-11-06",
       "B": "2026-11-06"
     },
-    "reviewOnly": true,
-    "requiredActivities": [],
-    "additionalActivities": [
+    "reviewOnly": false,
+    "requiredActivities": [
       "flashcards",
-      "matching",
+      "matching"
+    ],
+    "additionalActivities": [
       "fill-in-blank",
       "illustration",
       "quiz",

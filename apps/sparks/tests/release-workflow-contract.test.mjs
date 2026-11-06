@@ -74,11 +74,14 @@ test('hosted readiness executes only in publishing jobs before either Pages depl
     assert.equal(reachableScripts(scripts, 'test:release').has('verify:owned-rpc-readiness'), false);
     for (const job of [deployment, promotion]) {
         assert.ok(job.includes(command));
-        assert.ok(job.indexOf(command) < job.indexOf('uses: actions/deploy-pages@'));
+        assert.ok(job.indexOf(command) < job.indexOf('run: bash .github/scripts/publish-validated-pages.sh validated-site'));
         assert.match(job, /SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL \}\}/);
         assert.match(job, /SUPABASE_PUBLISHABLE_KEY: \$\{\{ secrets\.SUPABASE_PUBLISHABLE_KEY \}\}/);
-        assert.match(job, /contents: read/);
-        assert.match(job, /actions\/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1/);
+        assert.match(job, /contents: write/);
+        assert.match(job, /actions: read/);
+        assert.match(job, /pages: write/);
+        assert.match(job, /contents\/\$file\?ref=\$GITHUB_SHA/);
+        assert.doesNotMatch(job, /id-token: write/);
         assert.match(job, /actions\/setup-node@820762786026740c76f36085b0efc47a31fe5020/);
         assert.match(job, /node-version: 22/);
         assert.doesNotMatch(job, /SUPABASE_(?:SERVICE_ROLE|SECRET|ACCESS_TOKEN)/);

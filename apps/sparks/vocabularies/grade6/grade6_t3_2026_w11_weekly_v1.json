@@ -1,7 +1,7 @@
 {
   "id": "grade6_t3_2026_w11_weekly_v1",
   "name": "G6 T3 W11 - Explain and improve saved work",
-  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
   "grades": [
     "6"
   ],
@@ -70,11 +70,12 @@
       "B": "2026-11-24",
       "C": "2026-11-25"
     },
-    "reviewOnly": true,
-    "requiredActivities": [],
-    "additionalActivities": [
+    "reviewOnly": false,
+    "requiredActivities": [
       "flashcards",
-      "matching",
+      "matching"
+    ],
+    "additionalActivities": [
       "fill-in-blank",
       "illustration",
       "quiz",

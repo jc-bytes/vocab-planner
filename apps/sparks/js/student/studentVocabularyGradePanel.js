@@ -16,10 +16,21 @@ const finite = value => typeof value === 'number' && Number.isFinite(value);
 export function mountStudentVocabularyGradePanel({ root, assignmentId, classId, isCurrent, signals = [], repository = classroomRepository }) {
     const panel = node('section', undefined, 'student-vocabulary-grade');
     panel.setAttribute('aria-label', 'Published vocabulary grade');
-    const title = node('h3', 'Grade');
+    panel.hidden = true;
+    const disclosure = node('details', undefined, 'student-vocabulary-grade-disclosure');
+    const scoreControl = node('summary', '', 'student-vocabulary-grade-score');
+    scoreControl.setAttribute('aria-label', 'Published grade details');
     const content = node('div', undefined, 'student-vocabulary-grade-content'); content.setAttribute('aria-live', 'polite');
-    panel.append(title, content);
-    root.querySelector('.activities-grid')?.before(panel);
+    disclosure.append(scoreControl, content);
+    panel.append(disclosure);
+    root.querySelector('.activity-menu-status')?.append(panel);
+    const dismiss = event => {
+        if (event.type === 'keydown' && event.key === 'Escape') {
+            if (disclosure.open) { disclosure.open = false; scoreControl.focus(); }
+        } else if (event.type === 'pointerdown' && !panel.contains(event.target)) disclosure.open = false;
+    };
+    document.addEventListener('pointerdown', dismiss);
+    panel.addEventListener('keydown', dismiss);
     let request = 0, disposed = false, controller;
     const current = () => !disposed && isCurrent() && panel.isConnected;
     const abort = () => { controller?.abort(); };
@@ -43,18 +54,22 @@ export function mountStudentVocabularyGradePanel({ root, assignmentId, classId, 
             const grade = response.grades.find(item => item.assignmentId === assignmentId);
             content.replaceChildren();
             if (!grade) {
-                content.append(node('p', 'No grade has been published for this vocabulary.'), button('Check for a grade', () => void load()));
+                panel.hidden = true; disclosure.open = false;
                 return;
             }
             if (grade.status === 'unavailable' || !finite(grade.earnedPoints) || !finite(grade.maxPoints) || grade.maxPoints <= 0 || !finite(grade.percent)
                 || !finite(grade.basePoints) || !finite(grade.bonusPoints) || !Array.isArray(grade.activities)) {
+                panel.hidden = false; scoreControl.textContent = '—';
+                scoreControl.setAttribute('aria-label', 'Published grade unavailable. Open details.');
                 content.append(node('p', 'The published grade is unavailable. Ask your teacher to review this vocabulary.'), button('Check again', () => void load()));
                 return;
             }
+            panel.hidden = false;
+            scoreControl.textContent = `${points(grade.earnedPoints)} / ${points(grade.maxPoints)}`;
+            scoreControl.setAttribute('aria-label', `Published grade: ${points(grade.earnedPoints)} out of ${points(grade.maxPoints)}. Open details.`);
             const summary = node('div', undefined, 'student-vocabulary-grade-summary');
-            const score = node('strong', `${points(grade.earnedPoints)} / ${points(grade.maxPoints)}`, 'student-vocabulary-grade-score');
             const percent = node('span', `${points(grade.percent)}%`, 'student-vocabulary-grade-percent');
-            summary.append(score, percent);
+            summary.append(node('strong', 'Grade'), percent);
             content.append(summary, node('p', `Base ${points(grade.basePoints)} points · Extra ${points(grade.bonusPoints)} points`));
             const publication = grade.publishedAt ? new Date(grade.publishedAt) : null;
             content.append(node('p', publication && Number.isFinite(publication.getTime())
@@ -72,11 +87,13 @@ export function mountStudentVocabularyGradePanel({ root, assignmentId, classId, 
             details.append(list); content.append(details, button('Check for updates', () => void load()));
         } catch {
             if (!current() || token !== request || signals.some(signal => signal.aborted)) return;
+            panel.hidden = false; scoreControl.textContent = '—';
+            scoreControl.setAttribute('aria-label', 'Published grade could not be loaded. Open to retry.');
             content.replaceChildren(node('p', 'Published grades could not be loaded. Try again.'), button('Retry grade', () => void load()));
         } finally {
             if (current() && token === request) panel.setAttribute('aria-busy', 'false');
         }
     }
     void load();
-    return { dispose() { disposed = true; request++; controller?.abort(); signals.forEach(signal => signal.removeEventListener('abort', abort)); panel.remove(); } };
+    return { dispose() { disposed = true; request++; controller?.abort(); document.removeEventListener('pointerdown', dismiss); panel.removeEventListener('keydown', dismiss); signals.forEach(signal => signal.removeEventListener('abort', abort)); panel.remove(); } };
 }

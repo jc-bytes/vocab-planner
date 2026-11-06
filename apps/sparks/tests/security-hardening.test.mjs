@@ -119,7 +119,7 @@ test('CI runs the complete tests and fails on meaningful database findings', asy
     assert.match(workflow, /supabase db advisors --local --level warn --fail-on warn --type all/);
     assert.doesNotMatch(workflow, /--fail-on none/);
     assert.match(workflow, /validate:[\s\S]*?deploy:[\s\S]*?needs: validate/);
-    assert.match(workflow, /deploy:[\s\S]*?pages: write[\s\S]*?id-token: write/);
+    assert.match(workflow, /deploy:[\s\S]*?contents: write[\s\S]*?actions: read[\s\S]*?pages: write/);
     assert.doesNotMatch(workflow, /uses: [^\s]+@v\d/);
 });
 

@@ -62,7 +62,11 @@ try {
             const copy = link.cloneNode(true); const loaded = new Promise(resolve => { copy.onload = resolve; copy.onerror = resolve; }); document.head.append(copy); return loaded;
         });
         document.body.className = 'student-site';
-        document.body.innerHTML = '<div class="app-container"><main class="student-main"><section id="activity-menu-view" class="view active"><div class="section-header"><div class="activity-menu-title-block"><h2>Online safety</h2></div></div><div class="activities-grid"></div></section></main></div>';
+        document.body.innerHTML = '<div class="app-container"><main class="student-main"></main></div>';
+        const unit = template.querySelector('#activity-menu-view').cloneNode(true);
+        unit.className = 'view active'; document.querySelector('main').append(unit);
+        unit.querySelector('#current-unit-title').textContent = 'Online safety';
+        await import('/js/student/studentUnitMenuStyles.js');
         await Promise.all(styles);
         const { mountStudentVocabularyGradePanel } = await import('/js/student/studentVocabularyGradePanel.js');
         window.gradePanelResponse = { grades: [] }; window.gradePanelReads = 0; window.gradePanelCurrent = true;
@@ -79,15 +83,26 @@ try {
         };
         window.mountGradePanel();
     });
-    await page.getByText('No grade has been published for this vocabulary.').waitFor();
+    await page.waitForFunction(() => window.gradePanelReads === 1 && document.querySelector('.student-vocabulary-grade').hidden);
     await page.evaluate(() => {
         window.gradePanelResponse = { grades: [{ assignmentId: 'assignment-a', enabled: true, status: 'provisional', maxPoints: 50, earnedPoints: 52.5,
             basePoints: 50, bonusPoints: 2.5, percent: 105, publishedAt: '2026-11-04T10:00:00Z',
             activities: [{ activityType: 'flashcards', required: true, complete: true, points: 50 }, { activityType: 'matching', required: false, complete: true, points: 2.5 }] }] };
     });
-    await page.getByRole('button', { name: 'Check for a grade', exact: true }).click();
+    await page.evaluate(() => window.mountGradePanel());
     await page.getByText('52.5 / 50', { exact: true }).waitFor();
-    assert.equal(await page.getByText('105%', { exact: true }).count(), 1);
+    assert.equal(await page.getByText('105%', { exact: true }).isVisible(), false);
+    for (const width of [1100, 390]) {
+        await page.setViewportSize({ width, height: 850 });
+        const close = await page.locator('#back-to-vocab').boundingBox();
+        const grade = await page.locator('.student-vocabulary-grade-score').boundingBox();
+        assert.ok(grade.y >= close.y + close.height, 'grade sits below the close control');
+        assert.ok(Math.abs(grade.x + grade.width / 2 - close.x - close.width / 2) < 2, 'grade is centered under close');
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        await page.screenshot({ path: `/tmp/sparks-compact-grade-${width}.png`, animations: 'disabled' });
+    }
+    await page.locator('.student-vocabulary-grade-score').click();
+    await page.getByText('105%', { exact: true }).waitFor();
     await page.getByText('How this grade was earned', { exact: true }).click();
     assert.match(await page.locator('.student-vocabulary-grade').textContent(), /Flashcards.*Required.*Complete.*50 points/);
     await page.evaluate(() => { window.gradePanelFailure = true; });
