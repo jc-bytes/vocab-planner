@@ -1,7 +1,7 @@
 {
   "id": "grade8_t3_2026_w09_weekly_v1",
   "name": "G8 T3 W09 - Scratch controls",
-  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
   "grades": [
     "8"
   ],
@@ -68,11 +68,12 @@
       "A": "2026-11-11",
       "B": "2026-11-09"
     },
-    "reviewOnly": true,
-    "requiredActivities": [],
-    "additionalActivities": [
+    "reviewOnly": false,
+    "requiredActivities": [
       "flashcards",
-      "matching",
+      "matching"
+    ],
+    "additionalActivities": [
       "fill-in-blank",
       "illustration",
       "quiz",

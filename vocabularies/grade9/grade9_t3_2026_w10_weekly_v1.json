@@ -1,7 +1,7 @@
 {
   "id": "grade9_t3_2026_w10_weekly_v1",
   "name": "G9 T3 W10 - Present and explain safety decisions",
-  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "description": "Review these five words. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
   "grades": [
     "9"
   ],
@@ -68,11 +68,12 @@
       "A": "2026-11-16",
       "B": "2026-11-16"
     },
-    "reviewOnly": true,
-    "requiredActivities": [],
-    "additionalActivities": [
+    "reviewOnly": false,
+    "requiredActivities": [
       "flashcards",
-      "matching",
+      "matching"
+    ],
+    "additionalActivities": [
       "fill-in-blank",
       "illustration",
       "quiz",
