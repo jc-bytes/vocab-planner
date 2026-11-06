@@ -39,3 +39,15 @@ test('legacy assignments with no assigned date retain their saved trimester', ()
     });
     assert.equal(schedule.getVocabTrimesterKey(vocab), 'IIIT');
 });
+
+test('assignment close time survives mapping and excludes closed work from available units', () => {
+ const today=new Date('2026-11-06T12:00:00Z');
+ const schedule=new StudentActivitySchedule({schoolCalendar:null});
+ const detail={id:'closed',materialId:'material',kind:'vocabulary',title:'Retired spreadsheet unit',
+  release_at:'2026-03-02T05:00:00Z',close_at:'2026-10-13T18:12:12Z',withdrawn:false,content:{words:[{word:'cell'}]}};
+ const vocab=assignmentVocabulary(detail);
+ assert.equal(vocab.closeAt,detail.close_at);
+ assert.equal(schedule.isStudentVocabularyAvailable(vocab,today),false);
+ assert.equal(schedule.isStudentVocabularyAvailable(assignmentVocabulary({...detail,close_at:null}),today),true);
+ assert.equal(schedule.isStudentVocabularyAvailable(assignmentVocabulary({...detail,close_at:today.toISOString()}),today),false);
+});

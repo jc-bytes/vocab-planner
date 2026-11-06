@@ -48,7 +48,7 @@ test('T3 class parts have small sourced word sets and distinct required practice
     }
 });
 
-test('October 13 online lesson has five sourced words and three required activities', async () => {
+test('October 13 online lesson has five sourced words and two required activities', async () => {
     const records = await loadVocabularyCatalog(workspaceRoot);
     const exceptions = records.map(r => r.vocabulary).filter(v => v.activitySettings.onlineLessonException);
     assert.equal(exceptions.length, 2);
@@ -57,10 +57,10 @@ test('October 13 online lesson has five sourced words and three required activit
     assert.deepEqual(v.grades, ['6']);
     assert.equal(v.assignedDate, '2026-10-13');
     assert.deepEqual(v.activitySettings.sections, ['A', 'B']);
-    assert.deepEqual(v.activitySettings.requiredActivities, ['flashcards', 'matching', 'fill-in-blank']);
+    assert.deepEqual(v.activitySettings.requiredActivities, ['flashcards', 'matching']);
     assert.deepEqual(v.words.map(w => w.word), ['Privacy', 'Boundary', 'Pressure', 'Permission', 'Report']);
     assert.deepEqual(v.activitySettings.additionalActivities, [
-        'illustration', 'quiz', 'word-search', 'crossword',
+        'fill-in-blank', 'illustration', 'quiz', 'word-search', 'crossword',
         'hangman', 'scramble', 'wordle', 'speed-match'
     ]);
     for (const word of v.words) {

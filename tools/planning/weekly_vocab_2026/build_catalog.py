@@ -24,7 +24,8 @@ for r in proposal['rows']:
    if g==7 and w==12:offsets={'A':4,'B':3}
    if g==8 and w==12:offsets['A']=3
    release={s:(start+dt.timedelta(days=offsets[s])).isoformat() for s in sections}
-   required=[] if review else ['flashcards','matching','fill-in-blank']
+   if start.month == 10:review=False
+   required=['flashcards','matching'] if start.month == 10 else [] if review else ['flashcards','matching','fill-in-blank']
    words=[]
    for term in terms:
     b=bank[term]; example=b['example']
@@ -34,6 +35,7 @@ for r in proposal['rows']:
    if suffix=='_c':title='Button counter'
    elif suffix=='_ab':title='Measured model review'
    description=('Optional review. No required vocabulary task this week. ' if review else 'Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. ')
+   if start.month == 10:description=description.replace('Flashcards, Matching and Fill in Blank','Flashcards and Matching')
    description+='Reuse this pool throughout the week. Follow your separate class instructions.'
    v=dict(id=id,name=f'G{g} T3 W{w:02} - {title}',description=description,grades=[str(g)],subjectSlug='technology',trimester='3',month=start.strftime('%B'),week=w,assignedDate=min(release.values()),purpose='practice',words=words,activitySettings=dict(weeklyPoolVersion=1,sections=sections,releaseDates=release,reviewOnly=review,requiredActivities=required,additionalActivities=[x for x in activities if x not in required],flashcards=5,matching=5,fillInBlank=5))
    path=f'vocabularies/grade{g}/{id}.json';(a.app/path).write_text(json.dumps(v,indent=2,ensure_ascii=False)+'\n')

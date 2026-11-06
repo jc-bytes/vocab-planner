@@ -6533,7 +6533,7 @@
     {
       "id": "grade6_t3_2026_w04_weekly_v1",
       "name": "G6 T3 W04 - Finish and check spreadsheets",
-      "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "6"
       ],
@@ -6558,10 +6558,10 @@
         "reviewOnly": false,
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "synonym-antonym",
@@ -6581,7 +6581,7 @@
     {
       "id": "grade6_t3_2026_w07_weekly_v1",
       "name": "G6 T3 W07 - Measure and model an eraser",
-      "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "6"
       ],
@@ -6606,10 +6606,10 @@
         "reviewOnly": false,
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "synonym-antonym",
@@ -6994,7 +6994,7 @@
     {
       "id": "grade7_t3_2026_w04_weekly_v1",
       "name": "G7 T3 W04 - Scratch delivery practice",
-      "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "7"
       ],
@@ -7017,10 +7017,10 @@
         "reviewOnly": false,
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "synonym-antonym",
@@ -7040,7 +7040,7 @@
     {
       "id": "grade7_t3_2026_w07_weekly_v1",
       "name": "G7 T3 W07 - Distance warning rule",
-      "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "7"
       ],
@@ -7063,10 +7063,10 @@
         "reviewOnly": false,
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "synonym-antonym",
@@ -7403,7 +7403,7 @@
     {
       "id": "grade8_t3_2026_w04_weekly_v1",
       "name": "G8 T3 W04 - Binary numbers",
-      "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "8"
       ],
@@ -7426,10 +7426,10 @@
         "reviewOnly": false,
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "synonym-antonym",
@@ -7449,7 +7449,7 @@
     {
       "id": "grade8_t3_2026_w07_weekly_v1",
       "name": "G8 T3 W07 - Python multiplication and debugging",
-      "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "8"
       ],
@@ -7472,10 +7472,10 @@
         "reviewOnly": false,
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "synonym-antonym",
@@ -7768,7 +7768,7 @@
     {
       "id": "grade9_t3_2026_w04_weekly_v1",
       "name": "G9 T3 W04 - Explain the message risk",
-      "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Complete Flashcards and Matching once this week. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "9"
       ],
@@ -7788,11 +7788,12 @@
           "A": "2026-10-05",
           "B": "2026-10-05"
         },
-        "reviewOnly": true,
-        "requiredActivities": [],
-        "additionalActivities": [
+        "reviewOnly": false,
+        "requiredActivities": [
           "flashcards",
-          "matching",
+          "matching"
+        ],
+        "additionalActivities": [
           "fill-in-blank",
           "illustration",
           "quiz",
@@ -7813,7 +7814,7 @@
     {
       "id": "grade9_t3_2026_w07_weekly_v1",
       "name": "G9 T3 W07 - Project-copy risk and priority",
-      "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+      "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
       "grades": [
         "9"
       ],
@@ -7836,10 +7837,10 @@
         "reviewOnly": false,
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "synonym-antonym",
@@ -7949,7 +7950,7 @@
     {
       "id": "grade6_t3_2026_w05_online_safety_ab",
       "name": "G6 T3 W05 - Online Safety - 6A and 6B",
-      "description": "Practise safe choices in online chats. Complete Flashcards, Matching and Fill in Blank once each this week. This is formative practice.",
+      "description": "Practise safe choices in online chats. Complete Flashcards and Matching once each this week. This is formative practice.",
       "grades": [
         "6"
       ],
@@ -7962,10 +7963,10 @@
       "activitySettings": {
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "word-search",
@@ -7993,7 +7994,7 @@
     {
       "id": "grade9_t3_2026_w05_hoaxes_fakes_ab",
       "name": "G9 T3 W05 - Hoaxes and Fakes - 9A and 9B",
-      "description": "Check online claims using sources and evidence. Review 10 words. Complete Flashcards, Matching and Fill in Blank once each this week. Ungraded formative practice.",
+      "description": "Check online claims using sources and evidence. Review 10 words. Complete Flashcards and Matching once each this week. Ungraded formative practice.",
       "grades": [
         "9"
       ],
@@ -8006,10 +8007,10 @@
       "activitySettings": {
         "requiredActivities": [
           "flashcards",
-          "matching",
-          "fill-in-blank"
+          "matching"
         ],
         "additionalActivities": [
+          "fill-in-blank",
           "illustration",
           "quiz",
           "word-search",

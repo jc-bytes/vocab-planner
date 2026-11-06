@@ -1,3 +1,4 @@
+import { assignmentUnavailableMessage } from '../services/assignmentAvailability.js';
 import { schoolContext } from '../services/schoolContext.js';
 import { selectStudentAssignmentSchool, waitStudentSchoolReady } from './studentSchoolSession.js';
 import { weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
@@ -317,6 +318,10 @@ export class StudentActivityVocabularyData {
                 await selectStudentAssignmentSchool(this.sm, detail, { isCurrent: isCurrentLoad, signal });
                 if (!isCurrentLoad()) return;
                 vocabMeta = assignmentVocabulary(detail);
+                if (assignmentUnavailableMessage(vocabMeta)) {
+                    this.renderUnavailableAssignment(vocabMeta, options);
+                    return false;
+                }
             } catch (error) {
                 if (!isCurrentLoad()) return;
                 console.warn('Could not load the class assignment:', error);
@@ -429,6 +434,26 @@ export class StudentActivityVocabularyData {
             state.innerHTML = getStudentPageSkeleton('unit', 'Loading vocabulary unit');
         }
         this.sm.switchView('activity-menu-view');
+    }
+
+    renderUnavailableAssignment(vocab, options = {}) {
+        this.sm.currentVocab = null;
+        const message = assignmentUnavailableMessage(vocab);
+        const view = $(options.deferActivityMenu ? '#activity-view' : '#activity-menu-view');
+        const container = $(options.deferActivityMenu ? '#activity-container' : '#activity-menu-view .activities-grid');
+        setStudentPageLoading(view, false);
+        const title = $('#current-unit-title');
+        if (title) title.textContent = vocab.name || 'Vocabulary unit';
+        if (container) {
+            container.innerHTML = `<div class="activity-load-error" role="status">
+                <h2>Unit unavailable</h2><p>${escapeHtml(message)}</p>
+                <button type="button" class="btn secondary-btn" data-return-to-units>Back to Units</button>
+            </div>`;
+            container.querySelector('[data-return-to-units]')?.addEventListener('click', () => {
+                this.sm.navigateTo({ view: 'units' });
+            }, { once: true });
+        }
+        this.sm.switchView(options.deferActivityMenu ? 'activity-view' : 'activity-menu-view');
     }
 
     renderVocabularyLoadError(vocabMeta = {}, options = {}) {

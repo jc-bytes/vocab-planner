@@ -1,7 +1,7 @@
 {
   "id": "grade9_t3_2026_w05_hoaxes_fakes_ab",
   "name": "G9 T3 W05 - Hoaxes and Fakes - 9A and 9B",
-  "description": "Check online claims using sources and evidence. Review 10 words. Complete Flashcards, Matching and Fill in Blank once each this week. Ungraded formative practice.",
+  "description": "Check online claims using sources and evidence. Review 10 words. Complete Flashcards and Matching once each this week. Ungraded formative practice.",
   "grades": [
     "9"
   ],
@@ -106,10 +106,10 @@
   "activitySettings": {
     "requiredActivities": [
       "flashcards",
-      "matching",
-      "fill-in-blank"
+      "matching"
     ],
     "additionalActivities": [
+      "fill-in-blank",
       "illustration",
       "quiz",
       "word-search",

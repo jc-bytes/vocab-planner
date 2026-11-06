@@ -1,7 +1,7 @@
 {
   "id": "grade6_t3_2026_w05_online_safety_ab",
   "name": "G6 T3 W05 - Online Safety - 6A and 6B",
-  "description": "Practise safe choices in online chats. Complete Flashcards, Matching and Fill in Blank once each this week. This is formative practice.",
+  "description": "Practise safe choices in online chats. Complete Flashcards and Matching once each this week. This is formative practice.",
   "grades": [
     "6"
   ],
@@ -61,10 +61,10 @@
   "activitySettings": {
     "requiredActivities": [
       "flashcards",
-      "matching",
-      "fill-in-blank"
+      "matching"
     ],
     "additionalActivities": [
+      "fill-in-blank",
       "illustration",
       "quiz",
       "word-search",

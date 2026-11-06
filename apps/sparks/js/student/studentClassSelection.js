@@ -1,3 +1,4 @@
+import { assignmentUnavailableMessage } from '../services/assignmentAvailability.js';
 import { renderStudentSubjectPicker } from './studentSubjectPicker.js';
 import { schoolContext } from '../services/schoolContext.js';
 import { schoolRepository } from '../services/schoolRepository.js';
@@ -88,7 +89,7 @@ export class StudentClassSelection {
                 if (selected.schoolId && schoolContext.getSchoolId() !== selected.schoolId) schoolContext.select(selected.schoolId);
                 schoolGeneration = schoolContext.getGeneration();
                 const assignments = await this.repository.listAssignments(selected.id, { signal });
-                const available = assignments.filter(a => a.kind === 'vocabulary' && !a.withdrawn && new Date(a.release_at) <= new Date());
+                const available = assignments.filter(a => a.kind === 'vocabulary' && !assignmentUnavailableMessage(a) && new Date(a.release_at) <= new Date());
                 vocabs = await Promise.all(available.map(async a => assignmentVocabulary(await this.repository.readAssignment(a.id, { signal }))));
             }
             if (current() && schoolGeneration === schoolContext.getGeneration()) {
