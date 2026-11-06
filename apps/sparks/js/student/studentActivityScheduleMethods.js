@@ -1,3 +1,4 @@
+import { assignmentUnavailableMessage } from '../services/assignmentAvailability.js';
 import { weeklyVocabularyVisible, weeklySettings, studentSection } from './weeklyVocabularyPolicy.js';
 import {
     calculateClassReleaseDate,
@@ -287,7 +288,7 @@ export class StudentActivitySchedule {
     }
 
     isStudentVocabularyAvailable(vocab, date = new Date()) {
-        if (vocab.assignmentId) return true;
+        if (vocab.assignmentId) return !assignmentUnavailableMessage(vocab, date);
         if (!weeklyVocabularyVisible(vocab, this.activities.sm?.studentProfile, date)) return false;
         const currentWindow = this.getCurrentScheduleWindow(date);
         const currentMonthStart = new Date(

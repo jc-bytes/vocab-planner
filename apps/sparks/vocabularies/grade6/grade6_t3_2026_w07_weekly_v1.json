@@ -1,7 +1,7 @@
 {
   "id": "grade6_t3_2026_w07_weekly_v1",
   "name": "G6 T3 W07 - Measure and model an eraser",
-  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
   "grades": [
     "6"
   ],
@@ -73,10 +73,10 @@
     "reviewOnly": false,
     "requiredActivities": [
       "flashcards",
-      "matching",
-      "fill-in-blank"
+      "matching"
     ],
     "additionalActivities": [
+      "fill-in-blank",
       "illustration",
       "quiz",
       "synonym-antonym",

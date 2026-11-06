@@ -1,3 +1,4 @@
+import { assignmentUnavailableMessage } from '../services/assignmentAvailability.js';
 import { activityHasPlayableRound, weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
 import { loadStudentFeatureStyles } from './studentFeatureStyleLoader.js';
 import { $ } from '../main.js';
@@ -145,6 +146,11 @@ export class StudentActivityLauncher {
     async startActivity(type, options = {}) {
         if (!this.sm.currentVocab) {
             this.sm.navigateTo({ view: 'units' });
+            return;
+        }
+
+        if (this.sm.currentVocab.assignmentId && assignmentUnavailableMessage(this.sm.currentVocab)) {
+            this.activities.vocabularyData.renderUnavailableAssignment(this.sm.currentVocab, { deferActivityMenu: true });
             return;
         }
 

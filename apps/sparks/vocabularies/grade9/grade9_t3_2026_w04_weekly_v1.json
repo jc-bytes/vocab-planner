@@ -1,7 +1,7 @@
 {
   "id": "grade9_t3_2026_w04_weekly_v1",
   "name": "G9 T3 W04 - Explain the message risk",
-  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "description": "Complete Flashcards and Matching once this week. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
   "grades": [
     "9"
   ],
@@ -68,11 +68,12 @@
       "A": "2026-10-05",
       "B": "2026-10-05"
     },
-    "reviewOnly": true,
-    "requiredActivities": [],
-    "additionalActivities": [
+    "reviewOnly": false,
+    "requiredActivities": [
       "flashcards",
-      "matching",
+      "matching"
+    ],
+    "additionalActivities": [
       "fill-in-blank",
       "illustration",
       "quiz",

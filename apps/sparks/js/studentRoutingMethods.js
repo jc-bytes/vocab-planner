@@ -436,13 +436,13 @@ export class StudentRouting {
                     return;
                 }
 
-                await this.sm.activities.loadVocabulary(vocab, {
+                const loaded = await this.sm.activities.loadVocabulary(vocab, {
                     fromRoute: true,
                     activityType: targetRoute.activityType,
                     skipActivityPreload: targetRoute.view === 'activity',
                     deferActivityMenu: targetRoute.view === 'activity' && !vocab.activitySettings?.retiredWeeklySet
                 });
-                if (!isCurrent()) return;
+                if (!isCurrent() || loaded === false) return;
 
                 if (vocab.activitySettings?.retiredWeeklySet) {
                     this.setRoute({ view: 'unit', unitId: this.getVocabRouteId(vocab) }, { replace: true });

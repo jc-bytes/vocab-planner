@@ -1,3 +1,4 @@
+import { assignmentUnavailableMessage } from '../services/assignmentAvailability.js';
 import { classroomRepository, assignmentVocabulary } from '../services/classroomRepository.js';
 import { schoolContext } from '../services/schoolContext.js';
 import { studentSchoolScope, waitStudentSchoolReady } from './studentSchoolSession.js';
@@ -27,7 +28,7 @@ export async function loadAssignedVocabulary(activities, { force = false } = {})
         const classes = (await classroomRepository.listMyClasses({ signal })).filter(item => item.schoolId === schoolContext.getSchoolId() && !item.archived);
         check();
         const assignments = (await Promise.all(classes.map(item => classroomRepository.listAssignments(item.id, { signal })))).flat()
-            .filter(item => item.kind === 'vocabulary' && !item.withdrawn && Number.isFinite(Date.parse(item.release_at)) && Date.parse(item.release_at) <= Date.now());
+            .filter(item => item.kind === 'vocabulary' && !assignmentUnavailableMessage(item) && Number.isFinite(Date.parse(item.release_at)) && Date.parse(item.release_at) <= Date.now());
         check();
         const vocabs = [];
         for (let start = 0; start < assignments.length; start += 4) {

@@ -30,3 +30,19 @@ test('student class preference is isolated by account and school',async()=>{
  schoolContext.select('two');const otherSchool=new StudentClassSelection(manager('student-a'),repository);await otherSchool.load();assert.equal(otherSchool.selectedId,'c');
  schoolContext.select('one');const back=new StudentClassSelection(manager('student-a'),repository);await back.load();assert.equal(back.selectedId,'b');
 });
+
+test('closed vocabulary is not offered as playable work in the class library', async () => {
+ values.clear(); schoolContext.select('one');
+ const rows = [
+  {id:'closed',kind:'vocabulary',release_at:'2026-03-02T05:00:00Z',close_at:'2026-10-13T18:12:12Z'},
+  {id:'open',kind:'vocabulary',release_at:'2026-10-01T05:00:00Z',close_at:null},
+ ];
+ const readIds=[];
+ const selection=new StudentClassSelection(manager('student-a'),{...repository,
+  listAssignments:async()=>rows,
+  readAssignment:async id=>{readIds.push(id);return {...rows.find(row=>row.id===id),materialId:id,title:id,content:{words:[{word:'cell'}]}};}
+ });
+ await selection.load();
+ assert.deepEqual(selection.vocabs.map(v=>v.id),['open']);
+ assert.deepEqual(readIds,['open']);
+});

@@ -167,6 +167,7 @@ export const classroomRepository = createClassroomRepository(async () => {
 export function assignmentVocabulary(detail) {
     if (detail.kind !== 'vocabulary') throw new Error('This assignment is not a vocabulary activity.');
     return { ...detail.content, ...(detail.vocabularyPlacement || {}), id: detail.materialId, assignmentId: detail.id,
+        releaseAt: detail.release_at, closeAt: detail.close_at, withdrawn: Boolean(detail.withdrawn),
         name: detail.title, subjectSlug: 'assignment', className: detail.className, classId: detail.classId || detail.class_id,
         __source: 'assignment', path: null };
 }

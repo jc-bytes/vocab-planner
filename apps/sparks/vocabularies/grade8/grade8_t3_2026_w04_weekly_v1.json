@@ -1,7 +1,7 @@
 {
   "id": "grade8_t3_2026_w04_weekly_v1",
   "name": "G8 T3 W04 - Binary numbers",
-  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "description": "Study these five words across this week. Complete Flashcards and Matching once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
   "grades": [
     "8"
   ],
@@ -71,10 +71,10 @@
     "reviewOnly": false,
     "requiredActivities": [
       "flashcards",
-      "matching",
-      "fill-in-blank"
+      "matching"
     ],
     "additionalActivities": [
+      "fill-in-blank",
       "illustration",
       "quiz",
       "synonym-antonym",
