@@ -1,0 +1,59 @@
+{
+  "id": "grade8_t3_2026_w03_part1",
+  "name": "G8 T3 W03 Part 1 - Practise your app explanation",
+  "description": "Practise your app explanation. 2 words. Required: Flashcards and Matching. Use the assigned class link; review the same words in 04 Sparks Review if unavailable.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "assignedDate": "2026-09-28",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Test",
+      "definition": "A check to find out whether something works.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "example": "We test the app by choosing a lunch and checking the order message.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback says the app should show the chosen lunch.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2,
+    "retiredWeeklySet": true,
+    "replacementIds": [
+      "grade8_t3_2026_w03_weekly_v1"
+    ]
+  }
+}

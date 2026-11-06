@@ -1,0 +1,102 @@
+{
+  "id": "grade7_iit_july_week4_variables",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IIT Practice: July Week 4 - Variables",
+  "description": "Practice words for variables and if/else choices.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "month": "July",
+  "week": 4,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "quiz"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "variable",
+      "definition": "A named place that stores a value that can change.",
+      "example": "The variable stored the player's score.",
+      "difficulty": 1,
+      "synonyms": [
+        "changing value"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "value",
+      "definition": "Information stored in a variable or cell.",
+      "example": "The score value changed after each correct answer.",
+      "difficulty": 1,
+      "synonyms": [
+        "amount",
+        "data"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "score",
+      "definition": "A Scratch variable that counts player points.",
+      "example": "The score increased when the sprite touched the target.",
+      "difficulty": 1,
+      "synonyms": [
+        "points"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that checks a game value, such as score, before choosing an action.",
+      "example": "The condition checked whether the score reached five.",
+      "difficulty": 1,
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "selection",
+      "definition": "Code that chooses what to do based on a condition.",
+      "example": "Selection chose the win message when the condition was true.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "if/else",
+      "definition": "A code choice between two actions.",
+      "example": "The if/else block showed either try again or you win.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

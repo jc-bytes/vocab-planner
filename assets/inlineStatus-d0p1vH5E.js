@@ -1,0 +1,1 @@
+const t=new Set(["muted","info","success","error"]);function e(e,s,r="muted"){const a=t.has(r)?r:"muted";return e.textContent=String(s??""),e.dataset.state=a,e.setAttribute("role","status"),e.setAttribute("aria-live","polite"),e.setAttribute("aria-atomic","true"),e}export{e as s};

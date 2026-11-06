@@ -1,0 +1,122 @@
+{
+  "id": "grade8_iit_july_week6_light_rgb",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IIT Practice: July Week 6 - Light and RGB",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "month": "July",
+  "week": 6,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "wordle"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "photoresistor",
+      "definition": "A sensor that changes value with light.",
+      "example": "The photoresistor reading dropped when the sensor was covered.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "light sensor",
+      "definition": "A sensor that detects light.",
+      "example": "The light sensor detected whether the desk was bright or dim.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "threshold",
+      "definition": "The sensor value limit that changes the RGB LED response.",
+      "example": "The threshold decided when the warning LED turned on.",
+      "difficulty": 1,
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "dim",
+      "definition": "Not very bright.",
+      "example": "The room was dim, so the project changed color.",
+      "difficulty": 1,
+      "synonyms": [
+        "low-light"
+      ],
+      "antonyms": [
+        "bright"
+      ]
+    },
+    {
+      "word": "bright",
+      "definition": "Giving a lot of light.",
+      "example": "A bright flashlight made the sensor value rise.",
+      "difficulty": 1,
+      "synonyms": [
+        "well-lit"
+      ],
+      "antonyms": [
+        "dim"
+      ]
+    },
+    {
+      "word": "condition",
+      "definition": "A sensor rule that compares a reading to a threshold before choosing a light color.",
+      "example": "The condition checked whether the reading was above the threshold.",
+      "difficulty": 1,
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "RGB",
+      "definition": "Red, green, and blue colors used to make other colors.",
+      "example": "The RGB LED mixed red and blue to make purple.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "color mix",
+      "definition": "A color made by combining other colors.",
+      "example": "The color mix changed when the sensor detected more light.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

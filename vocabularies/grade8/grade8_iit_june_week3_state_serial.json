@@ -1,0 +1,124 @@
+{
+  "id": "grade8_iit_june_week3_state_serial",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IIT Practice: June Week 3 - State and Serial",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "month": "June",
+  "week": 3,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "word-search"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "state",
+      "definition": "The current condition of something.",
+      "example": "The state changed from off to on after the button press.",
+      "difficulty": 1,
+      "synonyms": [
+        "status"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "serial",
+      "definition": "A way for a device and computer to send messages.",
+      "example": "Serial messages showed the button state on the computer.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "send",
+      "definition": "To move information to another place.",
+      "example": "The Arduino can send a message when the button changes.",
+      "difficulty": 1,
+      "synonyms": [
+        "transmit"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "receive",
+      "definition": "To get information from another place.",
+      "example": "The computer can receive the serial message from the board.",
+      "difficulty": 1,
+      "synonyms": [
+        "get"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "monitor",
+      "definition": "A screen or tool used to watch information.",
+      "example": "The serial monitor displayed each test reading.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "baud rate",
+      "definition": "The speed used for serial messages.",
+      "example": "The baud rate matched the speed set in the code.",
+      "difficulty": 1,
+      "synonyms": [
+        "serial speed"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Information sent or shown.",
+      "example": "The message said whether the LED was on or off.",
+      "difficulty": 1,
+      "synonyms": [
+        "communication",
+        "note"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To use serial messages and wiring checks to find and fix a circuit problem.",
+      "example": "The team can debug by checking whether the button wire is in the wrong row.",
+      "difficulty": 1,
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
+    }
+  ]
+}

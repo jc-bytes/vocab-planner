@@ -1,0 +1,108 @@
+{
+  "id": "grade7_iit_july_week6_loops",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IIT Practice: July Week 6 - Loops",
+  "description": "Practice words for loops and timing.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "month": "July",
+  "week": 6,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "wordle"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "loop",
+      "definition": "A Scratch block group that repeats an animation or action.",
+      "example": "The loop kept the character dancing until the music stopped.",
+      "difficulty": 1,
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "iteration",
+      "definition": "One repeat of a loop.",
+      "example": "Each iteration changed the costume once.",
+      "difficulty": 1,
+      "synonyms": [
+        "one repeat"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "repeat",
+      "definition": "To do something again.",
+      "example": "The repeat block made the sprite clap four times.",
+      "difficulty": 1,
+      "synonyms": [
+        "do again"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "countdown",
+      "definition": "Counting backward to a final number.",
+      "example": "The countdown went from three to one before the game started.",
+      "difficulty": 1,
+      "synonyms": [
+        "backward count"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "rhythm",
+      "definition": "A repeated beat or timing pattern.",
+      "example": "The rhythm matched the sprite movement to the beat.",
+      "difficulty": 1,
+      "synonyms": [
+        "beat"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find why a Scratch loop repeats incorrectly and fix it.",
+      "example": "The student can debug the loop when the dance never stops.",
+      "difficulty": 1,
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
+    }
+  ]
+}

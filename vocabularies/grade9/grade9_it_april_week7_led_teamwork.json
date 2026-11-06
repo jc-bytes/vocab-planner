@@ -1,0 +1,130 @@
+{
+  "id": "grade9_it_april_week7_led_teamwork",
+  "subjectSlug": "technology",
+  "name": "Grade 9 IT Practice: April Week 7 - LED Teamwork",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "month": "April",
+  "week": 7,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "crossword"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 9,
+    "flashcards": 9,
+    "quiz": 9,
+    "illustration": 9,
+    "synonymAntonym": 9,
+    "wordSearch": 9,
+    "crossword": 9,
+    "hangman": 9,
+    "scramble": 9,
+    "speedMatch": 9,
+    "fillInBlank": 9
+  },
+  "words": [
+    {
+      "word": "addressable LED",
+      "definition": "A light that can be controlled separately in a strip or group.",
+      "example": "The addressable LED strip let the team control one pixel at a time.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pixel",
+      "definition": "One tiny dot in a digital image or display.",
+      "example": "The first pixel turned blue while the rest stayed off.",
+      "difficulty": 1,
+      "synonyms": [
+        "picture dot"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "animation",
+      "definition": "A sequence of images or changes that looks like movement.",
+      "example": "The animation moved a light pattern across the LED strip.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pattern",
+      "definition": "A planned LED color or blink sequence used as a warning signal.",
+      "example": "The team created a red-blue-red pattern for the warning signal.",
+      "difficulty": 1,
+      "synonyms": [
+        "repetition"
+      ],
+      "antonyms": [
+        "randomness"
+      ]
+    },
+    {
+      "word": "speed",
+      "definition": "How fast something happens or moves.",
+      "example": "The animation speed changed when the delay value changed.",
+      "difficulty": 1,
+      "synonyms": [
+        "pace"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "builder",
+      "definition": "The person who builds the physical parts.",
+      "example": "The builder connected the LED strip and checked the wiring.",
+      "difficulty": 1,
+      "synonyms": [
+        "maker"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "coder",
+      "definition": "The person who works on the code.",
+      "example": "The coder edited the loop that controlled the LED pattern.",
+      "difficulty": 1,
+      "synonyms": [
+        "programmer"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "tester",
+      "definition": "The person who checks if it works.",
+      "example": "The tester ran the program and recorded what worked.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "recorder",
+      "definition": "The person who writes notes or evidence.",
+      "example": "The recorder wrote the test result in the project log.",
+      "difficulty": 1,
+      "synonyms": [
+        "note taker"
+      ],
+      "antonyms": []
+    }
+  ]
+}

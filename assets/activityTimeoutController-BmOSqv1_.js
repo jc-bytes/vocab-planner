@@ -1,0 +1,1 @@
+class e{constructor(){this.pending=new Set,this.destroyed=!1}schedule(e,t){const s=setTimeout(()=>{this.pending.delete(s),this.destroyed||e()},t);return this.pending.add(s),s}clear(){this.destroyed=!0,this.pending.forEach(e=>clearTimeout(e)),this.pending.clear()}}export{e as A};

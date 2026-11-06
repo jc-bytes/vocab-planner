@@ -1,0 +1,109 @@
+{
+  "id": "grade7_iit_july_week7_debugging_roles",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IIT Practice: July Week 7 - Debugging Roles",
+  "description": "Practice words for debugging and pair-programming roles.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "month": "July",
+  "week": 7,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "crossword"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "debug",
+      "definition": "To trace a Scratch script with a partner and fix the bug.",
+      "example": "The pair can debug the script after the score does not change.",
+      "difficulty": 1,
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
+    },
+    {
+      "word": "trace",
+      "definition": "To follow code step by step.",
+      "example": "The navigator can trace the blocks from top to bottom.",
+      "difficulty": 1,
+      "synonyms": [
+        "follow step by step"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "bug",
+      "definition": "A mistake in a program.",
+      "example": "The bug made the sprite jump to the wrong place.",
+      "difficulty": 1,
+      "synonyms": [
+        "mistake",
+        "error"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "driver",
+      "definition": "The partner controlling the computer during pair work.",
+      "example": "The driver controlled the mouse and changed the blocks.",
+      "difficulty": 1,
+      "synonyms": [
+        "computer controller"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "navigator",
+      "definition": "The partner who guides and checks the work during pair work.",
+      "example": "The navigator read the checklist and watched for mistakes.",
+      "difficulty": 1,
+      "synonyms": [
+        "guide partner"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Partner comments about what works in the script and what needs revision.",
+      "example": "Feedback helped the pair improve the game controls.",
+      "difficulty": 1,
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
+      "antonyms": []
+    }
+  ]
+}

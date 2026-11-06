@@ -1,0 +1,127 @@
+{
+  "id": "grade6_t2_august_week3_demo_reflection",
+  "subjectSlug": "technology",
+  "name": "Grade 6 T2 Practice: August Week 11 - Demo Reflection",
+  "description": "Practice words for testing, explaining, and reflecting on the final robotics challenge.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "month": "August",
+  "week": 11,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "challenge",
+      "definition": "The part of the robot task that was difficult and needed testing.",
+      "example": "The challenge was to reach the finish marker.",
+      "difficulty": 1,
+      "synonyms": [
+        "task",
+        "problem"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "test",
+      "definition": "To try something and see if it works.",
+      "example": "We test the program before showing it.",
+      "difficulty": 1,
+      "synonyms": [
+        "check",
+        "trial"
+      ],
+      "antonyms": [
+        "guess"
+      ]
+    },
+    {
+      "word": "debug",
+      "definition": "To describe how the team found and fixed a robot problem.",
+      "example": "We debug when the robot turns the wrong way.",
+      "difficulty": 1,
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
+    },
+    {
+      "word": "improve",
+      "definition": "To use reflection notes to make the robot route better.",
+      "example": "We improve the route after testing.",
+      "difficulty": 1,
+      "synonyms": [
+        "upgrade",
+        "make better"
+      ],
+      "antonyms": [
+        "worsen"
+      ]
+    },
+    {
+      "word": "audience",
+      "definition": "The people who see or hear your work.",
+      "example": "The audience watched the robot demo.",
+      "difficulty": 1,
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "explain",
+      "definition": "To make an idea clear with words.",
+      "example": "Students explain what their robot does.",
+      "difficulty": 1,
+      "synonyms": [
+        "describe",
+        "clarify"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "A short note about what worked, what was fixed, and what to try next.",
+      "example": "The reflection described one debugging step.",
+      "difficulty": 1,
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
+      "antonyms": []
+    }
+  ]
+}

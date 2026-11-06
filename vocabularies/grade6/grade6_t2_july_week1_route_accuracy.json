@@ -1,0 +1,112 @@
+{
+  "id": "grade6_t2_july_week1_route_accuracy",
+  "subjectSlug": "technology",
+  "name": "Grade 6 T2 Practice: July Week 5 - Route Accuracy",
+  "description": "Practice words for route maps and accurate movement.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "month": "July",
+  "week": 5,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "speed-match"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "fill-in-blank"
+    ],
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "speed",
+      "definition": "The movement setting adjusted to make the route more accurate.",
+      "example": "We lowered the speed so the robot stayed on the path.",
+      "difficulty": 1,
+      "synonyms": [
+        "pace"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "time",
+      "definition": "How long something lasts.",
+      "example": "The robot moved for two seconds of time.",
+      "difficulty": 1,
+      "synonyms": [
+        "duration"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "turn",
+      "definition": "To change direction.",
+      "example": "The robot made a left turn.",
+      "difficulty": 1,
+      "synonyms": [
+        "rotate",
+        "change direction"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "sequence",
+      "definition": "The exact order of movement steps used to test route accuracy.",
+      "example": "The robot followed the movement sequence.",
+      "difficulty": 1,
+      "synonyms": [
+        "order",
+        "steps"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "route",
+      "definition": "The path used to get from one place to another.",
+      "example": "The route had two turns.",
+      "difficulty": 1,
+      "synonyms": [
+        "path"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "accurate",
+      "definition": "Correct and close to the target.",
+      "example": "An accurate turn stopped at the marker.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "marker",
+      "definition": "An object or line used to show a place.",
+      "example": "The marker showed where the robot should stop.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "id": "grade9_iit_july_week4_data_science",
+  "subjectSlug": "technology",
+  "name": "Grade 9 IIT Practice: July Week 4 - Data Science",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "month": "July",
+  "week": 4,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "quiz"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "sequence",
+      "definition": "The ordered data-science workflow from collection to explanation.",
+      "example": "The class followed a sequence: collect data, clean it, chart it, and explain it.",
+      "difficulty": 1,
+      "synonyms": [
+        "order",
+        "steps"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "text",
+      "definition": "Words or characters.",
+      "example": "The survey response was saved as text before the class analyzed it.",
+      "difficulty": 1,
+      "synonyms": [
+        "words"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "analysis",
+      "definition": "Looking closely at data to understand it.",
+      "example": "The analysis compared which option students chose most often.",
+      "difficulty": 1,
+      "synonyms": [
+        "study"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "data science",
+      "definition": "Using data to answer questions.",
+      "example": "Data science helped the class use survey results to make a recommendation.",
+      "difficulty": 1,
+      "synonyms": [
+        "data study"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "observation",
+      "definition": "Something noticed from data or testing.",
+      "example": "The student wrote an observation after noticing one category was much higher.",
+      "difficulty": 1,
+      "synonyms": [
+        "what you notice"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "decision",
+      "definition": "A choice made after thinking about information.",
+      "example": "The group made a decision after comparing the chart results.",
+      "difficulty": 1,
+      "synonyms": [
+        "choice"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "investigative cycle",
+      "definition": "Steps for asking, collecting, analyzing, and concluding with data.",
+      "example": "The investigative cycle began with a question and ended with a conclusion.",
+      "difficulty": 2,
+      "synonyms": [
+        "inquiry process"
+      ],
+      "antonyms": []
+    }
+  ]
+}

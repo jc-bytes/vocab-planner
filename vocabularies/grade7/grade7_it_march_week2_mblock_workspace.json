@@ -1,0 +1,112 @@
+{
+  "id": "grade7_it_march_week2_mblock_workspace",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IT Practice: March Week 2 - mBlock Workspace",
+  "description": "Practice words for mBlock tools and first scripts.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "month": "March",
+  "week": 2,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "mBlock",
+      "definition": "A block coding tool used to program the mBot.",
+      "example": "The student opened mBlock to program the mBot.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "workspace",
+      "definition": "The area in a program where you do your work.",
+      "example": "The movement blocks were arranged in the workspace.",
+      "difficulty": 1,
+      "synonyms": [
+        "work area"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "sprite",
+      "definition": "A character or object in a Scratch or mBlock project.",
+      "example": "The sprite on the screen copied the robot movement.",
+      "difficulty": 1,
+      "synonyms": [
+        "character"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "block",
+      "definition": "A coding command that snaps into a program.",
+      "example": "The forward block made the robot drive ahead.",
+      "difficulty": 1,
+      "synonyms": [
+        "command piece"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "script",
+      "definition": "A group of connected blocks that run together.",
+      "example": "The script connected start, move, and stop blocks.",
+      "difficulty": 1,
+      "synonyms": [
+        "code stack"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "upload",
+      "definition": "To send a program from the computer to the robot.",
+      "example": "Upload sent the finished program to the mBot.",
+      "difficulty": 1,
+      "synonyms": [
+        "send to device"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "interface",
+      "definition": "The screen and tools used to work with a program.",
+      "example": "The interface showed the blocks, stage, and device connection.",
+      "difficulty": 1,
+      "synonyms": [
+        "screen tools"
+      ],
+      "antonyms": []
+    }
+  ]
+}

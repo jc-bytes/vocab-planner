@@ -1,0 +1,105 @@
+{
+  "id": "grade9_it_may_week9_robot_design",
+  "subjectSlug": "technology",
+  "name": "Grade 9 IT Practice: May Week 9 - Robot Design",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "month": "May",
+  "week": 9,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "scramble"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "robot goal",
+      "definition": "What the robot should do.",
+      "example": "The robot goal was to detect an object and give a warning signal.",
+      "difficulty": 1,
+      "synonyms": [
+        "robot target"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "component list",
+      "definition": "A list of parts needed for a project.",
+      "example": "The component list included the sensor, LED, resistor, and buzzer.",
+      "difficulty": 2,
+      "synonyms": [
+        "parts list"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "state chart",
+      "definition": "A table or diagram showing states and actions.",
+      "example": "The state chart showed what the robot should do when the sensor changed.",
+      "difficulty": 1,
+      "synonyms": [
+        "state diagram"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "design plan",
+      "definition": "A plan for building and testing a project.",
+      "example": "The design plan explained the inputs, outputs, and test steps.",
+      "difficulty": 1,
+      "synonyms": [
+        "build plan"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "test step",
+      "definition": "One action used to check if something works.",
+      "example": "The first test step checked whether the sensor reading appeared.",
+      "difficulty": 1,
+      "synonyms": [
+        "checking step"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Peer or teacher comments used to refine the robot goal, design, or evidence plan.",
+      "example": "Peer feedback helped the team simplify the robot goal.",
+      "difficulty": 1,
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
+      "antonyms": []
+    }
+  ]
+}

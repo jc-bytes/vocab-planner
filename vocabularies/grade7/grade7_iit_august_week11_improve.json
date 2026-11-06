@@ -1,0 +1,105 @@
+{
+  "id": "grade7_iit_august_week11_improve",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IIT Practice: August Week 11 - Improve",
+  "description": "Practice words for improving game features.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "month": "August",
+  "week": 11,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "score",
+      "definition": "The visible game counter players use to track progress.",
+      "example": "The score display moved to the top corner.",
+      "difficulty": 1,
+      "synonyms": [
+        "points"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "timer",
+      "definition": "A tool or variable that tracks time.",
+      "example": "The timer gave players thirty seconds to finish.",
+      "difficulty": 1,
+      "synonyms": [
+        "clock",
+        "counter"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "organization",
+      "definition": "Keeping work clear and easy to follow.",
+      "example": "Organization kept the scripts grouped by sprite.",
+      "difficulty": 1,
+      "synonyms": [
+        "order",
+        "structure"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "functionality",
+      "definition": "How well something does what it should do.",
+      "example": "Functionality improved when every button worked.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "application",
+      "definition": "A real use for a skill or project.",
+      "example": "The application showed how loops and variables can make a game.",
+      "difficulty": 1,
+      "synonyms": [
+        "real use"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "A note explaining how the Scratch project became more functional.",
+      "example": "The reflection explained which block was hardest to use.",
+      "difficulty": 1,
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "id": "grade6_t2_july_week4_conditions_flowcharts",
+  "subjectSlug": "technology",
+  "name": "Grade 6 T2 Practice: July Week 8 - Conditions and Flowcharts",
+  "description": "Practice words for simple conditions and robot responses.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "month": "July",
+  "week": 8,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "hangman"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "if",
+      "definition": "A word used to start a condition.",
+      "example": "If the sensor sees an obstacle, the robot stops.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A yes-or-no rule in a flowchart or program that decides the next action.",
+      "example": "The condition checks for an object.",
+      "difficulty": 1,
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "response",
+      "definition": "What happens after an input or condition.",
+      "example": "The response was a beep.",
+      "difficulty": 1,
+      "synonyms": [
+        "reaction",
+        "reply"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "true",
+      "definition": "Correct or happening.",
+      "example": "The condition is true when the object is close.",
+      "difficulty": 1,
+      "synonyms": [
+        "correct"
+      ],
+      "antonyms": [
+        "false"
+      ]
+    },
+    {
+      "word": "false",
+      "definition": "Not correct or not happening.",
+      "example": "The condition is false when the path is clear.",
+      "difficulty": 1,
+      "synonyms": [
+        "incorrect"
+      ],
+      "antonyms": [
+        "true"
+      ]
+    },
+    {
+      "word": "flowchart",
+      "definition": "A diagram that shows steps or choices.",
+      "example": "The flowchart showed what the robot should do.",
+      "difficulty": 1,
+      "synonyms": [
+        "process diagram"
+      ],
+      "antonyms": []
+    }
+  ]
+}

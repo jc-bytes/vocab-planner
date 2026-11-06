@@ -1,0 +1,109 @@
+{
+  "id": "grade6_t2_august_week2_final_challenge_plan",
+  "subjectSlug": "technology",
+  "name": "Grade 6 T2 Practice: August Week 10 - Final Challenge Plan",
+  "description": "Practice words for planning and improving the final mBot challenge.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "month": "August",
+  "week": 10,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "word-search"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "goal",
+      "definition": "What you are trying to do.",
+      "example": "The goal was to follow the route.",
+      "difficulty": 1,
+      "synonyms": [
+        "target",
+        "aim"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "success rule",
+      "definition": "A simple rule that says when the task is complete.",
+      "example": "The success rule was to stop inside the box.",
+      "difficulty": 1,
+      "synonyms": [
+        "completion rule"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "test area",
+      "definition": "The space where a project is tried safely.",
+      "example": "We put tape in the test area.",
+      "difficulty": 1,
+      "synonyms": [
+        "safe test space"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that helps the robot reach the marker more accurately.",
+      "example": "The improvement made the robot stop closer to the marker.",
+      "difficulty": 1,
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
+    },
+    {
+      "word": "challenge",
+      "definition": "The final robot task that combines movement, testing, and improvement.",
+      "example": "The challenge was to reach the finish marker.",
+      "difficulty": 1,
+      "synonyms": [
+        "task",
+        "problem"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "parts",
+      "definition": "Pieces that make up a device.",
+      "example": "The robot parts include wheels and sensors.",
+      "difficulty": 1,
+      "synonyms": [
+        "pieces"
+      ],
+      "antonyms": []
+    }
+  ]
+}

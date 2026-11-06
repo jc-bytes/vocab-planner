@@ -1,0 +1,102 @@
+{
+  "id": "grade8_it_march_week4_svg_markup",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IT Practice: March Week 4 - SVG and Markup",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "month": "March",
+  "week": 4,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "quiz"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "SVG",
+      "definition": "A file format for vector graphics.",
+      "example": "The SVG stayed sharp when the student resized the icon.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "markup",
+      "definition": "Text that describes structure or design.",
+      "example": "The markup described the circle, rectangle, and text.",
+      "difficulty": 1,
+      "synonyms": [
+        "structure code"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "tag",
+      "definition": "A markup label inside angle brackets.",
+      "example": "The circle tag created one shape in the SVG.",
+      "difficulty": 1,
+      "synonyms": [
+        "markup label"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "attribute",
+      "definition": "Extra information inside a tag.",
+      "example": "The fill attribute changed the icon color.",
+      "difficulty": 1,
+      "synonyms": [
+        "tag detail"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "scalable",
+      "definition": "Able to change size without losing quality.",
+      "example": "The scalable graphic looked clear on both small and large screens.",
+      "difficulty": 1,
+      "synonyms": [
+        "resizable"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "property",
+      "definition": "A style or setting that can be changed.",
+      "example": "The width property controlled the size of the rectangle.",
+      "difficulty": 1,
+      "synonyms": [
+        "setting"
+      ],
+      "antonyms": []
+    }
+  ]
+}

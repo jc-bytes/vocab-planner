@@ -1,0 +1,107 @@
+{
+  "id": "grade7_iit_august_week12_demo",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IIT Practice: August Week 12 - Demo",
+  "description": "Practice words for demonstrating and reflecting on the dance game.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "month": "August",
+  "week": 12,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "demo",
+      "definition": "A short demonstration of how something works.",
+      "example": "The demo showed one full round of the game.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "presentation",
+      "definition": "A short explanation and demo of the game rules, controls, and result.",
+      "example": "The presentation explained the game rules and controls.",
+      "difficulty": 1,
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "application",
+      "definition": "A real use for a skill or project.",
+      "example": "The application of variables helped explain the score.",
+      "difficulty": 1,
+      "synonyms": [
+        "real use"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "rubric",
+      "definition": "A guide that explains how work will be graded.",
+      "example": "The rubric helped the group check missing features.",
+      "difficulty": 1,
+      "synonyms": [
+        "grading guide"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "A short explanation of the bug fixed, improvement made, and skill learned.",
+      "example": "The reflection named one bug and how it was fixed.",
+      "difficulty": 1,
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes the game clearer or easier for players.",
+      "example": "The improvement made the instructions clearer for players.",
+      "difficulty": 1,
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
+    }
+  ]
+}

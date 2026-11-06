@@ -1,0 +1,1 @@
+function r(r,n,t,{vertical:e=!1}={}){const o=Array.from(r||[]),f=o.indexOf(n);if(f<0)return null;if("Home"===t)return o[0];if("End"===t)return o.at(-1);const i="ArrowRight"===t||e&&"ArrowDown"===t;return i||"ArrowLeft"===t||e&&"ArrowUp"===t?o[(f+(i?1:-1)+o.length)%o.length]:null}export{r as g};

@@ -1,0 +1,102 @@
+{
+  "id": "grade8_it_may_week11_testing_revision",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IT Practice: May Week 11 - Testing and Revision",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "month": "May",
+  "week": 11,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "feedback",
+      "definition": "User or peer comments about portfolio navigation, readability, links, or media.",
+      "example": "Feedback showed that the menu labels needed to be clearer.",
+      "difficulty": 1,
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "readability",
+      "definition": "How easy text is to read.",
+      "example": "Readability improved after the student shortened the paragraph.",
+      "difficulty": 1,
+      "synonyms": [
+        "ease of reading"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "alt text",
+      "definition": "Text that describes an image for accessibility.",
+      "example": "Alt text described the poster image for screen readers.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "link",
+      "definition": "A way to open a web page or file.",
+      "example": "The broken link was fixed before publishing the page.",
+      "difficulty": 1,
+      "synonyms": [
+        "connection"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "revision",
+      "definition": "A changed version made after review.",
+      "example": "The revision changed the homepage after peer review.",
+      "difficulty": 1,
+      "synonyms": [
+        "updated version",
+        "edit"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "publish",
+      "definition": "To make a site or work available to others.",
+      "example": "The student can publish the final portfolio for the teacher to view.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "id": "grade8_it_may_week13_archive_reflection",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IT Practice: May Week 13 - Archive and Reflection",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "month": "May",
+  "week": 13,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "word-search"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "archive",
+      "definition": "To store files neatly for later.",
+      "example": "The student can archive the final website files in one folder.",
+      "difficulty": 1,
+      "synonyms": [
+        "store",
+        "save"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "file",
+      "definition": "A saved document, image, or project on a computer.",
+      "example": "The HTML file was saved with a clear project name.",
+      "difficulty": 1,
+      "synonyms": [
+        "saved document"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "submission",
+      "definition": "Work that is turned in to the teacher.",
+      "example": "The submission included the link, screenshots, and reflection.",
+      "difficulty": 1,
+      "synonyms": [
+        "turned-in work"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "correction",
+      "definition": "A change that fixes a mistake.",
+      "example": "The correction fixed a missing image credit.",
+      "difficulty": 1,
+      "synonyms": [
+        "fix"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "A final note about the strongest portfolio evidence and remaining improvements.",
+      "example": "The reflection described the strongest part of the project.",
+      "difficulty": 1,
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "folder",
+      "definition": "A place used to organize files.",
+      "example": "The folder kept images, code, and notes together.",
+      "difficulty": 1,
+      "synonyms": [
+        "file container"
+      ],
+      "antonyms": []
+    }
+  ]
+}

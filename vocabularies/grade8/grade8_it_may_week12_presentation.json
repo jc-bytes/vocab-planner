@@ -1,0 +1,110 @@
+{
+  "id": "grade8_it_may_week12_presentation",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IT Practice: May Week 12 - Presentation",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "month": "May",
+  "week": 12,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "presentation",
+      "definition": "An explanation of the portfolio, design choices, and evidence.",
+      "example": "The presentation showed the portfolio and explained the design choices.",
+      "difficulty": 1,
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "design choice",
+      "definition": "A decision made while designing.",
+      "example": "Using large icons was a design choice for quick scanning.",
+      "difficulty": 2,
+      "synonyms": [
+        "design decision"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "An explanation of which portfolio design choices improved after feedback.",
+      "example": "The reflection explained what improved after feedback.",
+      "difficulty": 1,
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "audience",
+      "definition": "The viewers who need the portfolio explanation to be clear.",
+      "example": "The student adjusted the explanation for a Grade 8 audience.",
+      "difficulty": 1,
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A revision that makes the portfolio clearer, more accurate, or easier to use.",
+      "example": "The improvement made the source credits easier to find.",
+      "difficulty": 1,
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
+    },
+    {
+      "word": "portfolio",
+      "definition": "A collection of work that shows learning.",
+      "example": "The portfolio showed the final website, poster, and research notes.",
+      "difficulty": 1,
+      "synonyms": [
+        "work collection"
+      ],
+      "antonyms": []
+    }
+  ]
+}

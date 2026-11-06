@@ -1,0 +1,108 @@
+{
+  "id": "grade7_it_april_week7_feedback_signals",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IT Practice: April Week 7 - Feedback Signals",
+  "description": "Practice words for lights, sound, and robot state signals.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "month": "April",
+  "week": 7,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "crossword"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "LED",
+      "definition": "A programmed robot light used as a feedback signal.",
+      "example": "The LED turned on when the robot reached the checkpoint.",
+      "difficulty": 1,
+      "synonyms": [
+        "light"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "buzzer",
+      "definition": "A part that makes a sound.",
+      "example": "The buzzer sounded after the robot completed the route.",
+      "difficulty": 1,
+      "synonyms": [
+        "alarm",
+        "beeper"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "state",
+      "definition": "The current condition of something.",
+      "example": "The robot state changed from moving to stopped.",
+      "difficulty": 1,
+      "synonyms": [
+        "status"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "event",
+      "definition": "Something that starts an action in a program.",
+      "example": "Touching the sensor was the event that started the sound.",
+      "difficulty": 1,
+      "synonyms": [
+        "trigger",
+        "action starter"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "signal",
+      "definition": "A sign or message sent to show information.",
+      "example": "The blinking light was a signal that the robot was ready.",
+      "difficulty": 1,
+      "synonyms": [
+        "sign"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "pattern",
+      "definition": "A repeated light or sound signal that communicates robot status.",
+      "example": "The LED pattern blinked twice before the robot moved.",
+      "difficulty": 1,
+      "synonyms": [
+        "repetition"
+      ],
+      "antonyms": [
+        "randomness"
+      ]
+    }
+  ]
+}

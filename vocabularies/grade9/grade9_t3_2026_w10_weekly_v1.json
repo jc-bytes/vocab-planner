@@ -1,0 +1,91 @@
+{
+  "id": "grade9_t3_2026_w10_weekly_v1",
+  "name": "G9 T3 W10 - Present and explain safety decisions",
+  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 10,
+  "assignedDate": "2026-11-16",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Backup",
+      "definition": "A separate copy kept so that information can be recovered if the working copy is lost.",
+      "example": "Keep a backup of the project in a separate location.",
+      "source": "https://techterms.com/definition/backup",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Probability",
+      "definition": "How likely something is to happen.",
+      "example": "Repeated failed logins increase our concern about the probability of an account attack.",
+      "source": "https://www.merriam-webster.com/dictionary/probability",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Impact",
+      "definition": "The effect or harm caused by a problem.",
+      "example": "A separate backup reduces the impact of losing the working file.",
+      "source": "https://www.merriam-webster.com/dictionary/impact",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Priority",
+      "definition": "Something chosen to be dealt with before other things.",
+      "example": "Protecting the only project copy is our first priority.",
+      "source": "https://www.merriam-webster.com/dictionary/priority",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Protection",
+      "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+      "example": "A separate backup provides protection against losing the only project copy.",
+      "source": "https://www.merriam-webster.com/dictionary/protection",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-11-16",
+      "B": "2026-11-16"
+    },
+    "reviewOnly": true,
+    "requiredActivities": [],
+    "additionalActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank",
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

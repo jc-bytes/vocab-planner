@@ -1,0 +1,118 @@
+{
+  "id": "grade7_iit_june_week2_branding",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IIT Practice: June Week 2 - Branding",
+  "description": "Practice words for branding and consistent design.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "month": "June",
+  "week": 2,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "brand",
+      "definition": "The style and identity of a product or group.",
+      "example": "The brand used the same colors on the poster and game screen.",
+      "difficulty": 1,
+      "synonyms": [
+        "identity"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "logo",
+      "definition": "A symbol or design that represents a group or idea.",
+      "example": "The logo represented the project with one simple symbol.",
+      "difficulty": 1,
+      "synonyms": [
+        "symbol"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "palette",
+      "definition": "A planned set of colors.",
+      "example": "The palette used blue, green, and white.",
+      "difficulty": 1,
+      "synonyms": [
+        "color set"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "typography",
+      "definition": "The style and arrangement of text.",
+      "example": "The typography made the title easy to read.",
+      "difficulty": 1,
+      "synonyms": [
+        "text style"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "consistency",
+      "definition": "Keeping choices the same across a design.",
+      "example": "Consistency kept the same logo size on each slide.",
+      "difficulty": 1,
+      "synonyms": [
+        "same style"
+      ],
+      "antonyms": [
+        "inconsistency"
+      ]
+    },
+    {
+      "word": "feedback",
+      "definition": "Comments about a logo, color palette, typography, or design consistency.",
+      "example": "Feedback told the student to make the title larger.",
+      "difficulty": 1,
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "revision",
+      "definition": "A changed version made after review.",
+      "example": "The revision changed the colors after peer review.",
+      "difficulty": 1,
+      "synonyms": [
+        "updated version",
+        "edit"
+      ],
+      "antonyms": []
+    }
+  ]
+}

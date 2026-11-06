@@ -1,0 +1,116 @@
+{
+  "id": "grade6_t2_august_week1_knowledge_cards",
+  "subjectSlug": "technology",
+  "name": "Grade 6 T2 Practice: August Week 9 - Knowledge Cards",
+  "description": "Practice words for mBot card stations and actions.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "month": "August",
+  "week": 9,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "scramble"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "movement",
+      "definition": "Changing place or position.",
+      "example": "The robot movement started slowly.",
+      "difficulty": 1,
+      "synonyms": [
+        "motion"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "A robot action students can name and explain, such as movement, light, or sound.",
+      "example": "A sound can be an output.",
+      "difficulty": 1,
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
+    },
+    {
+      "word": "sensor",
+      "definition": "A robot part students can identify as an input source.",
+      "example": "The sensor detected an object.",
+      "difficulty": 1,
+      "synonyms": [
+        "detector"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To explain how a wrong robot action was found and fixed.",
+      "example": "We debug when the robot turns the wrong way.",
+      "difficulty": 1,
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
+    },
+    {
+      "word": "card",
+      "definition": "A small guide with steps or information.",
+      "example": "The card helped us find the right block.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "station",
+      "definition": "A place set up for one activity.",
+      "example": "The sensor station had a test line.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "action",
+      "definition": "Something a device or person does.",
+      "example": "The robot action was a short turn.",
+      "difficulty": 1,
+      "synonyms": [
+        "activity"
+      ],
+      "antonyms": []
+    }
+  ]
+}

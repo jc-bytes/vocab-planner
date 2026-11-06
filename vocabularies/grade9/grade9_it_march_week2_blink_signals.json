@@ -1,0 +1,125 @@
+{
+  "id": "grade9_it_march_week2_blink_signals",
+  "subjectSlug": "technology",
+  "name": "Grade 9 IT Practice: March Week 2 - Blink and Signals",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "month": "March",
+  "week": 2,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "digital",
+      "definition": "Using clear separate values, like on or off.",
+      "example": "The digital pin turned the LED fully on or fully off.",
+      "difficulty": 1,
+      "synonyms": [
+        "on-off"
+      ],
+      "antonyms": [
+        "analog"
+      ]
+    },
+    {
+      "word": "analog",
+      "definition": "Using values that can change smoothly.",
+      "example": "The analog reading changed gradually as the sensor value changed.",
+      "difficulty": 1,
+      "synonyms": [
+        "smooth value"
+      ],
+      "antonyms": [
+        "digital"
+      ]
+    },
+    {
+      "word": "signal",
+      "definition": "A sign or message sent by a system.",
+      "example": "The signal told the Arduino when to change the LED state.",
+      "difficulty": 1,
+      "synonyms": [
+        "sign"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "LED",
+      "definition": "A circuit output light controlled by Arduino code.",
+      "example": "The LED blinked after the sketch uploaded successfully.",
+      "difficulty": 1,
+      "synonyms": [
+        "light"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "blink",
+      "definition": "To turn on and off.",
+      "example": "The blink pattern turned the LED on, waited, and turned it off.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "setup",
+      "definition": "The part of a program that runs first.",
+      "example": "The setup section told the Arduino which pin would be an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "loop",
+      "definition": "The Arduino section that repeats the signal pattern.",
+      "example": "The loop repeated the blink pattern until the board was unplugged.",
+      "difficulty": 1,
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "delay",
+      "definition": "A pause in a program.",
+      "example": "The delay made the LED wait one second before changing.",
+      "difficulty": 1,
+      "synonyms": [
+        "pause"
+      ],
+      "antonyms": []
+    }
+  ]
+}

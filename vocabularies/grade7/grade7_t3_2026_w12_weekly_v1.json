@@ -1,0 +1,91 @@
+{
+  "id": "grade7_t3_2026_w12_weekly_v1",
+  "name": "G7 T3 W12 - Finish the feedback improvement",
+  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 12,
+  "assignedDate": "2026-12-03",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Sensor",
+      "definition": "A device that detects or measures something, such as light or distance.",
+      "example": "A distance sensor measures how far away an object is.",
+      "source": "https://www.merriam-webster.com/dictionary/sensor",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Threshold",
+      "definition": "A limit at which a response changes.",
+      "example": "The threshold is 18 centimetres, so only larger distances trigger the warning.",
+      "source": "https://www.merriam-webster.com/dictionary/threshold",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Radio",
+      "definition": "A way to send signals without wires using radio waves.",
+      "example": "The micro:bit uses radio to send ALERT to the receiver.",
+      "source": "https://www.merriam-webster.com/dictionary/radio",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Message",
+      "definition": "Information sent from one person or device to another.",
+      "example": "The receiver shows an icon when the message is ALERT.",
+      "source": "https://www.merriam-webster.com/dictionary/message",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Output",
+      "definition": "Information or a signal produced by a computer or program.",
+      "example": "The displayed number is an output from the counter.",
+      "source": "https://techterms.com/definition/output",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-12-04",
+      "B": "2026-12-03"
+    },
+    "reviewOnly": true,
+    "requiredActivities": [],
+    "additionalActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank",
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "id": "grade9_it_may_week13_archive",
+  "subjectSlug": "technology",
+  "name": "Grade 9 IT Practice: May Week 13 - Archive",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "month": "May",
+  "week": 13,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "word-search"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "archive",
+      "definition": "To store files neatly for later.",
+      "example": "The student moved the final code and photos into the project archive.",
+      "difficulty": 1,
+      "synonyms": [
+        "store",
+        "save"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "make-up",
+      "definition": "Work completed later because it was missed.",
+      "example": "The make-up task let the student submit missing test evidence.",
+      "difficulty": 1,
+      "synonyms": [
+        "recovery work"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "evidence",
+      "definition": "Screenshots, photos, code, logs, and files that prove project completion.",
+      "example": "The evidence folder included screenshots, photos, and the final sketch.",
+      "difficulty": 1,
+      "synonyms": [
+        "proof"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Teacher or peer comments used to complete the archived project evidence.",
+      "example": "The student used teacher feedback to fix one missing explanation.",
+      "difficulty": 1,
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "admin",
+      "definition": "Class tasks for organization, records, or exams.",
+      "example": "The admin task was renaming files before final submission.",
+      "difficulty": 1,
+      "synonyms": [
+        "management"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "skill",
+      "definition": "An ability you can practice and improve.",
+      "example": "The reflection named debugging as the strongest skill practiced.",
+      "difficulty": 1,
+      "synonyms": [
+        "ability"
+      ],
+      "antonyms": []
+    }
+  ]
+}

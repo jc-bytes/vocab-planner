@@ -1,0 +1,115 @@
+{
+  "id": "grade8_it_march_week3_campaign_graphics",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IT Practice: March Week 3 - Campaign Graphics",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "month": "March",
+  "week": 3,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "word-search"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "campaign",
+      "definition": "A planned message that asks people to care or act.",
+      "example": "The campaign asked students to keep devices organized and safe.",
+      "difficulty": 1,
+      "synonyms": [
+        "awareness effort"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "audience",
+      "definition": "The group the campaign graphic is made to inform or persuade.",
+      "example": "The audience for the poster was Grade 8 students.",
+      "difficulty": 1,
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Information sent or shown.",
+      "example": "The message told viewers to back up their portfolio files.",
+      "difficulty": 1,
+      "synonyms": [
+        "communication",
+        "note"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "icon",
+      "definition": "A small picture that represents an idea.",
+      "example": "The icon showed a small shield for online safety.",
+      "difficulty": 1,
+      "synonyms": [
+        "symbol"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "logo",
+      "definition": "A symbol or design that represents a group or idea.",
+      "example": "The logo used simple shapes so it stayed clear when small.",
+      "difficulty": 1,
+      "synonyms": [
+        "symbol"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "originality",
+      "definition": "Making work that is your own idea.",
+      "example": "Originality meant drawing a new symbol instead of copying one.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sketch",
+      "definition": "A rough drawing or plan.",
+      "example": "The sketch planned the poster layout before the final design.",
+      "difficulty": 1,
+      "synonyms": [
+        "draft drawing",
+        "plan"
+      ],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "id": "grade7_it_summative_robotics_parts",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IT Summative: Robotics Parts",
+  "description": "Ten core first-trimester words for the Grade 7 robotics vocabulary table.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "month": "March",
+  "week": 1,
+  "purpose": "summative",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "illustration"
+    ],
+    "additionalActivities": [
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "mBot",
+      "definition": "A small robot used to learn robotics and coding.",
+      "example": "The team programmed the mBot to drive through the maze.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "hardware",
+      "definition": "The physical parts of a computer or robot.",
+      "example": "The wheels, sensors, and control board were the robot hardware.",
+      "difficulty": 1,
+      "synonyms": [
+        "physical parts"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "software",
+      "definition": "Programs that tell a computer or robot what to do.",
+      "example": "The mBlock software sent the movement program to the robot.",
+      "difficulty": 1,
+      "synonyms": [
+        "programs"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "chassis",
+      "definition": "The frame that holds robot parts together.",
+      "example": "The chassis held the wheels, motor, and control board together.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "motor",
+      "definition": "A part that makes movement by turning or spinning.",
+      "example": "The motor turned faster when the student increased the speed value.",
+      "difficulty": 1,
+      "synonyms": [
+        "engine"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "sensor",
+      "definition": "A robot part that collects environmental information for code, such as distance.",
+      "example": "The ultrasonic sensor helped the robot notice an obstacle.",
+      "difficulty": 1,
+      "synonyms": [
+        "detector"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "LED",
+      "definition": "A robot light controlled by code to show a state or checkpoint.",
+      "example": "The LED flashed green when the robot reached a checkpoint.",
+      "difficulty": 1,
+      "synonyms": [
+        "light"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "buzzer",
+      "definition": "A part that makes a sound.",
+      "example": "The buzzer played a short sound after the robot completed the route.",
+      "difficulty": 1,
+      "synonyms": [
+        "alarm",
+        "beeper"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "controller",
+      "definition": "The board that controls the robot parts.",
+      "example": "The controller received the uploaded instructions from the computer.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "control board",
+      "definition": "The main board that connects and controls robot parts.",
+      "example": "The control board connected the sensor, motor, LED, and buzzer.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

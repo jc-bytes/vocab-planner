@@ -1,0 +1,125 @@
+{
+  "id": "grade8_iit_july_week5_analog_values",
+  "subjectSlug": "technology",
+  "name": "Grade 8 IIT Practice: July Week 5 - Analog Values",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "month": "July",
+  "week": 5,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "speed-match"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "fill-in-blank"
+    ],
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "digital",
+      "definition": "Using clear separate values, like on or off.",
+      "example": "The digital button reading was either HIGH or LOW.",
+      "difficulty": 1,
+      "synonyms": [
+        "on-off"
+      ],
+      "antonyms": [
+        "analog"
+      ]
+    },
+    {
+      "word": "analog",
+      "definition": "Using values that can change smoothly.",
+      "example": "The analog knob reading changed gradually from low to high.",
+      "difficulty": 1,
+      "synonyms": [
+        "smooth value"
+      ],
+      "antonyms": [
+        "digital"
+      ]
+    },
+    {
+      "word": "potentiometer",
+      "definition": "A knob that changes an analog value.",
+      "example": "The potentiometer controlled the brightness value.",
+      "difficulty": 2,
+      "synonyms": [
+        "knob"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "ADC",
+      "definition": "A part that changes an analog signal into a number.",
+      "example": "The ADC changed the knob signal into a number.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "variable",
+      "definition": "A value that can change in a program.",
+      "example": "The variable stored the sensor reading in the sketch.",
+      "difficulty": 1,
+      "synonyms": [
+        "changing value"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "PWM",
+      "definition": "A fast on/off signal used to control brightness or speed.",
+      "example": "PWM made the LED look dimmer without turning fully off.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "brightness",
+      "definition": "How light or dark something is.",
+      "example": "Brightness increased when the PWM value went up.",
+      "difficulty": 1,
+      "synonyms": [
+        "light level"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "reading",
+      "definition": "A value measured by a sensor.",
+      "example": "The reading changed when the student turned the knob.",
+      "difficulty": 1,
+      "synonyms": [
+        "measurement",
+        "value"
+      ],
+      "antonyms": []
+    }
+  ]
+}

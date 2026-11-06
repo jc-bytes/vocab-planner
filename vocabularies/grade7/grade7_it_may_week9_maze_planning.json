@@ -1,0 +1,105 @@
+{
+  "id": "grade7_it_may_week9_maze_planning",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IT Practice: May Week 9 - Maze Planning",
+  "description": "Practice words for maze route planning.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "month": "May",
+  "week": 9,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "scramble"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "maze",
+      "definition": "A path challenge with turns and obstacles.",
+      "example": "The maze had turns, walls, and checkpoints for the robot.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "route",
+      "definition": "The planned path to follow.",
+      "example": "The route avoided the obstacle and reached the finish.",
+      "difficulty": 1,
+      "synonyms": [
+        "path"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "checkpoint",
+      "definition": "A place used to check progress on a route.",
+      "example": "Each checkpoint helped the team test part of the maze.",
+      "difficulty": 1,
+      "synonyms": [
+        "progress point"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "obstacle",
+      "definition": "Something that blocks the way.",
+      "example": "The obstacle showed where the robot needed to turn.",
+      "difficulty": 1,
+      "synonyms": [
+        "barrier"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "prototype",
+      "definition": "A test version of the maze route used before final coding.",
+      "example": "The prototype maze used tape lines on the floor.",
+      "difficulty": 1,
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
+    },
+    {
+      "word": "algorithm",
+      "definition": "A clear set of steps to solve a problem.",
+      "example": "The algorithm listed the exact moves to finish the maze.",
+      "difficulty": 1,
+      "synonyms": [
+        "step-by-step plan"
+      ],
+      "antonyms": []
+    }
+  ]
+}

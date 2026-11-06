@@ -1,0 +1,106 @@
+{
+  "id": "grade9_iit_august_week11_revision",
+  "subjectSlug": "technology",
+  "name": "Grade 9 IIT Practice: August Week 11 - Revision",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "month": "August",
+  "week": 11,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "peer feedback",
+      "definition": "Helpful comments from a classmate.",
+      "example": "Peer feedback helped the student notice that the chart title was unclear.",
+      "difficulty": 2,
+      "synonyms": [
+        "classmate comments"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "calculation",
+      "definition": "A math result found by using numbers.",
+      "example": "The calculation found the percentage of students who chose each answer.",
+      "difficulty": 1,
+      "synonyms": [
+        "math result"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "label",
+      "definition": "A name or short description.",
+      "example": "The student fixed the axis label so the chart showed what was being counted.",
+      "difficulty": 1,
+      "synonyms": [
+        "tag"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "revision",
+      "definition": "A changed version made after review.",
+      "example": "The revision replaced a crowded chart with a simpler bar chart.",
+      "difficulty": 1,
+      "synonyms": [
+        "updated version",
+        "edit"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "evidence statement",
+      "definition": "A sentence that uses evidence.",
+      "example": "The evidence statement connected the recommendation to the survey result.",
+      "difficulty": 2,
+      "synonyms": [
+        "proof sentence"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "limitation",
+      "definition": "A project weakness that must be explained before making a recommendation.",
+      "example": "The limitation explained that the survey only included one grade level.",
+      "difficulty": 1,
+      "synonyms": [
+        "constraint",
+        "weakness"
+      ],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "id": "grade7_iit_july_week5_operators",
+  "subjectSlug": "technology",
+  "name": "Grade 7 IIT Practice: July Week 5 - Operators",
+  "description": "Practice words for comparison and logic operators.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "month": "July",
+  "week": 5,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "speed-match"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "fill-in-blank"
+    ],
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "operator",
+      "definition": "A symbol or block that compares or calculates.",
+      "example": "The greater-than operator compared the score to the goal.",
+      "difficulty": 1,
+      "synonyms": [
+        "symbol"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "comparison",
+      "definition": "Checking how two values are related.",
+      "example": "The comparison checked if the timer was less than zero.",
+      "difficulty": 1,
+      "synonyms": [
+        "checking relationship"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "logic",
+      "definition": "Rules used to make decisions.",
+      "example": "The game logic decided when the player won.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "true",
+      "definition": "Correct or matching a condition.",
+      "example": "The condition was true when the sprite touched the target.",
+      "difficulty": 1,
+      "synonyms": [
+        "correct"
+      ],
+      "antonyms": [
+        "false"
+      ]
+    },
+    {
+      "word": "false",
+      "definition": "Not correct or not matching a condition.",
+      "example": "The condition was false when the sprite missed the target.",
+      "difficulty": 1,
+      "synonyms": [
+        "incorrect"
+      ],
+      "antonyms": [
+        "true"
+      ]
+    },
+    {
+      "word": "response",
+      "definition": "What happens after an input or event.",
+      "example": "The response played a sound after the player clicked.",
+      "difficulty": 1,
+      "synonyms": [
+        "reaction",
+        "reply"
+      ],
+      "antonyms": []
+    }
+  ]
+}
