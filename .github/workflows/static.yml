@@ -231,16 +231,29 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validation_only }}
     needs: validate
     permissions:
-      contents: read
+      contents: write
+      actions: read
       pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout release compatibility verifier
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Download release compatibility verifier
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for file in apps/sparks/scripts/verify-owned-rpc-readiness.mjs .github/scripts/publish-validated-pages.sh; do
+            mkdir -p "$(dirname "$file")"
+            gh api -H 'Accept: application/vnd.github.raw+json' "repos/$GITHUB_REPOSITORY/contents/$file?ref=$GITHUB_SHA" > "$file"
+          done
+      - name: Download the validated Pages artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --name github-pages --dir validated-artifact
+          mkdir validated-site
+          tar -xf validated-artifact/artifact.tar -C validated-site
       - name: Setup Node for release compatibility check
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
@@ -250,8 +263,8 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
         run: node apps/sparks/scripts/verify-owned-rpc-readiness.mjs
-      - name: Setup Pages
-        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
-      - name: Deploy to GitHub Pages
+      - name: Publish and verify validated Pages artifact
         id: deployment
-        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/publish-validated-pages.sh validated-site
