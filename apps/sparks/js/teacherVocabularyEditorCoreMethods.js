@@ -216,6 +216,7 @@ class TeacherVocabularyEditorCoreMethods {
                     ? `${generatedId}_${Date.now().toString(36)}` : generatedId;
                 $('#vocab-id').value = this.vocabSet.id;
                 delete this.vocabSet.source;
+                delete this.vocabSet.contentRevision;
                 if (reviewingLocalCopy) this.setRoute({ view: 'editor', vocabularyId: this.vocabSet.id }, { replace: true });
             } else {
                 this.updateGeneratedVocabId();
@@ -267,6 +268,10 @@ class TeacherVocabularyEditorCoreMethods {
             if (!this.isTeacherNavigationCurrent(navigation)) return;
             try {
                 const data = parseVocabularyJson(e.target.result);
+                // Imported files are drafts, never permission to overwrite an existing school record.
+                delete data.contentRevision;
+                delete data.archivedAt;
+                delete data.source;
                 data.subjectSlug = getVocabSubjectSlug(data);
                 this.beginTeacherVocabularyDocument();
                 this.vocabSet = data;

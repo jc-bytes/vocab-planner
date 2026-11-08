@@ -77,15 +77,15 @@ try {
         // Optional path-backed imported draft retains face/count coverage without a public catalogue read.
         await page.route('**/vocabularies/material-action-remote.json*', route => route.fulfill({ json: { ...remote,
             words: ['Device', 'Router', 'Switch'].map(word => ({ word, definition: `A ${word.toLowerCase()} connects computers.` })) } }));
-        await page.route(`https://${backend}/rest/v1/vocabularies*`, async route => {
-            if (route.request().method() !== 'DELETE') return route.fallback();
-            const url = new URL(route.request().url());
-            deletes.push({ id: url.searchParams.get('id'), school: url.searchParams.get('school_id') });
+        await page.route(`https://${backend}/rest/v1/rpc/preview_vocabulary_change_v1`, route => route.fulfill({ status: 200, headers, json: { token: 'fixture-reviewed-archive' } }));
+        await page.route(`https://${backend}/rest/v1/rpc/apply_vocabulary_change_v1`, async route => {
+            const request = route.request().postDataJSON();
+            deletes.push({ id: `eq.${request.p_material_id}`, school: `eq.${request.p_school_id}` });
             if (scenario === 'cloud-stale-ack') { entered.resolve(); await release.promise; }
             if (scenario === 'cloud-failure') return route.fulfill({ status: 403, headers,
-                json: { code: '42501', message: 'Fixture denied deletion.' } });
+                json: { code: '42501', message: 'Fixture denied archive.' } });
             deleted = true;
-            return route.fulfill({ status: 204, headers, body: '' });
+            return route.fulfill({ status: 200, headers, json: { changes: [], studentRecordsDeleted: 0 } });
         });
         if (scenario === 'held-module') await page.route(url => url.origin === baseUrl
             && /teacher(?:UnitCard|MaterialItem)[^/]*\.js/.test(url.pathname), async route => {

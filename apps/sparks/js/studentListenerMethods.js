@@ -95,6 +95,14 @@ export class StudentListeners {
         }
         this.sm.startStudentDashboardMutationObserver();
 
+        // Expire assignment listings on return without replacing an active activity
+        // or clearing saved/queued work. Unit entry always reads its current detail.
+        const expireAssignments = () => {
+            const selection = this.sm.activities?.vocabularyData?.classSelection;
+            if (selection) selection.loadedAt = 0;
+        };
+        this.listen(window, 'focus', expireAssignments);
+        this.listen(document, 'visibilitychange', () => { if (!document.hidden) expireAssignments(); });
         this.listen(window, 'hashchange', () => this.sm.handleRouteChange());
         this.listen(window, 'popstate', () => this.sm.handleRouteChange());
         this.listen(window, 'resize', debounceStudentResize(() => this.sm.setStudentMobileMenu(false)));

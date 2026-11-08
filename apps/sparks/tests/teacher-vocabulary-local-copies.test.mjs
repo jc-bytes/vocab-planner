@@ -163,7 +163,7 @@ test('owned copy acknowledgment retires route intent before throwing feedback ob
         await f.failedEdit(); await f.owner.openTeacherVocabularyItem({ id: old.id }, 'local-copy');
         const observed = [];
         f.owner.setCloudStatus = text => {
-            if (text === 'Saved to cloud') {
+            if (text === 'Draft saved. Published assignments are unchanged.') {
                 observed.push(f.owner.parseRoute());
                 throw new Error('Fixture feedback failure after acknowledged copy');
             }

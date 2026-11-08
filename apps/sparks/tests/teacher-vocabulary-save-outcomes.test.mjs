@@ -169,7 +169,7 @@ test('confirmed acknowledgment cannot become cloud failure when the success-stat
     const f = fixture();
     try {
         const status = f.owner.setCloudStatus;
-        f.owner.setCloudStatus = (text, type) => { status(text, type); if (text === 'Saved to cloud') throw new Error('Fixture status observer failed'); };
+        f.owner.setCloudStatus = (text, type) => { status(text, type); if (text === 'Draft saved. Published assignments are unchanged.') throw new Error('Fixture status observer failed'); };
         const [outcome] = await Promise.allSettled([f.owner.publishVocabulary()]);
         assert.deepEqual(f.events.fallbacks, [], 'UI feedback failure cannot create a cloud-failure fallback');
         assert.equal(outcome.status, 'fulfilled');
@@ -255,7 +255,7 @@ for (const outcome of ['success', 'failure']) {
             assert.deepEqual(f.events.cloud.map(call => call.payload.name), ['Current unsaved work', 'Newer reopened work']);
             assert.deepEqual(f.owner.getLocalVocabs(), [], 'the newest acknowledgment still cleans up its own captured draft');
             assert.equal(f.owner.vocabSet.source, 'cloud');
-            assert.equal(f.events.statuses.at(-1).text, 'Saved to cloud');
+            assert.equal(f.events.statuses.at(-1).text, 'Draft saved. Published assignments are unchanged.');
         } finally { pending.resolve({}); f.close(); }
     });
 
@@ -316,7 +316,7 @@ test('initial signed-in draft quota cannot suppress a healthy cloud autosave or 
         f.runAutosave(); for (let pass = 0; pass < 4; pass++) await turn();
         assert.equal(thrown, undefined, 'local persistence failure cannot prevent an authorized remote attempt');
         assert.equal(f.events.cloud.length, 1);
-        assert.equal(f.events.statuses.at(-1).text, 'Saved to cloud');
+        assert.equal(f.events.statuses.at(-1).text, 'Draft saved. Published assignments are unchanged.');
         assert.equal(f.owner.vocabSet, work); assert.deepEqual(f.owner.vocabSet, { ...before, source: 'cloud' });
         assert.equal(f.owner.autoGenerateVocabId, true, 'autosave must not acquire manual Publish finalization semantics');
         assert.equal(f.owner.getLocalVocabs()[0].name, 'Earlier durable draft');

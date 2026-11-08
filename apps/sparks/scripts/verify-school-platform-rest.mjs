@@ -41,6 +41,10 @@ try {
   if ((file.includes('platform_foundation') && foundationPresent) || (file.includes('classroom_ownership') && classroomPresent)) continue;
   sql(readFileSync(join('supabase/migrations',file),'utf8'),database,migrationOwner);
  }
+ for (const [name,probe] of [
+  ['20261104045454_vocabulary_grading_and_gradebook.sql', "select to_regprocedure('private.vocabulary_grade_activity_playable_v1(jsonb,text)') is not null"],
+  ['20261108010410_vocabulary_content_lifecycle.sql', "select to_regprocedure('public.save_vocabulary_revision_v1(uuid,text,jsonb,integer,uuid)') is not null"]
+ ]) if(sql(probe)!=='t') sql(readFileSync(join('supabase/migrations',name),'utf8'),database,migrationOwner);
  console.log(foundationPresent && classroomPresent ? 'Testing existing school schema cloned with original ACL (CI migrations already applied).' : 'Testing local pre-school schema with additive school migrations applied to disposable clone.');
  sql(`create role ${role} login noinherit password '${password}'; grant anon, authenticated to ${role};`,'postgres');
  const restInspect=JSON.parse(docker(['inspect',source.replace('supabase_db_','supabase_rest_')]))[0];
@@ -101,9 +105,11 @@ try {
  success(await rpc(adminA,'set_school_member_v1',{p_school_id:schoolA.id,p_user_id:coTeacher,p_roles:['teacher']}));
  success(await rpc(adminA,'set_class_teacher_v1',{p_class_id:classroom.id,p_teacher_id:coTeacher,p_active:true}));
  const materialId=`rest-${randomUUID()}`;
- success(await request(teacher,'/vocabularies',{id:materialId,name:'REST vocabulary',school_id:schoolA.id,teacher_subject_id:subject.id,subject_slug:'technology',words:[{word:'cell',definition:'One place in a table',image:'',example:'Cell A1'}],grades:['6']}));
- const upserted=success(await request(coTeacher,'/vocabularies?on_conflict=id',{id:materialId,name:'Co-teacher edit',school_id:schoolA.id,teacher_subject_id:subject.id,subject_slug:'technology',words:[{word:'cell',definition:'One place in a table',image:'',example:'Cell A1'}],grades:['6']},'POST',true));
- assert.equal(upserted[0].owner_id,teacher);
+ const vocabularyPayload={name:'REST vocabulary',teacher_subject_id:subject.id,subject_slug:'technology',words:[{word:'cell',definition:'One place in a table',image:'',example:'Cell A1'}],grades:['6'],activity_settings:{requiredActivities:['flashcards','matching'],additionalActivities:[]}};
+ success(await rpc(teacher,'save_vocabulary_revision_v1',{p_school_id:schoolA.id,p_id:materialId,p_payload:vocabularyPayload,p_expected_revision:0,p_request_key:randomUUID()}));
+ const upserted=success(await rpc(coTeacher,'save_vocabulary_revision_v1',{p_school_id:schoolA.id,p_id:materialId,p_payload:{...vocabularyPayload,name:'Co-teacher edit'},p_expected_revision:1,p_request_key:randomUUID()}));
+ assert.equal(upserted.owner_id,teacher);
+ deny(await request(coTeacher,'/vocabularies?on_conflict=id',{id:materialId,name:'Unchecked edit',school_id:schoolA.id},'POST',true));
  success(await rpc(adminB,'set_school_member_v1',{p_school_id:schoolB.id,p_user_id:teacher,p_roles:['teacher']}));
  success(await rpc(adminB,'set_school_year_v1',{p_school_id:schoolB.id,p_year:2026,p_label:'2026'}));
  const subjectB=success(await request(teacher,'/teacher_subjects',{name:'Technology',school_id:schoolB.id}))[0];

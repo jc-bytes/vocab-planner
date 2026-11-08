@@ -83,6 +83,14 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 }
                 details.body.append(metadata, node('p', 'This assignment uses the saved material published to this class. Editing Library does not change this copy.'));
 
+                if (assignment.kind === 'vocabulary' && ownClass.canTeach === true) details.footer.append(action('Manage vocabulary publications', async () => {
+                    if (!current(id, owner)) return;
+                    const detail = await repository.readAssignment(assignment.id);
+                    const { openVocabularyPublicationManager } = await import('./teacherVocabularyPublicationManager.js');
+                    if (current(id, owner)) await openVocabularyPublicationManager({ materialId: detail.materialId, repository,
+                        isCurrent: () => current(id, owner), onChanged: () => show(context) });
+                }));
+
                 if (!assignment.withdrawn && ownClass.canTeach === true) details.footer.append(action('Withdraw assignment', () => {
                             if (!current(id, owner)) return; closeDialog();
                             const confirm = createAssignmentDialog('Withdraw assignment', () => { dialog = null; }); dialog = confirm;

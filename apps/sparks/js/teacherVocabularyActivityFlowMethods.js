@@ -76,10 +76,10 @@ class TeacherVocabularyActivityFlowMethods {
             additional.push(activityId);
         }
 
-        if (required.length === 0) {
-            notifications.warning('At least one required activity is needed.');
-            required = [activityId];
-            additional = additional.filter(id => id !== activityId);
+        if (required.length < 2) {
+            notifications.warning('Keep Flashcards and at least one other required activity.');
+            this.renderActivityFlowSettings();
+            return;
         }
 
         this.vocabSet.activitySettings.requiredActivities = [...new Set(required)];

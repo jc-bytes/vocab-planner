@@ -46,10 +46,10 @@ test('autosave retains its captured snapshot, 800ms debounce and 1500ms current 
     assert.deepEqual([...f.timers.values()].map(timer => timer.delay), [800]);
     f.fire(800); await turn();
     assert.equal(f.writes[0].name, 'Captured'); assert.equal(f.writes[0].words[0].word, 'Network');
-    assert.deepEqual(f.statuses.map(status => status.label), ['Saving...', 'Saved to cloud']);
+    assert.deepEqual(f.statuses.map(status => status.label), ['Saving...', 'Draft saved. Published assignments are unchanged.']);
     assert.deepEqual([...f.timers.values()].map(timer => timer.delay), [1500]);
     f.fire(1500);
-    assert.deepEqual(f.statuses.map(status => status.label), ['Saving...', 'Saved to cloud', 'Ready']);
+    assert.deepEqual(f.statuses.map(status => status.label), ['Saving...', 'Draft saved. Published assignments are unchanged.', 'Ready']);
 });
 
 test('Publish cancels the old document debounce before Save as New preparation changes identity', async () => {

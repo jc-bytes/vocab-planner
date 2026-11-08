@@ -99,6 +99,8 @@ jobs:
             echo "Container registry throttled the download; retrying with cached images in 30 seconds."
             sleep 30
           done
+      - name: Verify vocabulary lifecycle and student data preservation
+        run: npm run test:vocabulary-content:database
       - name: Verify student insight and feedback database regressions
         run: npm run test:student-insight:database
       - name: Smoke test app shells

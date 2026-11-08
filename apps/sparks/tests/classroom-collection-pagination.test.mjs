@@ -11,13 +11,14 @@ function fixture({ cap = 1000, count = true, beforePage = () => {} } = {}) {
         const query = {
             select(columns, options) { call.columns = columns; call.count = options?.count; return query; },
             eq(key, value) { call.filters.push([key, value]); return query; },
+            is(key, value) { call.filters.push([key, value]); return query; },
             in(key, values) { call.filters.push([key, values]); return query; },
             order(key, options) { call.orders.push([key, options?.ascending !== false]); return query; },
             range(start, end) { call.start = start; call.end = end; return query; },
             abortSignal(signal) { call.signal = signal; return query; },
             then(resolve, reject) { return Promise.resolve().then(() => {
                 beforePage(call, { controller, setScope: value => { scope = value; } });
-                let rows = (tables[table] || []).filter(row => call.filters.every(([key, value]) => Array.isArray(value) ? value.includes(row[key]) : row[key] === value));
+                let rows = (tables[table] || []).filter(row => call.filters.every(([key, value]) => Array.isArray(value) ? value.includes(row[key]) : (row[key] ?? null) === value));
                 rows = rows.toSorted((a, b) => { for (const [key, asc] of call.orders) { const comparison = String(a[key]).localeCompare(String(b[key])); if (comparison) return asc ? comparison : -comparison; } return 0; });
                 return { data: rows.slice(call.start, Math.min(call.end + 1, call.start + cap)), error: null,
                     count: count && call.count === 'exact' ? rows.length : null };

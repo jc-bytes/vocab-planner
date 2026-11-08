@@ -335,7 +335,7 @@ test('cloud saves use immutable snapshots and reach the repository in initiation
         await Promise.all([oldSave, newSave]);
         assert.deepEqual(removed, ['unit-a']);
         assert.equal(manager.vocabSet.source, 'cloud');
-        assert.deepEqual(statuses[0], ['Saved to cloud', 'success']);
+        assert.deepEqual(statuses[0], ['Draft saved. Published assignments are unchanged.', 'success']);
     } finally {
         vocabularyRepository.save = originalSave;
         manager.clearTeacherVocabularySessionState();

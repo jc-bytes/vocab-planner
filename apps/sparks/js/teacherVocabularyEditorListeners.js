@@ -41,6 +41,20 @@ function bindVocabularyMetaListeners(manager) {
 }
 
 function bindVocabularyPublishListeners(manager) {
+    const saveButton = $('#publish-update-btn');
+    if (saveButton && !document.querySelector('#manage-vocabulary-publications')) {
+        const button = document.createElement('button'); button.type = 'button'; button.id = 'manage-vocabulary-publications';
+        button.className = 'btn secondary-btn'; button.textContent = 'Published assignments';
+        saveButton.parentElement.append(button);
+        button.addEventListener('click', async () => {
+            const id = manager.vocabSet?.id;
+            if (!id || manager.authDisabled) return;
+            const isCurrent = manager.createTeacherVocabularyOperationGuard();
+            const { openVocabularyPublicationManager } = await import('./teacherVocabularyPublicationManager.js');
+            if (isCurrent()) await openVocabularyPublicationManager({ materialId: id, isCurrent,
+                onChanged: () => manager.invalidateTeacherLibraryCache() });
+        });
+    }
     $('#publish-update-btn')?.addEventListener('click', () => {
         manager.publishVocabulary({ asNew: false });
     });

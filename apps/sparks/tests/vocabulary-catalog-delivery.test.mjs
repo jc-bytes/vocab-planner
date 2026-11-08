@@ -12,7 +12,7 @@ async function fixture(t) {
     const entry = { id: 'fixture', path: 'vocabularies/grade6/fixture.json', name: 'Fixture' };
     const vocabulary = { id: 'fixture', name: 'Fixture', month: 'October', week: 1,
         words: [{ word: 'Source', definition: 'Where information starts.' }],
-        activitySettings: { requiredActivities: ['flashcards'], additionalActivities: [] } };
+        activitySettings: { requiredActivities: ['flashcards', 'matching'], additionalActivities: [] } };
     const manifest = path.join(source, 'vocabularies', 'manifest.json'), file = path.join(source, entry.path);
     await writeFile(manifest, JSON.stringify({ vocabularies: [entry] }, null, 3) + '\n\n');
     await writeFile(file, JSON.stringify(vocabulary, null, 4) + '\n');
