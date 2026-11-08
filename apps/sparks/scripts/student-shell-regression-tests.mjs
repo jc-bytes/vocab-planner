@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { weeklyFixture } from '../tests/fixtures/weekly-vocabulary-fixture.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
@@ -28,14 +29,16 @@ async function resolveServer() {
 }
 
 async function installFixture(page) {
-    // Keep scheduled catalog fixtures available regardless of the CI run date.
+    // Fixed fictional content keeps layout checks independent of school content.
     await page.clock.setFixedTime(new Date('2026-09-14T15:00:00Z'));
     await page.goto(`${baseUrl}/student.html`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.studentApp?.activities, null, { timeout: 15000 });
-    await page.evaluate(async () => {
+    await page.evaluate(source => {
         window.studentApp.authDisabled = true;
-        await window.studentApp.activities.loadManifest();
-    });
+        window.studentApp.activities.manifest = { vocabularies: [source] };
+    }, { ...weeklyFixture(), path: null, assignedDate: '2026-09-14', month: 'September',
+        activitySettings: { requiredActivities: ['flashcards', 'matching'] },
+        words: weeklyFixture().words.map(word => ({ ...word, synonyms: ['Test synonym'], antonyms: ['Test opposite'] })) });
     await page.evaluate(async () => {
         const app = window.studentApp;
         const source = app.activities.manifest.vocabularies.find(vocab => {
