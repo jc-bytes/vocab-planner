@@ -458,7 +458,7 @@ returns jsonb language plpgsql stable security definer set search_path='' as $$
 declare result jsonb;
 begin
  if not private.can_edit_school_library(p_school_id) then raise exception 'School library unavailable.' using errcode='42501'; end if;
- select jsonb_build_object('checkedAt',now(),'assignments',count(*),'exceptions',coalesce(jsonb_agg(jsonb_build_object('assignmentId',a.id,'title',a.title,'classId',a.class_id,'errors',private.vocabulary_publication_errors_v1(m.student_content))) filter(where private.vocabulary_publication_errors_v1(m.student_content)<>'[]'::jsonb),'[]')) into result
+ select jsonb_build_object('checkedAt',now(),'assignments',count(*),'retiredHistory',count(*) filter(where m.student_content#>'{activitySettings,retiredWeeklySet}'='true'::jsonb),'exceptions',coalesce(jsonb_agg(jsonb_build_object('assignmentId',a.id,'title',a.title,'classId',a.class_id,'errors',private.vocabulary_publication_errors_v1(m.student_content))) filter(where private.vocabulary_publication_errors_v1(m.student_content)<>'[]'::jsonb and m.student_content#>'{activitySettings,retiredWeeklySet}' is distinct from 'true'::jsonb),'[]')) into result
  from public.class_assignments a join private.class_material_versions m on m.id=a.version_id
  where a.school_id=p_school_id and a.kind='vocabulary' and not a.withdrawn and (a.close_at is null or a.close_at>now()) and private.can_teach_class(a.class_id);
  return result;

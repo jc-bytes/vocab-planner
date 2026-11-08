@@ -11,7 +11,7 @@ const as=(actor,query)=>sql(`begin; set local role authenticated; set local requ
 const words=[{word:'cell',definition:'A place in a table',example:'Select a cell.'},{word:'chart',definition:'A picture of data',example:'Make a chart.'},{word:'table',definition:'Rows and columns',example:'Read a table.'},{word:'value',definition:'Data in a cell',example:'Change a value.'}];
 const settings={requiredActivities:['flashcards','matching'],additionalActivities:['quiz']};
 test('publication policy SQL and client agree on rejected and playable paths',{skip:!enabled},()=>{
- for(const config of [settings,{requiredActivities:[]},{requiredActivities:['flashcards']},{requiredActivities:['flashcards','flashcards']},{requiredActivities:['matching','flashcards']},{requiredActivities:['flashcards','nope']},{requiredActivities:['flashcards','matching'],additionalActivities:['matching']},{requiredActivities:['flashcards','crossword'],weeklyPoolVersion:1}]) {
+ for(const config of [settings,{...settings,retiredWeeklySet:true},{requiredActivities:[]},{requiredActivities:['flashcards']},{requiredActivities:['flashcards','flashcards']},{requiredActivities:['matching','flashcards']},{requiredActivities:['flashcards','nope']},{requiredActivities:['flashcards','matching'],additionalActivities:['matching']},{requiredActivities:['flashcards','crossword'],weeklyPoolVersion:1}]) {
   const content={words,activitySettings:config};
   assert.deepEqual(JSON.parse(sql(`select private.vocabulary_publication_errors_v1(${quote(content)}::jsonb)`)),vocabularyPublicationErrors(content));
  }
@@ -41,6 +41,16 @@ test('revision conflicts, atomic changes, repeatable retries and preserved stude
  assert.throws(()=>save(payload,0),/changed elsewhere/);
  assert.throws(()=>save(payload,1,randomUUID(),student),/unavailable/);
  assert.throws(()=>as(teacher,`update public.vocabularies set name='Bypass' where id='${material}'`),/permission denied/);
+ // A stale calendar item must reject the entire batch without changing its valid peer.
+ const peer=`lifecycle-${randomUUID()}`;
+ as(teacher,`select public.save_vocabulary_revision_v1('${school}','${peer}',${quote(payload)}::jsonb,0,'${randomUUID()}')`);
+ const calendarBefore=sql(`select jsonb_agg(to_jsonb(v) order by id) from public.vocabularies v where id in ('${material}','${peer}')`);
+ const patches=[{id:material,expected_revision:1,month:'December'},{id:peer,expected_revision:0,month:'December'}];
+ assert.throws(()=>as(teacher,`select public.update_vocabulary_placements_school_v1('${school}',${quote(patches)}::jsonb)`),/placement changed/);
+ assert.equal(sql(`select jsonb_agg(to_jsonb(v) order by id) from public.vocabularies v where id in ('${material}','${peer}')`),calendarBefore);
+ const calendarResult=JSON.parse(as(teacher,`select public.update_vocabulary_placements_school_v1('${school}',${quote([{id:peer,expected_revision:1,month:'December',week:2}])}::jsonb)`));
+ assert.equal(calendarResult.updated,1);
+ assert.equal(sql(`select content_revision from public.vocabularies where id='${peer}'`),'2');
  const pubkey=randomUUID();
  const publish=(revision=1,actor=teacher,pk=pubkey)=>JSON.parse(as(actor,`select public.publish_class_material_v2(array['${class1}','${class2}']::uuid[],'vocabulary','${material}',now()-interval '1 day','${pk}',${revision})`));
  // Stable dates are part of idempotency, use literal below.

@@ -28,7 +28,7 @@ Run `npm run test:vocabulary-content:database` with the local Supabase Docker so
 
 Run `npm run test:ui:content-lifecycle` for the publication preview and retry browser test. The standard release also covers save recovery, local drafts, account changes and existing student queues.
 
-Run `supabase/tests/audit_vocabulary_publications.sql` through the trusted database operator connection before/after promotion. Investigate nonzero policy exceptions or missing placement. Do not automatically rewrite historical work. The authenticated `audit_vocabulary_publications_v1` endpoint limits reports to assignments the current teacher can teach.
+Run `supabase/tests/audit_vocabulary_publications.sql` through the trusted database operator connection before/after promotion. Investigate nonzero policy exceptions or missing placement. Retired, hidden weekly sets are counted separately as history and are never automatically rewritten. Do not automatically rewrite historical work. The authenticated `audit_vocabulary_publications_v1` endpoint limits reports to assignments the current teacher can teach.
 
 Promotion probes all new RPC signatures and refuses an older hosted schema. Publish the exact validated artifact and verify public bytes. Keep UI/device acceptance separate from SQL and fixture checks.
 
