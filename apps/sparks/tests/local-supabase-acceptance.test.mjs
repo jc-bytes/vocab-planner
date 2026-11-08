@@ -29,6 +29,7 @@ const IDS = {
     settings: `${RUN_ID}-settings`,
     subject: `${RUN_ID}-subject`,
     vocabulary: `${RUN_ID}-vocabulary`,
+    activityVocabulary: `${RUN_ID}-activity-vocabulary`,
     spark: `${RUN_ID}-spark`,
     unit: `${RUN_ID}-unit`,
     peerEmail: `${RUN_ID}@aid.edu.pa`,
@@ -195,7 +196,7 @@ async function cleanupAcceptanceData({ admin, peer, student, teacher, schoolId, 
             delete from public.student_unit_progress where assignment_id='${assignmentId}';
             delete from private.student_activity_attempts where assignment_id='${assignmentId}';
             delete from public.class_assignments where id='${assignmentId}';
-            delete from private.class_material_versions where vocabulary_id='${IDS.vocabulary}'; commit;`, stdio: ['pipe', 'ignore', 'pipe'] });
+            delete from private.class_material_versions where vocabulary_id in ('${IDS.vocabulary}','${IDS.activityVocabulary}'); commit;`, stdio: ['pipe', 'ignore', 'pipe'] });
     }
     await admin.from('export_logs').delete().eq('filename', IDS.exportFilename);
     await admin.from('weekly_sparks').delete().eq('id', IDS.spark);
@@ -203,7 +204,7 @@ async function cleanupAcceptanceData({ admin, peer, student, teacher, schoolId, 
         .eq('user_id', student.id).like('event_key', `formative:${activityUnitKey}:%`);
     await admin.from('student_activity_progress').delete()
         .eq('user_id', student.id).eq('unit_key', activityUnitKey);
-    await admin.from('vocabularies').delete().eq('id', IDS.vocabulary);
+    await admin.from('vocabularies').delete().in('id', [IDS.vocabulary, IDS.activityVocabulary]).throwOnError();
     await admin.from('teacher_settings').delete().eq('key', IDS.settings);
     await admin.from('teacher_subjects').delete().eq('id', IDS.subject);
     await admin.from('scores').delete().eq('user_id', student.id).eq('game_id', 'snake');
@@ -215,7 +216,7 @@ async function cleanupAcceptanceData({ admin, peer, student, teacher, schoolId, 
     }
     if (subject?.id) await admin.from('teacher_subjects').delete().eq('id',subject.id).throwOnError();
     if (schoolId) execFileSync('docker',['exec',process.env.SPARKS_TEST_DB_CONTAINER || 'supabase_db_ifofhiypzffruzhiukst','psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-c',
-        `delete from private.school_admin_events where school_id='${schoolId}'; delete from private.school_invitations where school_id='${schoolId}'; delete from public.school_settings where school_id='${schoolId}'; delete from public.school_member_roles where school_id='${schoolId}'; delete from public.school_memberships where school_id='${schoolId}'; delete from public.school_academic_years where school_id='${schoolId}'; delete from public.schools where id='${schoolId}';`],{stdio:'pipe'});
+        `delete from private.vocabulary_change_receipts where school_id='${schoolId}'; delete from private.school_admin_events where school_id='${schoolId}'; delete from private.school_invitations where school_id='${schoolId}'; delete from public.school_settings where school_id='${schoolId}'; delete from public.school_member_roles where school_id='${schoolId}'; delete from public.school_memberships where school_id='${schoolId}'; delete from public.school_academic_years where school_id='${schoolId}'; delete from public.schools where id='${schoolId}';`],{stdio:'pipe'});
     for(const user of [peer,student,teacher]) if(user?.id) await admin.auth.admin.deleteUser(user.id);
     schoolContext.clear();
 }
@@ -517,7 +518,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
         });
 
         await t.test('Student RPCs enforce authentication, role, ownership, idempotency, and score uniqueness', async () => {
-            await withServiceClient(teacherClient, () => vocabularyRepository.save(IDS.vocabulary, {
+            await withServiceClient(teacherClient, () => vocabularyRepository.save(IDS.activityVocabulary, {
                 name: 'Verified Activity Unit', description: 'Acceptance activity verification',
                 grades: ['6'], subjectSlug: seeded.subject.id, assignedDate: '2026-07-14',
                 trimester: 'IIT', month: 'July', week: 1,
@@ -534,7 +535,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 ],
                 ownerId: teacher.id
             }));
-            const [assignment] = await createClassroomRepository(() => teacherClient).publishMaterial({ classIds: [seeded.classroom.id], kind: 'vocabulary', materialId: IDS.vocabulary, releaseAt: '2026-01-01T00:00:00Z', publicationKey: crypto.randomUUID() });
+            const [assignment] = await createClassroomRepository(() => teacherClient).publishMaterial({ classIds: [seeded.classroom.id], kind: 'vocabulary', expectedRevision: 1, materialId: IDS.activityVocabulary, releaseAt: '2026-01-01T00:00:00Z', publicationKey: crypto.randomUUID() });
             assignmentId = assignment.id;
             const activityUnitKey = `assignment:${assignment.id}`;
             const initial = await withServiceClient(studentClient, () => supabaseService.ensureOwnStudentProgress({
@@ -569,7 +570,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             await expectRejected(() => withServiceClient(studentClient, () => (
                 supabaseService.startStudentActivityAttempt({
                     unitKey: activityUnitKey,
-                    vocabularyId: IDS.vocabulary,
+                    vocabularyId: IDS.activityVocabulary,
                     activityType: 'matching'
                 })
             )), /flashcards/i);
@@ -577,7 +578,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             const attempt = await withServiceClient(studentClient, () => (
                 supabaseService.startStudentActivityAttempt({
                     unitKey: activityUnitKey,
-                    vocabularyId: IDS.vocabulary,
+                    vocabularyId: IDS.activityVocabulary,
                     activityType: 'flashcards'
                 })
             ));
@@ -615,7 +616,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             const matchingAttempt = await withServiceClient(studentClient, () => (
                 supabaseService.startStudentActivityAttempt({
                     unitKey: activityUnitKey,
-                    vocabularyId: IDS.vocabulary,
+                    vocabularyId: IDS.activityVocabulary,
                     activityType: 'matching'
                 })
             ));
