@@ -124,9 +124,17 @@ export const vocabularyRepository = {
     },
     async remove(id, options) {
         const schoolId = requireSchoolId();
+        const identity = serviceMutationIdentity(supabaseService), generation = schoolContext.getGeneration();
+        const assertCurrent = () => {
+            const now = serviceMutationIdentity(supabaseService);
+            if (now.userId !== identity.userId || now.generation !== identity.generation || schoolContext.getGeneration() !== generation)
+                throw new DOMException('The account or school changed. Start this action again.', 'AbortError');
+        };
         const { classroomRepository } = await import('./classroomRepository.js');
+        assertCurrent();
         const request = { operation: 'archive', assignmentIds: [] };
         const preview = await classroomRepository.previewVocabularyChange(id, request);
-        return classroomRepository.applyVocabularyChange(id, request, preview.token, crypto.randomUUID(), options);
+        assertCurrent();
+        return classroomRepository.applyVocabularyChange(id, request, preview.token, crypto.randomUUID(), { ...options, ownerUserId: identity.userId });
     }
 };
