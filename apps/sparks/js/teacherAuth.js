@@ -81,7 +81,10 @@ class TeacherAuthMethods {
                         this.clearTeacherSettingsSessionState?.();
                         this.clearTeacherVocabularySessionState?.();
                     }
-                    if (restoredUserHandled && this.isAuthenticated && this.currentUser?.uid === user.uid) {
+                    // The subscription repeats the restored session even when its
+                    // access check failed. Recovery owns any subsequent retry.
+                    if (restoredUserHandled && event === 'INITIAL_SESSION'
+                        && restoredUser?.uid === user.uid && this.currentUser?.uid === user.uid) {
                         restoredUserHandled = false;
                         return;
                     }

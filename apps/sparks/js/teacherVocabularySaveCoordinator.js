@@ -66,7 +66,7 @@ export function createTeacherVocabularySaveCoordinator({ prepareSnapshot, captur
         }
         if (uiCurrent(ticket)) {
             observe('Could not mark the current vocabulary as saved', () => markCloudSource(ticket.snapshot.id));
-            if (uiCurrent(ticket)) observe('Could not display vocabulary save success', () => setStatus('Saved to cloud', 'success'));
+            if (uiCurrent(ticket)) observe('Could not display vocabulary save success', () => setStatus('Draft saved. Published assignments are unchanged.', 'success'));
             if (uiCurrent(ticket)) {
                 clearStatus(ticket.state);
                 ticket.state.statusTimer = setTimer(() => {

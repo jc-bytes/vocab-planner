@@ -30,15 +30,15 @@ try {
         page.on('request', request => requests.push(new URL(request.url()).pathname));
         await page.route(url => /\/(?:rest|auth|storage|functions)\/v1\//.test(url.pathname) && url.hostname !== host,
             route => { forbidden.push(route.request().url()); return route.abort(); });
-        await page.route(`https://${host}/rest/v1/vocabularies*`, async route => {
+        await page.route(`https://${host}/rest/v1/rpc/save_vocabulary_revision_v1`, async route => {
             if (route.request().method() !== 'POST') return route.fallback();
-            posts.push(route.request().postDataJSON()); entered.resolve();
+            posts.push({ ...route.request().postDataJSON().p_payload, school_id: route.request().postDataJSON().p_school_id }); entered.resolve();
             const reopened = scenario.startsWith('reopened-');
             if (['publish', 'initial-quota-healthy', 'stale-session'].includes(scenario) || (reopened && posts.length === 1)) await release.promise;
             if (['dual-failure-publish', 'initial-quota-failure', 'stale-session'].includes(scenario)
                 || (scenario === 'reopened-failure' && posts.length === 1))
                 return route.fulfill({ status: 403, headers, json: { code: '42501', message: 'Fixture cloud unavailable.' } });
-            return route.fulfill({ status: 204, headers, body: '' });
+            return route.fulfill({ status: 200, headers, json: { ...route.request().postDataJSON().p_payload, content_revision: route.request().postDataJSON().p_expected_revision + 1 } });
         });
         try {
             await page.goto(`${baseUrl}/teacher.html#/teacher/overview`);
@@ -50,7 +50,7 @@ try {
                 const status = app.setCloudStatus.bind(app), draft = app.saveToLocal.bind(app), storage = Storage.prototype.setItem;
                 app.setCloudStatus = (text, type) => {
                     events.statuses.push({ text, type }); status(text, type);
-                    if (scenario === 'status-observer' && text === 'Saved to cloud') throw new Error('Fixture success-status observer');
+                    if (scenario === 'status-observer' && text === 'Draft saved. Published assignments are unchanged.') throw new Error('Fixture success-status observer');
                 };
                 app.saveToLocal = vocab => { events.draftCalls.push(JSON.parse(JSON.stringify(vocab))); return draft(vocab); };
                 Storage.prototype.setItem = function (key, value) {
@@ -120,7 +120,7 @@ try {
                         assert.equal(await page.evaluate(() => __saveEvents.statuses.some(event => /^Saved/.test(event.text))), false,
                             'initial quota is not success before cloud acknowledgment');
                         release.resolve();
-                        await page.waitForFunction(() => __saveEvents.statuses.some(event => event.text === 'Saved to cloud'));
+                        await page.waitForFunction(() => __saveEvents.statuses.some(event => event.text === 'Draft saved. Published assignments are unchanged.'));
                         assert.equal(await page.evaluate(() => teacherApp.vocabSet.source), 'cloud');
                     } else {
                         await page.waitForFunction(() => __saveEvents.statuses.some(event => event.text === 'Save failed'));
@@ -156,7 +156,7 @@ try {
                         'older acknowledgment/failure cannot delete or replace newer same-ID durable work');
                     assert.deepEqual(await page.evaluate(() => __saveEvents.draftCalls.map(vocab => vocab.description)), ['Newer reopened description']);
                     await page.evaluate(() => __reopenedTimers.shift().callback());
-                    await page.waitForFunction(() => __saveEvents.statuses.some(event => event.text === 'Saved to cloud'));
+                    await page.waitForFunction(() => __saveEvents.statuses.some(event => event.text === 'Draft saved. Published assignments are unchanged.'));
                     assert.equal(await page.evaluate(id => teacherApp.getLocalVocabs().some(vocab => vocab.id === id), unit.id), false,
                         'the actual newest acknowledgment still cleans up its own draft');
                     assert.equal(await page.evaluate(() => teacherApp.vocabSet.description), 'Newer reopened description');

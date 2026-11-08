@@ -56,7 +56,7 @@ values('school-acceptance-spark','ac000000-0000-0000-0000-000000000001','ad00000
 on conflict(id) do update set title=excluded.title,owner_id=excluded.owner_id;
 select pg_temp.assert_true((select owner_id='ab000000-0000-0000-0000-000000000002'::uuid from public.weekly_sparks where id='school-acceptance-spark'),'upsert retains author');
 insert into public.vocabularies(id,school_id,teacher_subject_id,name,words,activity_settings)
-values('school-acceptance-vocab','ac000000-0000-0000-0000-000000000001','ad000000-0000-0000-0000-000000000001','Vocabulary','[{"word":"Data","definition":"Facts"},{"word":"Cell","definition":"A box"},{"word":"Row","definition":"Across"},{"word":"Column","definition":"Down"}]','{"requiredActivities":["flashcards"]}');
+values('school-acceptance-vocab','ac000000-0000-0000-0000-000000000001','ad000000-0000-0000-0000-000000000001','Vocabulary','[{"word":"Data","definition":"Facts"},{"word":"Cell","definition":"A box"},{"word":"Row","definition":"Across"},{"word":"Column","definition":"Down"}]','{"requiredActivities":["flashcards","matching"]}');
 select public.publish_class_material_v1(array[current_setting('test.class_id')::uuid]::uuid[],'vocabulary','school-acceptance-vocab',now()-interval '1 day','af000000-0000-0000-0000-000000000002');
 select set_config('request.jwt.claim.sub','ab000000-0000-0000-0000-000000000005',true);
 select public.start_student_activity_attempt('assignment:'||(select id::text from public.class_assignments where kind='vocabulary'),'school-acceptance-vocab','flashcards');

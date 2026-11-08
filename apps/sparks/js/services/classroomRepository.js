@@ -95,12 +95,12 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
             if (error) throw error;
             if (!user) throw new Error('Sign in to assign materials.');
             const [vocabulary, sparks] = await Promise.all([
-                collection((client, count) => client.from('vocabularies').select('id,name', count)
-                    .eq('school_id', schoolId).order('name').order('id'), options.signal, client),
+                collection((client, count) => client.from('vocabularies').select('id,name,content_revision', count)
+                    .eq('school_id', schoolId).is('archived_at', null).order('name').order('id'), options.signal, client),
                 collection((client, count) => client.from('weekly_sparks').select('id,title', count)
                     .eq('school_id', schoolId).order('title').order('id'), options.signal, client)
             ]);
-            return [...vocabulary.map(v => ({ id: v.id, title: v.name, kind: 'vocabulary' })),
+            return [...vocabulary.map(v => ({ id: v.id, title: v.name, revision: v.content_revision, kind: 'vocabulary' })),
                 ...sparks.map(s => ({ id: s.id, title: s.title, kind: 'spark' }))];
         },
         async createClass({ name, subjectId, schoolYear }, options) {
@@ -152,9 +152,13 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
             p_assignment_id: assignmentId, p_response: response, p_expected_revision: expectedRevision
         }, options),
         readAssignment: (assignmentId, options) => rpc('read_class_assignment_v1', { p_assignment_id: assignmentId }, options),
-        publishMaterial: ({ classIds, kind, materialId, releaseAt, publicationKey, dueAt = null, closeAt = null }, options) =>
-            writeRpc('publish_class_material_v1', { p_class_ids: classIds, p_kind: kind, p_material_id: materialId,
-                p_release_at: releaseAt, p_publication_key: publicationKey, p_due_at: dueAt, p_close_at: closeAt }, options),
+        publishMaterial: ({ classIds, kind, materialId, releaseAt, publicationKey, expectedRevision = null, dueAt = null, closeAt = null }, options) =>
+            writeRpc('publish_class_material_v2', { p_class_ids: classIds, p_kind: kind, p_material_id: materialId,
+                p_release_at: releaseAt, p_expected_revision: expectedRevision, p_publication_key: publicationKey, p_due_at: dueAt, p_close_at: closeAt }, options),
+        vocabularyPublicationState: (materialId, options) => rpc('vocabulary_publication_state_v1', { p_school_id: getSchoolId(), p_material_id: materialId }, options),
+        previewVocabularyChange: (materialId, request, options) => rpc('preview_vocabulary_change_v1', { p_school_id: getSchoolId(), p_material_id: materialId, p_request: request }, options),
+        applyVocabularyChange: (materialId, request, token, requestKey, options) => writeRpc('apply_vocabulary_change_v1', { p_school_id: getSchoolId(), p_material_id: materialId, p_request: request, p_preview_token: token, p_request_key: requestKey }, options),
+        auditVocabularyPublications: options => rpc('audit_vocabulary_publications_v1', { p_school_id: getSchoolId() }, options),
         withdrawAssignment: (assignmentId, options) => writeRpc('withdraw_class_assignment_v1', { p_assignment_id: assignmentId }, options)
     });
 }
@@ -166,7 +170,7 @@ export const classroomRepository = createClassroomRepository(async () => {
 
 export function assignmentVocabulary(detail) {
     if (detail.kind !== 'vocabulary') throw new Error('This assignment is not a vocabulary activity.');
-    return { ...detail.content, ...(detail.vocabularyPlacement || {}), id: detail.materialId, assignmentId: detail.id,
+    return { ...detail.content, ...(detail.vocabularyPlacement || {}), id: detail.materialId, assignmentId: detail.id, contentRevision: detail.content_revision, contentVersionId: detail.version_id,
         releaseAt: detail.release_at, closeAt: detail.close_at, withdrawn: Boolean(detail.withdrawn),
         name: detail.title, subjectSlug: 'assignment', className: detail.className, classId: detail.classId || detail.class_id,
         __source: 'assignment', path: null };

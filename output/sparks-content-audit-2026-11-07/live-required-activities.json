@@ -1,0 +1,57 @@
+[
+  {
+    "assignments": 170,
+    "all_meet_minimum": true,
+    "two_required": 151,
+    "three_required": 19,
+    "more_than_three": 0,
+    "groups": [
+      {
+        "classroom": "Technology 6A",
+        "assignments": 21,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 6B",
+        "assignments": 21,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 6C",
+        "assignments": 22,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 7A",
+        "assignments": 21,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 7B",
+        "assignments": 21,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 8A",
+        "assignments": 19,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 8B",
+        "assignments": 19,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 9A",
+        "assignments": 13,
+        "all_meet_minimum": true
+      },
+      {
+        "classroom": "Technology 9B",
+        "assignments": 13,
+        "all_meet_minimum": true
+      }
+    ],
+    "exceptions": null
+  }
+]

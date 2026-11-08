@@ -267,7 +267,7 @@ export async function seedLocalAuditData() {
     await client.rpc('set_school_year_v1',{p_school_id:schoolId,p_year:2026,p_label:'2026',p_archived:false}).throwOnError();
     let subject = (await repo.listSubjects()).find(row => row.name === 'Audit Technology');
     subject ||= await repo.createSubject('Audit Technology');
-    await admin.from('vocabularies').upsert({
+    const { data: savedVocabulary } = await admin.from('vocabularies').upsert({
         id: AUDIT_VOCABULARY_ID, school_id:schoolId, teacher_subject_id:subject.id,
         name: 'Cross-browser Audit Vocabulary',
         description: 'Stable local vocabulary used by authenticated browser smoke tests.',
@@ -278,7 +278,7 @@ export async function seedLocalAuditData() {
         month: 'August',
         week: 1,
         activity_settings: {
-            requiredActivities: ['flashcards'],
+            requiredActivities: ['flashcards', 'matching'],
             additionalActivities: []
         },
         words: [
@@ -289,7 +289,7 @@ export async function seedLocalAuditData() {
         ],
         owner_id: users.teacher.id,
         updated_at: new Date().toISOString()
-    }, { onConflict: 'id' }).throwOnError();
+    }, { onConflict: 'id' }).select('content_revision').single().throwOnError();
 
     const auditSparks = buildAuditSparks({ teacherId: users.teacher.id });
     await admin
@@ -304,7 +304,7 @@ export async function seedLocalAuditData() {
         active: true, removed_at: null }, { onConflict: 'class_id,student_id' }).throwOnError();
     const assignments = [];
     for (const [index, [kind, materialId]] of [['vocabulary', AUDIT_VOCABULARY_ID], ['spark', AUDIT_SPARK_IDS[0]], ['spark', AUDIT_SPARK_IDS[1]]].entries()) {
-        const published = await repo.publishMaterial({ classIds: [classroom.id], kind, materialId,
+        const published = await repo.publishMaterial({ classIds: [classroom.id], kind, materialId, expectedRevision: kind === 'vocabulary' ? savedVocabulary.content_revision : null,
             releaseAt: index === 2 ? '2099-01-01T00:00:00Z' : '2026-01-01T00:00:00Z',
             publicationKey: `6b47ab0a-2026-4000-8000-00000000000${index + 1}` });
         assignments.push(...published);

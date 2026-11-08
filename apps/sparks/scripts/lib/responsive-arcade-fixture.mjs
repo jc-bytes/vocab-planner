@@ -34,27 +34,30 @@ export async function prepareResponsiveArcadeFixture({ studentId, assignmentId, 
     ) then raise exception 'Arcade fixture material identity does not match'; end if; end $$;`);
     const unitKey = `assignment:${assignmentId}`;
     const unitQuery = () => admin.from('student_unit_progress').select('*').eq('user_id', studentId).eq('unit_key', unitKey).maybeSingle();
-    const scoreQuery = () => admin.from('student_activity_progress').select('*').eq('user_id', studentId).eq('unit_key', unitKey).eq('activity_type', 'flashcards').maybeSingle();
+    // Both dedicated browser fixtures now require Flashcards and Matching.
+    const requiredActivities = ['flashcards', 'matching'];
+    const scoreQuery = () => admin.from('student_activity_progress').select('*').eq('user_id', studentId).eq('unit_key', unitKey).in('activity_type', requiredActivities).order('activity_type');
     const [{ data: oldUnit, error: unitError }, { data: oldScore, error: scoreError }] = await Promise.all([unitQuery(), scoreQuery()]);
     if (unitError || scoreError) throw new Error('Could not snapshot the responsive audit fixture.');
     let unitCreated = false;
     const restore = async () => {
         if (oldUnit) await admin.from('student_unit_progress').upsert(oldUnit, { onConflict: 'user_id,unit_key' }).throwOnError();
-        if (oldScore) await admin.from('student_activity_progress').upsert(oldScore, { onConflict: 'user_id,unit_key,activity_type' }).throwOnError();
-        else await admin.from('student_activity_progress').delete().eq('user_id', studentId).eq('unit_key', unitKey).eq('activity_type', 'flashcards').throwOnError();
+        if (oldScore.length) await admin.from('student_activity_progress').upsert(oldScore, { onConflict: 'user_id,unit_key,activity_type' }).throwOnError();
+        const createdActivities = requiredActivities.filter(activity => !oldScore.some(row => row.activity_type === activity));
+        if (createdActivities.length) await admin.from('student_activity_progress').delete().eq('user_id', studentId).eq('unit_key', unitKey).in('activity_type', createdActivities).throwOnError();
         if (unitCreated) await admin.from('student_unit_progress').delete().eq('user_id', studentId).eq('unit_key', unitKey).throwOnError();
         const [unit, score] = await Promise.all([unitQuery(), scoreQuery()]);
         const state = row => row && Object.fromEntries(Object.entries(row).filter(([name]) => name !== 'updated_at'));
-        if (unit.error || score.error || !isDeepStrictEqual(state(unit.data), state(oldUnit)) || !isDeepStrictEqual(state(score.data), state(oldScore))) {
+        if (unit.error || score.error || !isDeepStrictEqual(state(unit.data), state(oldUnit)) || !isDeepStrictEqual(score.data.map(state), oldScore.map(state))) {
             throw new Error('Responsive audit fixture restoration did not match its snapshot.');
         }
     };
     async function setComplete(complete) {
-        await admin.from('student_activity_progress').upsert({
-            user_id: studentId, unit_key: unitKey, activity_type: 'flashcards',
+        await admin.from('student_activity_progress').upsert(requiredActivities.map(activity_type => ({
+            user_id: studentId, unit_key: unitKey, activity_type,
             score: complete ? 100 : 0, is_complete: complete, verified: true,
             plays: complete ? 1 : 0, details: { fixture: 'responsive-arcade' }
-        }, { onConflict: 'user_id,unit_key,activity_type' }).throwOnError();
+        })), { onConflict: 'user_id,unit_key,activity_type' }).throwOnError();
     }
     try {
         if (!oldUnit) {

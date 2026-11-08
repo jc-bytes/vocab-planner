@@ -7,6 +7,8 @@ const coordinators = new WeakMap();
 
 export function getTeacherVocabularySaves(owner) {
     if (coordinators.has(owner)) return coordinators.get(owner);
+    const revisions = new Map();
+    const requests = new Map();
     const coordinator = createTeacherVocabularySaveCoordinator({
         prepareSnapshot(vocab) {
             const snapshot = JSON.parse(JSON.stringify(vocab || {}));
@@ -25,9 +27,21 @@ export function getTeacherVocabularySaves(owner) {
                 isNavigationCurrent: () => !navigation || owner.isTeacherNavigationCurrent?.(navigation) });
         },
         authorize: showAlert => owner.ensureAuthenticated(showAlert),
-        writeCloud(snapshot, context) {
+        async writeCloud(snapshot, context) {
             const { __source, source, ...rest } = snapshot;
-            return vocabularyRepository.save(snapshot.id, { ...rest, ownerId: context.ownerId, updatedAt: new Date().toISOString() });
+            const key = `${context.ownerId}:${context.documentKey}:${snapshot.id}`;
+            const revision = revisions.get(key) ?? snapshot.contentRevision ?? 0;
+            const fingerprint = JSON.stringify({ ...rest, contentRevision: revision });
+            let request = requests.get(key);
+            if (!request || request.fingerprint !== fingerprint) {
+                request = { fingerprint, key: crypto.randomUUID(), updatedAt: new Date().toISOString() };
+                requests.set(key, request);
+            }
+            const saved = await vocabularyRepository.save(snapshot.id, { ...rest, contentRevision: revision, ownerId: context.ownerId, updatedAt: request.updatedAt }, { requestKey: request.key });
+            requests.delete(key);
+            if (Number.isInteger(saved.contentRevision)) revisions.set(key, saved.contentRevision);
+            if (Number.isInteger(saved.contentRevision) && context.isCurrent() && context.isDocumentCurrent() && owner.vocabSet?.id === snapshot.id) owner.vocabSet.contentRevision = saved.contentRevision;
+            return saved;
         },
         writeDraft: snapshot => owner.saveToLocal(snapshot),
         removeDraft: id => owner.removeLocalVocab(id),
@@ -44,8 +58,8 @@ export function getTeacherVocabularySaves(owner) {
             }
         },
         setStatus: (text, type) => owner.setCloudStatus(text, type),
-        notifyFailure({ localOnly, localError }) {
-            notifications.error(localOnly
+        notifyFailure({ localOnly, localError, cloudError }) {
+            notifications.error(cloudError?.code === '40001' ? cloudError.message : localOnly
                 ? 'Local save failed. Keep this page open and free device storage before trying again.'
                 : localError ? 'Cloud save failed and this device could not keep a draft. Keep this page open and try again.'
                 : 'Cloud save failed. Check backend rules to ensure authenticated users can write to the vocabularies collection.');

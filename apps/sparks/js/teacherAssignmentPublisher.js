@@ -63,7 +63,7 @@ export function createTeacherAssignmentPublisher({ getUserId, repository = class
                         if (!classIds.length) throw new Error('Select at least one class.');
                         if (classIds.length > 50) throw new Error('Assign to at most 50 classes at a time.');
                         const chosen = materials[Number(material.value)];
-                        pending = { classIds, kind: chosen.kind, materialId: chosen.id, publicationKey: crypto.randomUUID(), ...publicationDates(release.value, due.value, close.value) };
+                        pending = { classIds, kind: chosen.kind, materialId: chosen.id, expectedRevision: chosen.revision, publicationKey: crypto.randomUUID(), ...publicationDates(release.value, due.value, close.value) };
                     }
                     busy = true; submit.disabled = true;
                     for (const control of form.querySelectorAll('input, select')) control.disabled = true;

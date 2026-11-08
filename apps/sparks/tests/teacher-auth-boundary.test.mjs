@@ -226,3 +226,49 @@ test('a stale empty teacher auth event cannot clear a recovered session; explici
     assert.equal(manager.isAuthenticated, false);
     assert.ok(calls.includes('login'));
 });
+
+test('restored teacher denial is not retried by the duplicate initial-session event', async () => {
+    let listener, reads = 0, denied = true;
+    const user = { uid: 'restored-denied-teacher' };
+    const { manager } = createManager({
+        init: async () => {}, getCurrentUser: () => user,
+        getProfile: async () => {
+            reads++;
+            if (denied) throw Object.assign(new Error('School access denied'), { status: 403 });
+            return { role: 'teacher' };
+        },
+        onAuthStateChanged(callback) { listener = callback; return () => {}; }
+    });
+    manager.vocabSet = { draft: 'Keep this draft' };
+    await manager.initAuth();
+    assert.equal(reads, 1);
+    assert.equal(manager.isAuthenticated, false);
+    listener(user, 'INITIAL_SESSION');
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(reads, 1, 'The already-attempted restored session must not start a second access request.');
+    assert.deepEqual(manager.vocabSet, { draft: 'Keep this draft' });
+    denied = false;
+    assert.equal(await manager.handleAuthWithRole(user), true, 'Explicit recovery remains available.');
+    assert.equal(reads, 2);
+    assert.equal(manager.isAuthenticated, true);
+});
+
+test('a different initial-session user still replaces a denied restored teacher', async () => {
+    let listener;
+    const restored = { uid: 'old-restored-teacher' }, replacement = { uid: 'new-session-teacher' }, reads = [];
+    const { manager } = createManager({
+        init: async () => {}, getCurrentUser: () => restored,
+        getProfile: async id => {
+            reads.push(id);
+            if (id === restored.uid) throw Object.assign(new Error('School access denied'), { status: 403 });
+            return { role: 'teacher' };
+        },
+        onAuthStateChanged(callback) { listener = callback; return () => {}; }
+    });
+    await manager.initAuth();
+    listener(replacement, 'INITIAL_SESSION');
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(reads, [restored.uid, replacement.uid]);
+    assert.equal(manager.currentUser.uid, replacement.uid);
+    assert.equal(manager.isAuthenticated, true);
+});

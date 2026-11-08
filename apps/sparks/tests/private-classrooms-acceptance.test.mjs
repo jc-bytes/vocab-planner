@@ -111,9 +111,9 @@ test('private classes enforce ownership and verified enrollment through real aut
         });
         await t.test('publication is private, atomic, retry-safe and retains a version after library edits', async () => {
             const materialId = `private-vocab-${run}`; materials.push(materialId);
-            await admin.from('vocabularies').insert({ id: materialId, owner_id: a.id, school_id: schoolA, teacher_subject_id:sa.id, name: 'Cell practice', assigned_date: '2026-10-01', trimester: '3', month: 'October', week: 1,
+            await admin.from('vocabularies').insert({ id: materialId, owner_id: a.id, school_id: schoolA, teacher_subject_id:sa.id, name: 'Cell practice', activity_settings: {requiredActivities:['flashcards','matching']}, assigned_date: '2026-10-01', trimester: '3', month: 'October', week: 1,
                 words: [{ word: 'Cell', definition: 'A box in a spreadsheet.' }] }).throwOnError();
-            const request = { classIds: [ca.id, club.id], kind: 'vocabulary', materialId,
+            const request = { classIds: [ca.id, club.id], kind: 'vocabulary', materialId, expectedRevision: 1,
                 releaseAt: new Date(Date.now() - 60000).toISOString(), publicationKey: crypto.randomUUID() };
             await assert.rejects(b.repo.publishMaterial({ ...request, classIds: [cb.id] }));
             await assert.rejects(a.repo.publishMaterial({ ...request, classIds: [ca.id, cb.id] }));
@@ -131,7 +131,7 @@ test('private classes enforce ownership and verified enrollment through real aut
             assert.equal((await both.repo.readAssignment(assignment.id)).content.words[0].word, 'Cell');
             await admin.from('vocabularies').update({ words: [{ word: 'Changed', definition: 'Later library edit.' }] }).eq('id', materialId).throwOnError();
             assert.equal((await both.repo.readAssignment(assignment.id)).content.words[0].word, 'Cell');
-            const future = (await a.repo.publishMaterial({ ...request, classIds: [ca.id],
+            const future = (await a.repo.publishMaterial({ ...request, classIds: [ca.id], expectedRevision: 2,
                 releaseAt: new Date(Date.now() + 86400000).toISOString(), publicationKey: crypto.randomUUID() }))[0];
             await assert.rejects(both.repo.readAssignment(future.id));
             assert.equal((await both.repo.listAssignments(ca.id)).length, 1);
@@ -142,7 +142,7 @@ test('private classes enforce ownership and verified enrollment through real aut
         await t.test('legacy library, profile, settings and report APIs respect workspace boundaries', async () => {
             assert.equal((await b.client.from('vocabularies').select('*').eq('id', materials[0])).data.length, 0);
             assert.equal((await both.client.from('vocabularies').select('*')).data.length, 0);
-            assert.equal((await b.client.from('vocabularies').update({ name: 'Stolen' }).eq('id', materials[0]).select()).data.length, 0);
+            assert.ok((await b.client.from('vocabularies').update({ name: 'Stolen' }).eq('id', materials[0]).select()).error);
             assert.ok((await a.client.from('vocabularies').update({ owner_id: b.id }).eq('id', materials[0])).error);
             assert.equal((await a.client.from('profiles').select('*').eq('user_id', both.id)).data.length, 0);
             assert.equal((await a.client.from('profiles').update({ first_name: 'Changed by teacher' }).eq('user_id', both.id).select()).data.length, 0);
@@ -190,7 +190,7 @@ test('private classes enforce ownership and verified enrollment through real aut
             }
         });
         await t.test('vocabulary attempts and saved state use the assignment snapshot and enrollment', async () => {
-            const [assignment] = await a.repo.publishMaterial({ classIds: [ca.id], kind: 'vocabulary', materialId: materials[0],
+            const [assignment] = await a.repo.publishMaterial({ classIds: [ca.id], kind: 'vocabulary', materialId: materials[0], expectedRevision: 2,
                 releaseAt: new Date(Date.now()-60000).toISOString(), publicationKey: crypto.randomUUID() });
             const key = `assignment:${assignment.id}`;
             const start = { p_unit_key: key, p_vocabulary_id: materials[0], p_activity_type: 'flashcards' };
@@ -470,7 +470,7 @@ test('private classes enforce ownership and verified enrollment through real aut
         if (materials.length) await admin.from('vocabularies').delete().in('id', materials).throwOnError();
         if (subjects.length) await admin.from('teacher_subjects').delete().in('id', subjects).throwOnError();
         execFileSync('docker',['exec',dbContainer,'psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-c',
-            `delete from private.school_admin_events where school_id in ('${schoolA}','${schoolB}'); delete from private.school_invitations where school_id in ('${schoolA}','${schoolB}'); delete from public.school_settings where school_id in ('${schoolA}','${schoolB}'); delete from public.school_member_roles where school_id in ('${schoolA}','${schoolB}'); delete from public.school_memberships where school_id in ('${schoolA}','${schoolB}'); delete from public.school_academic_years where school_id in ('${schoolA}','${schoolB}'); delete from public.schools where id in ('${schoolA}','${schoolB}');`],{stdio:'pipe'});
+            `delete from private.vocabulary_change_receipts where school_id in ('${schoolA}','${schoolB}'); delete from private.school_admin_events where school_id in ('${schoolA}','${schoolB}'); delete from private.school_invitations where school_id in ('${schoolA}','${schoolB}'); delete from public.school_settings where school_id in ('${schoolA}','${schoolB}'); delete from public.school_member_roles where school_id in ('${schoolA}','${schoolB}'); delete from public.school_memberships where school_id in ('${schoolA}','${schoolB}'); delete from public.school_academic_years where school_id in ('${schoolA}','${schoolB}'); delete from public.schools where id in ('${schoolA}','${schoolB}');`],{stdio:'pipe'});
         for (const user of users) {
             await admin.auth.admin.deleteUser(user.id);
             if (user.role === 'teacher') await admin.from('teacher_allowlist').delete().eq('email', user.email);

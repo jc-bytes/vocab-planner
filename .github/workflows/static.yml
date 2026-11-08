@@ -99,6 +99,8 @@ jobs:
             echo "Container registry throttled the download; retrying with cached images in 30 seconds."
             sleep 30
           done
+      - name: Verify vocabulary lifecycle and student data preservation
+        run: npm run test:vocabulary-content:database
       - name: Verify student insight and feedback database regressions
         run: npm run test:student-insight:database
       - name: Smoke test app shells
@@ -144,6 +146,8 @@ jobs:
           printf 'VITE_SUPABASE_PUBLISHABLE_KEY=%s\n' "$VITE_SUPABASE_PUBLISHABLE_KEY" >> "$GITHUB_ENV"
       - name: Build site
         run: npm run desktop:build:web
+      - name: Verify compiled vocabulary publication workflow
+        run: UI_CONTENT_LIFECYCLE_DIST=1 npm run test:ui:content-lifecycle
       - name: Verify first-paint loading styles before feature startup
         run: LOADING_FIRST_PAINT_DIST=1 npm run test:ui:loading-first-paint
       - name: Verify built class progress and published vocabulary grades

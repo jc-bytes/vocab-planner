@@ -16,7 +16,13 @@ export const OWNED_RPC_PROBES = Object.freeze({
     teacher_publish_vocabulary_grades_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_assignment_id: zero, p_expected_revision: 0 }),
     teacher_class_progress_v1: Object.freeze({ p_school_id: zero, p_class_id: zero, p_from: '2000-01-01', p_to: '2000-01-01' }),
     teacher_class_gradebook_v1: Object.freeze({ p_school_id: zero, p_class_id: zero, p_from: '2000-01-01', p_to: '2000-01-01' }),
-    my_class_vocabulary_grades_v1: Object.freeze({ p_school_id: zero, p_class_id: zero })
+    my_class_vocabulary_grades_v1: Object.freeze({ p_school_id: zero, p_class_id: zero }),
+    save_vocabulary_revision_v1: Object.freeze({ p_school_id: zero, p_id: 'readiness-probe', p_payload: {}, p_expected_revision: 0, p_request_key: zero }),
+    vocabulary_publication_state_v1: Object.freeze({ p_school_id: zero, p_material_id: 'readiness-probe' }),
+    preview_vocabulary_change_v1: Object.freeze({ p_school_id: zero, p_material_id: 'readiness-probe', p_request: {} }),
+    apply_vocabulary_change_v1: Object.freeze({ p_school_id: zero, p_material_id: 'readiness-probe', p_request: {}, p_preview_token: 'probe', p_request_key: zero }),
+    publish_class_material_v2: Object.freeze({ p_class_ids: [zero], p_kind: 'vocabulary', p_material_id: 'probe', p_release_at: '2000-01-01T00:00:00Z', p_publication_key: zero, p_expected_revision: 0, p_due_at: null, p_close_at: null }),
+    audit_vocabulary_publications_v1: Object.freeze({ p_school_id: zero })
 });
 
 function isAnonymousBrowserKey(key) {

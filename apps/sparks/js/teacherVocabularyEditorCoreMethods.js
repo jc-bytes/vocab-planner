@@ -216,6 +216,7 @@ class TeacherVocabularyEditorCoreMethods {
                     ? `${generatedId}_${Date.now().toString(36)}` : generatedId;
                 $('#vocab-id').value = this.vocabSet.id;
                 delete this.vocabSet.source;
+                delete this.vocabSet.contentRevision;
                 if (reviewingLocalCopy) this.setRoute({ view: 'editor', vocabularyId: this.vocabSet.id }, { replace: true });
             } else {
                 this.updateGeneratedVocabId();
@@ -263,10 +264,17 @@ class TeacherVocabularyEditorCoreMethods {
 
         const navigation = this.beginTeacherNavigation();
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             if (!this.isTeacherNavigationCurrent(navigation)) return;
             try {
                 const data = parseVocabularyJson(e.target.result);
+                // Imported files are drafts, never permission to overwrite an existing school record.
+                delete data.contentRevision;
+                delete data.archivedAt;
+                delete data.source;
+                const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(e.target.result));
+                if (!this.isTeacherNavigationCurrent(navigation)) return;
+                data.importProvenance = { filename: file.name, sha256: [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('') };
                 data.subjectSlug = getVocabSubjectSlug(data);
                 this.beginTeacherVocabularyDocument();
                 this.vocabSet = data;

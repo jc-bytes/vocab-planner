@@ -27,12 +27,12 @@ try {
         await page.route(url => /\/(?:rest|auth|storage|functions)\/v1\//.test(url.pathname) && url.hostname !== host, route => { forbidden.push(route.request().url()); return route.abort(); });
         await page.route('**/vocabularies/manifest.json*', route => route.fulfill({ json: { vocabularies: [] } }));
         await page.route(`https://${host}/rest/v1/rpc/list_vocabulary_metadata_school_v1`, route => route.fulfill({ status: 200, headers, json: [{ ...cloud, wordCount: cloud.words.length }] }));
-        await page.route(`https://${host}/rest/v1/vocabularies*`, route => {
+        await page.route(url => url.hostname === host && (url.pathname === '/rest/v1/vocabularies' || url.pathname === '/rest/v1/rpc/save_vocabulary_revision_v1'), route => {
             if (route.request().method() === 'POST') {
-                const payload = route.request().postDataJSON(); posts.push(payload);
+                const request = route.request().postDataJSON(); const payload = request.p_payload; posts.push(payload);
                 if (failing) return route.fulfill({ status: 403, headers, json: { code: '42501', message: 'Fixture cloud failure.' } });
                 cloud = { ...unit, ...payload, subjectSlug: ids.subject };
-                return route.fulfill({ status: 204, headers, body: '' });
+                return route.fulfill({ status: 200, headers, json: { ...payload, content_revision: request.p_expected_revision + 1 } });
             }
             if (route.request().method() === 'GET') {
                 reads++;

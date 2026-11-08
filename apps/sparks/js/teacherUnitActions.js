@@ -21,8 +21,9 @@ export function createTeacherUnitActions(owner, vocab, type) {
     if (type === 'cloud' && schoolContext.hasRole('teacher')) actions.onAssign = () => {
         if (current()) owner.openAssignmentPublisher({ materialId: vocab.id, kind: 'vocabulary' });
     };
+    actions.deleteLabel = type === 'cloud' ? 'Archive' : 'Delete';
     if (type === 'local' || type === 'cloud') actions.onDelete = async () => {
-        if (!current() || !confirm(`Delete ${type === 'cloud' ? 'cloud' : 'draft'} vocabulary "${vocab.name}"? This cannot be undone.`) || !current()) return;
+        if (!current() || !confirm(type === 'cloud' ? `Archive vocabulary "${vocab.name}"? Published assignments and student work remain saved. Use Published assignments to withdraw work from selected classes.` : `Delete draft vocabulary "${vocab.name}"? This cannot be undone.`) || !current()) return;
         if (type === 'local') { owner.removeLocalVocab(vocab.id); if (current()) owner.loadLibrary(); }
         else if (await owner.deleteCloudVocab(vocab.id) && current()) owner.loadLibrary();
     };

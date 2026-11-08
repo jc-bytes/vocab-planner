@@ -84,14 +84,14 @@ export async function rehearsePinnedMutations({ sql, base, jwt, teacher, student
         });
         const key = randomUUID();
         await race('Class publication', () => classroomRepository.publishMaterial({ classIds: [classId], kind: 'vocabulary',
-            materialId: vocabularyId, releaseAt: '2026-01-01T00:00:00Z', publicationKey: key }), () => {
+            materialId: vocabularyId, expectedRevision: Number(sql(`select content_revision from public.vocabularies where id='${vocabularyId}'`)), releaseAt: '2026-01-01T00:00:00Z', publicationKey: key }), () => {
             assert.equal(sql(`select owner_id from public.class_assignments where publication_key='${key}'`), teacher);
             assert.equal(sql(`select count(*) from public.class_assignments where publication_key='${key}' and owner_id='${otherTeacher}'`), '0');
         });
         await race('School role administration', () => schoolRepository.setMember(school, studentA, ['student'], true, { grade: '6', section: 'B' }), () => {
             assert.equal(sql(`select actor_id from private.school_admin_events where school_id='${school}' and target_user_id='${studentA}' and action='member.changed' order by created_at desc limit 1`), teacher);
         });
-        await race('Vocabulary update', () => vocabularyRepository.update(vocabularyId, { name: 'Pinned vocabulary update' }), () => {
+        await race('Vocabulary update', () => vocabularyRepository.update(vocabularyId, { name: 'Pinned vocabulary update', contentRevision: Number(sql(`select content_revision from public.vocabularies where id='${vocabularyId}'`)) }), () => {
             assert.equal(sql(`select name from public.vocabularies where id='${vocabularyId}'`), 'Pinned vocabulary update');
             assert.equal(sql(`select owner_id from public.vocabularies where id='${vocabularyId}'`), teacher);
         });
