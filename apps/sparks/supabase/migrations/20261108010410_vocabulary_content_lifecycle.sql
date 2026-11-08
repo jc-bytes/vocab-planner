@@ -2,15 +2,15 @@ begin;
 set transaction isolation level repeatable read;
 create temporary table vocabulary_preservation_receipt(table_name text primary key, row_count bigint, digest text) on commit drop;
 do $$ declare t record; n bigint; h text; begin
- for t in select table_schema,table_name from information_schema.tables where table_schema in ('public','private') and table_type='BASE TABLE'
- and (table_name ~ '(student|progress|grade|reward|coin|arcade|feedback|illustration|submission)' or table_name in ('profiles','class_memberships','class_assignment_responses')) loop
- execute format($q$select count(*),md5(coalesce(string_agg(md5((to_jsonb(t)-'content_version_id')::text),'' order by md5((to_jsonb(t)-'content_version_id')::text)),'')) from %I.%I t$q$,t.table_schema,t.table_name) into n,h;
+ for t in select table_schema,table_name from information_schema.tables where table_schema in ('public','private') and table_type='BASE TABLE' loop
+ execute format($q$select count(*),md5(coalesce(string_agg(md5((to_jsonb(t)-array['content_version_id','content_revision','vocabulary_placement','library_revision','policy_version','archived_at','import_provenance'])::text),'' order by md5((to_jsonb(t)-array['content_version_id','content_revision','vocabulary_placement','library_revision','policy_version','archived_at','import_provenance'])::text)),'')) from %I.%I t$q$,t.table_schema,t.table_name) into n,h;
  insert into vocabulary_preservation_receipt values(t.table_schema||'.'||t.table_name,n,h);
  end loop;
 end $$;
 -- Additive lifecycle metadata. No student rows, assignment IDs or versions are replaced.
 alter table public.vocabularies add column content_revision integer not null default 1,
- add column archived_at timestamptz;
+ add column archived_at timestamptz,
+ add column import_provenance jsonb not null default '{}'::jsonb;
 alter table public.class_assignments add column content_revision integer not null default 1,
  add column vocabulary_placement jsonb;
 alter table private.class_material_versions add column library_revision integer,
@@ -30,7 +30,7 @@ begin select version_id into new.content_version_id from public.class_assignment
 revoke all on function private.capture_grade_content_version_v1() from public,anon,authenticated;
 create trigger capture_grade_content_version before insert on private.vocabulary_grade_publications for each row execute function private.capture_grade_content_version_v1();
 create table private.vocabulary_change_receipts (
- actor_id uuid not null references public.profiles(user_id), request_key uuid not null,
+ actor_id uuid not null, request_key uuid not null,
  school_id uuid not null references public.schools(id), request jsonb not null, result jsonb not null,
  created_at timestamptz not null default now(), primary key(actor_id,request_key)
 );
@@ -150,11 +150,11 @@ begin
  if coalesce(old.content_revision,0)<>p_expected_revision then raise exception 'This vocabulary changed elsewhere. Your draft is kept on this device. Reopen the saved version before merging your changes.' using errcode='40001'; end if;
  v:=jsonb_populate_record(old,p_payload - array['id','owner_id','school_id','created_at','content_revision','archived_at']);
  if old.id is null then
-  insert into public.vocabularies(id,school_id,owner_id,name,description,subject_slug,teacher_subject_id,grades,assigned_date,trimester,month,week,activity_settings,words)
-  values(p_id,p_school_id,auth.uid(),coalesce(v.name,''),coalesce(v.description,''),'technology',v.teacher_subject_id,coalesce(v.grades,'{}'),v.assigned_date,coalesce(v.trimester,''),coalesce(v.month,''),v.week,coalesce(v.activity_settings,'{}'),coalesce(v.words,'[]')) returning * into v;
+  insert into public.vocabularies(id,school_id,owner_id,name,description,subject_slug,teacher_subject_id,grades,assigned_date,trimester,month,week,activity_settings,words,import_provenance)
+  values(p_id,p_school_id,auth.uid(),coalesce(v.name,''),coalesce(v.description,''),'technology',v.teacher_subject_id,coalesce(v.grades,'{}'),v.assigned_date,coalesce(v.trimester,''),coalesce(v.month,''),v.week,coalesce(v.activity_settings,'{}'),coalesce(v.words,'[]'),coalesce(v.import_provenance,'{}')) returning * into v;
  else
   update public.vocabularies set name=v.name,description=v.description,teacher_subject_id=v.teacher_subject_id,grades=v.grades,
-   assigned_date=v.assigned_date,trimester=v.trimester,month=v.month,week=v.week,activity_settings=v.activity_settings,words=v.words,updated_at=now()
+   assigned_date=v.assigned_date,trimester=v.trimester,month=v.month,week=v.week,activity_settings=v.activity_settings,words=v.words,import_provenance=v.import_provenance,updated_at=now()
    where id=p_id returning * into v;
  end if;
  result:=to_jsonb(v);
@@ -382,6 +382,58 @@ begin
     return result;
 end;
 $function$;
+create or replace function private.update_vocabulary_placements_school_v1(p_school_id uuid,p_updates jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+declare
+    requested_count integer;
+    updated_count integer;
+begin
+    perform 1 from public.schools where id=p_school_id for share;
+    if not private.can_edit_school_library(p_school_id) then
+        raise exception 'Only teachers can update vocabulary placements.';
+    end if;
+    if jsonb_typeof(coalesce(p_updates, '[]'::jsonb)) <> 'array' then
+        raise exception 'Vocabulary placement updates must be an array.';
+    end if;
+
+    requested_count := jsonb_array_length(coalesce(p_updates, '[]'::jsonb));
+    if requested_count > 500 then
+        raise exception 'A maximum of 500 vocabulary placements can be updated at once.';
+    end if;
+
+    if requested_count<>(select count(distinct x->>'id') from jsonb_array_elements(p_updates) x) then raise exception 'Choose distinct vocabularies.' using errcode='22023'; end if;
+    perform 1 from public.vocabularies where school_id=p_school_id and id in(select x->>'id' from jsonb_array_elements(p_updates) x) order by id for update;
+    if requested_count<>(select count(*) from jsonb_array_elements(p_updates) x join public.vocabularies v on v.id=x->>'id' and v.school_id=p_school_id and v.archived_at is null and v.content_revision=(x->>'expected_revision')::integer) then
+        raise exception 'Vocabulary placement changed. Reload the library before recalculating.' using errcode='40001';
+    end if;
+    update public.vocabularies vocabulary
+    set
+        assigned_date = nullif(trim(patch.assigned_date), '')::date,
+        trimester = coalesce(patch.trimester, ''),
+        month = coalesce(patch.month, ''),
+        week = patch.week,
+        updated_at = coalesce(patch.updated_at, now())
+    from jsonb_to_recordset(coalesce(p_updates, '[]'::jsonb)) as patch(
+        id text,
+        assigned_date text,
+        trimester text,
+        month text,
+        week integer,
+        updated_at timestamptz
+    )
+    where vocabulary.id = patch.id and vocabulary.school_id=p_school_id;
+
+    get diagnostics updated_count = row_count;
+    return jsonb_build_object(
+        'requested', requested_count,
+        'updated', updated_count
+    );
+end;
+$function$;
 create function private.publish_class_material_v2(p_class_ids uuid[],p_kind text,p_material_id text,p_release_at timestamptz,p_publication_key uuid,p_expected_revision integer,p_due_at timestamptz default null,p_close_at timestamptz default null)
 returns jsonb language plpgsql security definer set search_path='' as $$
 declare v public.vocabularies;
@@ -416,7 +468,7 @@ revoke all on function private.audit_vocabulary_publications_v1(uuid),public.aud
 grant execute on function private.audit_vocabulary_publications_v1(uuid),public.audit_vocabulary_publications_v1(uuid) to authenticated;
 do $$ declare t record; n bigint; h text; begin
  for t in select * from vocabulary_preservation_receipt loop
- execute format($q$select count(*),md5(coalesce(string_agg(md5((to_jsonb(t)-'content_version_id')::text),'' order by md5((to_jsonb(t)-'content_version_id')::text)),'')) from %s t$q$,t.table_name) into n,h;
+ execute format($q$select count(*),md5(coalesce(string_agg(md5((to_jsonb(t)-array['content_version_id','content_revision','vocabulary_placement','library_revision','policy_version','archived_at','import_provenance'])::text),'' order by md5((to_jsonb(t)-array['content_version_id','content_revision','vocabulary_placement','library_revision','policy_version','archived_at','import_provenance'])::text)),'')) from %s t$q$,t.table_name) into n,h;
  if n<>t.row_count or h<>t.digest then raise exception 'Student data preservation failed for %',t.table_name; end if;
  end loop;
 end $$;

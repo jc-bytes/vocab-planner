@@ -264,7 +264,7 @@ class TeacherVocabularyEditorCoreMethods {
 
         const navigation = this.beginTeacherNavigation();
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             if (!this.isTeacherNavigationCurrent(navigation)) return;
             try {
                 const data = parseVocabularyJson(e.target.result);
@@ -272,6 +272,9 @@ class TeacherVocabularyEditorCoreMethods {
                 delete data.contentRevision;
                 delete data.archivedAt;
                 delete data.source;
+                const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(e.target.result));
+                if (!this.isTeacherNavigationCurrent(navigation)) return;
+                data.importProvenance = { filename: file.name, sha256: [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('') };
                 data.subjectSlug = getVocabSubjectSlug(data);
                 this.beginTeacherVocabularyDocument();
                 this.vocabSet = data;

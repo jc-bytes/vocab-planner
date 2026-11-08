@@ -108,11 +108,16 @@ test('vocabulary grades require explicit opt-in, verified completion and explici
  assert.throws(()=>book(coTeacher),/unavailable/);
  sql(`update public.class_memberships set active=false,removed_at=now() where class_id='${classId}' and student_id='${student}';`);
  assert.throws(()=>mine(),/unavailable/);
- // Library defaults are frozen into future assigned copies, and validated for authenticated teacher writes.
- as(teacher,`update public.vocabularies set activity_settings='{"requiredActivities":["flashcards","quiz"],"additionalActivities":["scramble"],"grading":{"enabled":true,"maxPoints":30}}' where id='${vocab}';`);
- assert.throws(()=>as(teacher,`update public.vocabularies set activity_settings='{"grading":{"maxPoints":"30"}}' where id='${vocab}';`),/Invalid vocabulary/);
+ // Library defaults are frozen into future assigned copies. Exercise the current write boundary.
+ const revisioned=sql("select to_regprocedure('public.save_vocabulary_revision_v1(uuid,text,jsonb,integer,uuid)') is not null")==='t';
+ const saveLibrary=config=>revisioned
+  ? as(teacher,`select public.save_vocabulary_revision_v1('${school}','${vocab}','${JSON.stringify({activity_settings:config})}',(select content_revision from public.vocabularies where id='${vocab}'),'${randomUUID()}')`)
+  : as(teacher,`update public.vocabularies set activity_settings='${JSON.stringify(config)}' where id='${vocab}'`);
+ const futureSettings={requiredActivities:['flashcards','quiz'],additionalActivities:['scramble'],grading:{enabled:true,maxPoints:30}};
+ saveLibrary(futureSettings);
+ assert.throws(()=>saveLibrary({grading:{maxPoints:'30'}}),/Invalid vocabulary/);
  const assignedCopy=JSON.parse(as(teacher,`select public.publish_class_material_v1(array['${classId}'::uuid],'vocabulary','${vocab}','2026-04-01T05:00Z','${randomUUID()}')`))[0];
- as(teacher,`update public.vocabularies set activity_settings=jsonb_set(activity_settings,'{grading,enabled}','false') where id='${vocab}';`);
+ saveLibrary({...futureSettings,grading:{...futureSettings.grading,enabled:false}});
  const frozen=book().assignments.find(a=>a.id===assignedCopy.id);
  assert.equal(frozen.grading.enabled,true);assert.equal(frozen.grading.maxPoints,30);assert.equal(frozen.revision,0);
  // Realistic class workload: 30 members, 12 assigned copies, 360 grade cells.

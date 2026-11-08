@@ -20,7 +20,7 @@ Every new publication requires Flashcards first and another distinct playable ac
 
 The migration is additive. Existing assignment IDs and version IDs are retained. It freezes placement to exactly the metadata previously read by students. Historical attempts and grade publications are not assigned a guessed content version. New attempts and grade publications record their version explicitly.
 
-The migration runs in a repeatable-read transaction and checks counts and deterministic row hashes for student, progress, grading, rewards, feedback, profile and membership tables before and after. Added version-provenance columns are excluded from the old-row comparison. A mismatch aborts the transaction.
+The migration runs in a repeatable-read transaction and checks counts and deterministic row hashes for every existing public and private application table before and after. Only the newly added lifecycle columns are excluded from the old-row comparison. A mismatch aborts the transaction.
 
 Before production application, export the application tables to restricted storage outside Git and rehearse against populated disposable fixtures. A paged export is a recovery aid, not a consistent whole-database restore point. The transaction's preservation checks are the proof that this migration did not change existing student data. Never restore a backup over work submitted after that backup.
 

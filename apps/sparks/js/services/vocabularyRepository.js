@@ -13,7 +13,7 @@ import { cleanUndefined, timestampToIso, toClientTimestamp } from './supabaseVal
 export function mapVocabularyRow(row) {
     if (!row) return null;
     return {
-        contentRevision: row.content_revision, archivedAt: row.archived_at, id: row.id, name: row.name || '', description: row.description || '', grades: row.grades || [],
+        importProvenance: row.import_provenance, contentRevision: row.content_revision, archivedAt: row.archived_at, id: row.id, name: row.name || '', description: row.description || '', grades: row.grades || [],
         subjectSlug: row.teacher_subject_id || row.subject_slug || 'technology', assignedDate: row.assigned_date || '',
         trimester: row.trimester || '', month: row.month || '', week: row.week || '',
         activitySettings: row.activity_settings || {}, words: row.words || [], ownerId: row.owner_id || null,
@@ -54,6 +54,7 @@ export function vocabularyPayload(vocabulary = {}, id = null) {
         trimester: vocabulary.trimester,
         month: vocabulary.month,
         week: vocabulary.week === '' || vocabulary.week === null || vocabulary.week === undefined ? null : Number.parseInt(String(vocabulary.week), 10),
+        import_provenance: vocabulary.importProvenance,
         activity_settings: vocabulary.activitySettings,
         words: vocabulary.words,
         owner_id: vocabulary.ownerId,
@@ -102,7 +103,7 @@ export const vocabularyRepository = {
     async updateVocabularyPlacements(updates = [], options) {
         const schoolId = requireSchoolId();
         const payload = updates.map(update => ({
-            id: update.id,
+            id: update.id, expected_revision: update.contentRevision,
             assigned_date: update.assignedDate || null,
             trimester: update.trimester || '',
             month: update.month || '',

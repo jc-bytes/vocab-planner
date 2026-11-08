@@ -425,7 +425,7 @@ export const teacherSchoolCalendarSettingsMethods = {
             }
 
             return [{
-                id: vocab.id,
+                id: vocab.id, contentRevision: vocab.contentRevision,
                 ...this.buildPlacementPatch(vocab.assignedDate, calendar),
                 updatedAt: new Date().toISOString()
             }];

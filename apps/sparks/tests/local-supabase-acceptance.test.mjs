@@ -347,7 +347,8 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 words: [{ word: 'Repository', definition: 'A domain data access boundary.' }],
                 ownerId: teacher.id
             };
-            const saved = await withServiceClient(teacherClient, () => vocabularyRepository.save(IDS.vocabulary, source));
+            const existing = await withServiceClient(teacherClient, () => vocabularyRepository.get(IDS.vocabulary));
+            const saved = await withServiceClient(teacherClient, () => vocabularyRepository.save(IDS.vocabulary, { ...source, contentRevision: existing?.contentRevision ?? 0 }));
             assert.equal(saved.id, IDS.vocabulary);
             let vocabulary = await withServiceClient(teacherClient, () => vocabularyRepository.get(IDS.vocabulary));
             assert.equal(vocabulary.id, IDS.vocabulary);
@@ -363,14 +364,14 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             assert.equal(metadata.words, undefined);
 
             vocabulary = await withServiceClient(teacherClient, () => vocabularyRepository.update(IDS.vocabulary, {
-                ...source, name: 'Acceptance Vocabulary Updated', week: 3
+                ...source, contentRevision: vocabulary.contentRevision, name: 'Acceptance Vocabulary Updated', week: 3
             }));
             assert.equal(vocabulary.name, 'Acceptance Vocabulary Updated');
             assert.equal(vocabulary.week, 3);
 
             const placementResult = await withServiceClient(teacherClient, () => (
                 vocabularyRepository.updateVocabularyPlacements([{
-                    id: IDS.vocabulary,
+                    id: IDS.vocabulary, contentRevision: vocabulary.contentRevision,
                     assignedDate: '2026-07-21',
                     trimester: 'IIT',
                     month: 'July',
@@ -386,14 +387,14 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             })));
             await expectRejected(() => withServiceClient(studentClient, () => (
                 vocabularyRepository.updateVocabularyPlacements([{
-                    id: IDS.vocabulary,
+                    id: IDS.vocabulary, contentRevision: vocabulary.contentRevision,
                     assignedDate: '2026-08-01',
                     trimester: 'IIT',
                     month: 'August',
                     week: 5
                 }])
             )));
-            await withServiceClient(studentClient, () => vocabularyRepository.remove(IDS.vocabulary));
+            await expectRejected(() => withServiceClient(studentClient, () => vocabularyRepository.remove(IDS.vocabulary)));
             assert.ok(await withServiceClient(teacherClient, () => vocabularyRepository.get(IDS.vocabulary)),
                 'RLS must keep the vocabulary row after a Student delete attempt.');
             await expectRejected(() => withServiceClient(studentClient, () => vocabularyRepository.save(
@@ -401,7 +402,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             )));
 
             await withServiceClient(teacherClient, () => vocabularyRepository.remove(IDS.vocabulary));
-            assert.equal(await withServiceClient(teacherClient, () => vocabularyRepository.get(IDS.vocabulary)), null);
+            assert.ok((await withServiceClient(teacherClient, () => vocabularyRepository.get(IDS.vocabulary))).archivedAt, 'Archive preserves the library row.');
         });
 
         await t.test('Teacher Spark save/update/archive succeeds and Student mutations are denied', async () => {
