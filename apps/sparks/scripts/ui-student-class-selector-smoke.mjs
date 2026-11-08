@@ -17,16 +17,16 @@ try {
     // Keep the established August fixture and publish an explicit October unit.
     // Both are needed to prove the current trimester excludes older work.
     const materialId = 'audit-current-class-vocabulary';
-    await seeded.admin.from('vocabularies').upsert({ id: materialId, owner_id: seeded.users.teacher.id,
+    const { data: savedVocabulary } = await seeded.admin.from('vocabularies').upsert({ id: materialId, owner_id: seeded.users.teacher.id,
         school_id: seeded.schoolId, teacher_subject_id: seeded.subject.id, name: 'Current class unit',
         assigned_date: '2026-10-01', trimester: '3', month: 'October', week: 1,
         words: [{ word: 'Source', definition: 'Where information comes from.' }],
-        activity_settings: { requiredActivities: ['flashcards'] }
-    }).throwOnError();
+        activity_settings: { requiredActivities: ['flashcards', 'matching'] }
+    }).select('content_revision').single().throwOnError();
     const teacher = createClient(config.url, config.publishableKey, { auth: { persistSession: false } });
     await teacher.auth.signInWithPassword({ email: AUDIT_TEACHER_EMAIL, password: AUDIT_PASSWORD }).then(({error}) => { if(error) throw error; });
     await createClassroomRepository(() => teacher, () => seeded.schoolId).publishMaterial({
-        classIds: [seeded.classroom.id], kind: 'vocabulary', materialId,
+        classIds: [seeded.classroom.id], kind: 'vocabulary', materialId, expectedRevision: savedVocabulary.content_revision,
         releaseAt: '2026-10-01T12:00:00Z', publicationKey: '6b47ab0a-2026-4000-8000-000000000004'
     });
     await teacher.auth.signOut();
