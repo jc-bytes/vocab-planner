@@ -2005,11 +2005,11 @@ test('Word Hunt export state is isolated inside its component', () => {
     assert.equal('wordHuntExportInProgress' in first, false);
 });
 
-test('Grade 9 week 1 part 2 unit card counts the same required activities as its open unit', async () => {
-    const { readFile } = await import('node:fs/promises');
-    const manifest = JSON.parse(await readFile(new URL('../vocabularies/manifest.json', import.meta.url)));
-    const meta = manifest.vocabularies.find(v => v.id === 'grade9_t3_2026_w01_part2');
-    const full = JSON.parse(await readFile(new URL(`../${meta.path}`, import.meta.url)));
+test('database unit metadata counts the same required activities as its saved snapshot', async () => {
+    const { weeklyFixture } = await import('./fixtures/weekly-vocabulary-fixture.mjs');
+    const full = weeklyFixture(9);
+    full.activitySettings.requiredActivities = ['flashcards', 'fill-in-blank'];
+    const { words, ...meta } = full;
     const scores = {
         flashcards: { score: 100, isComplete: true, verified: true },
         'fill-in-blank': { score: 100, isComplete: true, verified: true }

@@ -1,3 +1,4 @@
+import { weeklyFixture } from './fixtures/weekly-vocabulary-fixture.mjs';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
@@ -293,11 +294,8 @@ test('signed-in completion gates require a server-verified score', () => {
     assert.equal(flow.isActivityScoreComplete({ score: 100, isComplete: true, verified: true }), true);
 });
 
-test('Week 3 catalog and server fallback both require Word Search after Flashcards', async () => {
-    const vocabulary = JSON.parse(await readFile(
-        new URL('../vocabularies/grade9/grade9_iit_june_week3_loops_strings.json', import.meta.url),
-        'utf8'
-    ));
+test('Week 3 client and server fallback both require Word Search after Flashcards', async () => {
+    const vocabulary = { ...weeklyFixture(9), week: 3, purpose: 'practice' };
     const flow = Object.create(StudentActivityProgressFlow.prototype);
     flow.sm = { currentVocab: vocabulary };
     flow.activities = {};
@@ -351,8 +349,9 @@ test('Fill in Blank submits each answer once and saves the final state before re
     assert.equal(reports[0].savedIndex, 1, 'The completion payload must use the completed state');
 });
 
-test('Picture size in bits unlocks optional practice after its two verified required activities', async () => {
-    const currentVocab = JSON.parse(await readFile(new URL('../vocabularies/grade9/grade9_t3_2026_w01_part1.json', import.meta.url), 'utf8'));
+test('A saved vocabulary unlocks optional practice after its two verified required activities', async () => {
+    const currentVocab = weeklyFixture(9, { review: true });
+    delete currentVocab.activitySettings.additionalActivities;
     const sm = { currentVocab, currentUser: { uid: 'test-student' }, unitScores: {} };
     const flow = new StudentActivityProgressFlow({ sm });
     assert.equal(flow.isActivityUnlocked('quiz'), false);

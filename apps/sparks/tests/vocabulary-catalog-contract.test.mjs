@@ -1,102 +1,19 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import {
-    ACTIVITY_IDS,
-    loadVocabularyCatalog,
-    resolveActivityFlow,
-    validateVocabulary
-} from '../scripts/lib/vocabularyCatalog.mjs';
-
 const workspaceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-
-test('every vocabulary unit has explicit valid placement and activity flow', async () => {
-    const records = await loadVocabularyCatalog(workspaceRoot);
-    assert.equal(records.length > 0, true);
-    const errors = records.flatMap(record => validateVocabulary(record.vocabulary, record.entry.path));
-    assert.deepEqual(errors, []);
-
-    for (const { vocabulary } of records) {
-        const flow = resolveActivityFlow(vocabulary);
-        assert.deepEqual(flow.required, vocabulary.activitySettings.requiredActivities);
-        assert.deepEqual(flow.additional, vocabulary.activitySettings.additionalActivities);
-    }
+test('release catalog contains no school content', () => {
+    execFileSync(process.execPath, ['scripts/validate-vocabulary-catalog.mjs'], { cwd: workspaceRoot });
 });
-
-test('T3 class parts have small sourced word sets and distinct required practice', async () => {
-    const records = await loadVocabularyCatalog(workspaceRoot);
-    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)) && !v.activitySettings.weeklyPoolVersion && !v.activitySettings.onlineLessonException);
-    assert.equal(t3.length, 91);
-    for (const v of t3) {
-        assert.match(v.id, /^grade[6-9]_t3_2026_w\d{2}_part[12]$/);
-        assert.ok(v.words.length === 2 || v.words.length === 3);
-        const part = v.id.endsWith('part1') ? 1 : 2;
-        assert.match(v.name, new RegExp(`Part ${part} - `));
-        assert.deepEqual(v.activitySettings.requiredActivities,
-            ['flashcards', part === 1 ? 'matching' : 'fill-in-blank']);
-        assert.deepEqual(v.activitySettings.additionalActivities,
-            ACTIVITY_IDS.filter(id => !v.activitySettings.requiredActivities.includes(id)),
-            `${v.id}: optional practice must remain available`);
-        for (const word of v.words) {
-            assert.ok(word.definition && word.example);
-            assert.match(word.source, /^https:\/\//);
-            assert.ok(word.example.toLowerCase().includes(word.word.toLowerCase()));
-        }
-    }
+test('retired importer fails without emitting SQL', () => {
+    const result = spawnSync(process.execPath, ['scripts/generate-vocabulary-catalog-upsert.mjs', '--grade', 'all'], { cwd: workspaceRoot, encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.equal(result.stdout, '');
+    assert.match(result.stderr, /File catalog imports have been retired/);
 });
-
-test('October 13 online lesson has five sourced words and two required activities', async () => {
-    const records = await loadVocabularyCatalog(workspaceRoot);
-    const exceptions = records.map(r => r.vocabulary).filter(v => v.activitySettings.onlineLessonException);
-    assert.equal(exceptions.length, 2);
-    const v = exceptions.find(v => v.id === 'grade6_t3_2026_w05_online_safety_ab');
-    assert.equal(v.id, 'grade6_t3_2026_w05_online_safety_ab');
-    assert.deepEqual(v.grades, ['6']);
-    assert.equal(v.assignedDate, '2026-10-13');
-    assert.deepEqual(v.activitySettings.sections, ['A', 'B']);
-    assert.deepEqual(v.activitySettings.requiredActivities, ['flashcards', 'matching']);
-    assert.deepEqual(v.words.map(w => w.word), ['Privacy', 'Boundary', 'Pressure', 'Permission', 'Report']);
-    assert.deepEqual(v.activitySettings.additionalActivities, [
-        'fill-in-blank', 'illustration', 'quiz', 'word-search', 'crossword',
-        'hangman', 'scramble', 'wordle', 'speed-match'
-    ]);
-    for (const word of v.words) {
-        assert.ok(word.definition);
-        assert.ok(word.example.toLowerCase().includes(word.word.toLowerCase()));
-        assert.match(word.source, /^https:\/\//);
-    }
-});
-
-test('catalog SQL updates existing rows and verifies database parity transactionally', () => {
-    const sql = execFileSync(process.execPath, [
-        'scripts/generate-vocabulary-catalog-upsert.mjs', '--grade', 'all'
-    ], { cwd: workspaceRoot, encoding: 'utf8' });
-
-    assert.match(sql, /on conflict \(id\) do update set/i);
-    assert.doesNotMatch(sql, /on conflict \(id\) do nothing/i);
-    assert.match(sql, /Vocabulary catalog verification failed after upsert/);
-    assert.match(sql, /grade9_iit_june_week3_loops_strings/);
-    assert.match(sql, /"requiredActivities":\["flashcards","word-search"\]/);
-    assert.match(sql, /^begin;[\s\S]*commit;\s*$/i);
-});
-
-test('catalog SQL can limit a production repair to exact vocabulary IDs', () => {
-    const sql = execFileSync(process.execPath, [
-        'scripts/generate-vocabulary-catalog-upsert.mjs',
-        '--grade', '6',
-        '--id', 'grade6_t3_2026_w01_part1',
-        '--id', 'grade6_t3_2026_w01_part2'
-    ], { cwd: workspaceRoot, encoding: 'utf8' });
-
-    assert.match(sql, /grade6_t3_2026_w01_part1/);
-    assert.match(sql, /grade6_t3_2026_w01_part2/);
-    assert.doesNotMatch(sql, /grade6_t1_summative_technology_vocabulary/);
-    assert.match(sql, /^begin;[\s\S]*commit;\s*$/i);
-});
-
 test('database writes normalize explicit required and additional activity flow', () => {
     const migration = readFileSync(path.join(
         workspaceRoot,
@@ -109,13 +26,4 @@ test('database writes normalize explicit required and additional activity flow',
     assert.match(migration, /'\{additionalActivities\}'/);
     assert.match(migration, /update public\.vocabularies[\s\S]*jsonb_typeof[\s\S]*is distinct from 'array'/i);
     assert.match(migration, /revoke all on function private\.normalize_vocabulary_activity_flow\(\)/i);
-});
-
-test('unit cards and opened vocabularies use identical activity requirements', async () => {
-    for (const { entry, vocabulary } of await loadVocabularyCatalog(workspaceRoot)) {
-        assert.deepEqual(entry.activitySettings?.requiredActivities,
-            vocabulary.activitySettings.requiredActivities, `${entry.id}: required activities`);
-        assert.deepEqual(entry.activitySettings?.additionalActivities,
-            vocabulary.activitySettings.additionalActivities, `${entry.id}: additional activities`);
-    }
 });
