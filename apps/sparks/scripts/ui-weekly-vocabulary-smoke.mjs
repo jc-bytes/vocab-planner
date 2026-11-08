@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { weeklyFixture } from '../tests/fixtures/weekly-vocabulary-fixture.mjs';
 import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 const port=Number(process.env.UI_WEEKLY_VOCABULARY_PORT || 8141);
@@ -6,12 +7,18 @@ const baseUrl=`http://127.0.0.1:${port}`;let server,browser;
 try {
  server=await ensureViteServer({baseUrl,probePath:'/student.html',host:'127.0.0.1',port,external:false});
  browser=await chromium.launch();const page=await browser.newPage({viewport:{width:1280,height:960}});
+ const fixtures=[6,7,8,9].flatMap(grade=>[weeklyFixture(grade),weeklyFixture(grade,{retired:true}),weeklyFixture(grade,{review:true})]);
+ await page.route('**/vocabularies/**', route => {
+  const url=new URL(route.request().url());
+  const data=url.pathname.endsWith('/manifest.json') ? {vocabularies:fixtures} : fixtures.find(v=>'/'+v.path===url.pathname);
+  return route.fulfill({status:data?200:404,contentType:'application/json',body:JSON.stringify(data||{})});
+ });
  await page.clock.setFixedTime(new Date('2026-11-20T17:00:00Z'));
  await page.goto(baseUrl+'/student.html');await page.waitForFunction(()=>window.studentApp?.activities);
  for(const grade of [6,7,8,9]){
  const result=await page.evaluate(async grade=>{
   const app=window.studentApp;app.authDisabled=true;app.currentUser=null;app.studentProfile={grade:String(grade),group:'A',firstName:'Test'};app.progressData={units:{}};
-  const v=await(await fetch(`/vocabularies/grade${grade}/grade${grade}_t3_2026_w02_weekly_v1.json`)).json();
+  const v=await(await fetch(`/vocabularies/fixtures/fixture_grade${grade}_weekly.json`)).json();
   app.activities.vocabularyData.applyVocabularyData(v);
   const flow=app.activities.getActivityFlowConfig();
   const pendingBefore=app.activities.getUnitRequiredCompletion(v);
@@ -33,22 +40,22 @@ try {
  }
  const review=await page.evaluate(async()=>{
  const app=window.studentApp;app.studentProfile={grade:'6',group:'C'};
- const v=await(await fetch('/vocabularies/grade6/grade6_t3_2026_w08_weekly_v1.json')).json();app.activities.vocabularyData.applyVocabularyData(v);await app.activities.showActivityMenu();
+ const v=await(await fetch('/vocabularies/fixtures/fixture_grade6_review.json')).json();app.activities.vocabularyData.applyVocabularyData(v);await app.activities.showActivityMenu();
  return {required:app.activities.getActivityFlowConfig().required,unlocked:app.activities.isActivityUnlocked('matching'),available:app.activities.isStudentVocabularyAvailable(v,new Date('2026-11-06T12:00:00'))};
  });assert.deepEqual(review,{required:['flashcards','matching'],unlocked:false,available:true});
  console.log('Review vocabulary requires Flashcards and Matching on its group release date.');
  const archive=await page.evaluate(async()=>{
   const app=window.studentApp;app.studentProfile={grade:'6',group:'A'};
   app.activities.manifest=await(await fetch('/vocabularies/manifest.json')).json();
-  const old=await app.routing.findVocabByRouteId('grade6_t3_2026_w02_part1');
-  const otherGrade=await app.routing.findVocabByRouteId('grade9_t3_2026_w02_part1');
+  const old=await app.routing.findVocabByRouteId('fixture_grade6_retired');
+  const otherGrade=await app.routing.findVocabByRouteId('fixture_grade9_retired');
   if(!old?.id||!old.path)throw new Error('Prepared own-grade archived vocabulary route was not found.');
   app.progressData.units['technology:'+old.id]={scores:{flashcards:{score:100,isComplete:true,verified:true}}};
   const oldData=await(await fetch('/'+old.path)).json();
   app.activities.vocabularyData.applyVocabularyData(oldData);await app.activities.showActivityMenu();
   const saved=app.unitScores.flashcards.score;
   const notice=document.getElementById('weekly-retirement-notice')?.textContent;
-  const v=await(await fetch('/vocabularies/grade6/grade6_t3_2026_w02_weekly_v1.json')).json();
+  const v=await(await fetch('/vocabularies/fixtures/fixture_grade6_weekly.json')).json();
   app.activities.vocabularyData.applyVocabularyData(v);
   return {saved,notice,newScore:app.unitScores.flashcards||null,otherGrade,projectUnits:app.activities.getPendingRequiredWork(new Date('2026-10-15T12:00:00')).units.length};
  });

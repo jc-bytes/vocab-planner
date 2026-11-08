@@ -1,24 +1,8 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import {
-    loadVocabularyCatalog,
-    validateVocabulary,
-    writeNormalizedVocabulary
-} from './lib/vocabularyCatalog.mjs';
-
-const workspaceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const shouldWrite = process.argv.includes('--write');
-const records = await loadVocabularyCatalog(workspaceRoot);
-
-if (shouldWrite) {
-    for (const record of records) {
-        record.vocabulary = await writeNormalizedVocabulary(record);
-    }
-}
-
-const errors = records.flatMap(record => validateVocabulary(record.vocabulary, record.entry.path));
-if (errors.length > 0) {
-    throw new Error(`Vocabulary catalog validation failed:\n${errors.map(error => `- ${error}`).join('\n')}`);
-}
-
-process.stdout.write(`${shouldWrite ? 'Normalized and validated' : 'Validated'} ${records.length} vocabulary units.\n`);
+import assert from 'node:assert/strict';
+import { readdir, readFile } from 'node:fs/promises';
+const root = new URL('../vocabularies/', import.meta.url);
+const files = await readdir(root, { recursive: true, withFileTypes: true });
+assert.deepEqual(files.filter(file => file.isFile()).map(file => file.name), ['manifest.json'], 'School vocabulary must not be bundled with the app');
+assert.deepEqual(JSON.parse(await readFile(new URL('manifest.json', root))).vocabularies, [], 'The compatibility index must stay empty');
+if (process.argv.includes('--write')) throw new Error('File catalog editing is retired. Edit vocabulary in the teacher library.');
+console.log('Verified database-only school content and empty compatibility index.');

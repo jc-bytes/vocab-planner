@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { weeklyFixture } from './fixtures/weekly-vocabulary-fixture.mjs';
 import test from 'node:test';
 
 globalThis.localStorage = { getItem() { return null; } };
@@ -24,8 +24,9 @@ installTeacherVocabularyPlacementMethods(Owner);
 installTeacherVocabularyEditorCoreMethods(Owner);
 Object.assign(Owner.prototype, teacherVocabularyDataMethods);
 
-const manifest = JSON.parse(await readFile(new URL('../vocabularies/manifest.json', import.meta.url), 'utf8'));
-const catalog = manifest.vocabularies.map(vocab => ({ vocab: structuredClone(vocab), type: 'remote' })).reverse();
+const catalog = [6,7,8,9].flatMap(grade => [1,2,3].flatMap(trimester => ['March','June','November'].map(month => ({
+    vocab: { ...weeklyFixture(grade), trimester: String(trimester), month }, type: 'cloud'
+}))));
 const helperNames = [
     'getVocabGrades', 'normalizeGradeLabel', 'formatGradeLabel', 'getGradeSortValue',
     'getTeacherTrimesterKey', 'normalizeTeacherTrimester', 'getTeacherTrimesterLabel',
@@ -172,7 +173,7 @@ test('repeated grouping prepares grade and trimester once without unrelated pres
     assert.deepEqual(Object.keys(calls).filter(name => !permitted.has(name)), []);
 });
 
-test('the complete shipped catalog groups without preparing unused fields', () => {
+test('the multi-grade fixture library groups without preparing unused fields', () => {
     const { owner, calls } = instrument();
     const model = browserModel(owner);
     model.beginRender();
@@ -183,13 +184,13 @@ test('the complete shipped catalog groups without preparing unused fields', () =
     assert.deepEqual(Object.keys(calls).filter(name => !permitted.has(name)), []);
 });
 
-test('complete catalog and legacy edge cases preserve every group, member, type and order', () => {
+test('fixture library and legacy edge cases preserve every group, member, type and order', () => {
     const owner = new Owner(), model = browserModel(owner);
     model.beginRender();
     assertCompleteGroups(model, owner, [...catalog, ...adversarialItems]);
 });
 
-test('full serialization and spreading preserve all catalog and purpose-fallback descriptor values', () => {
+test('full serialization and spreading preserve all fixture and purpose-fallback descriptor values', () => {
     const owner = new Owner();
     for (const { vocab, type } of [...catalog, ...adversarialItems]) {
         const expected = eagerDescriptor(owner, vocab, type);
@@ -261,7 +262,7 @@ test('explicit item sets use the same drilldown filter as the browser-owned cata
     assert.deepEqual(model.getTeacherVocabularyItemsForDrilldown(drilldown, items), expected);
 });
 
-test('all catalog row orders and visible presentation values match the placement owner', () => {
+test('all fixture row orders and visible presentation values match the placement owner', () => {
     const owner = new Owner(), model = browserModel(owner), items = [...catalog, ...adversarialItems];
     for (const drilldown of [{}, { subject: 'technology' }, { subject: 'technology', grade: '6' },
         { subject: 'technology', grade: '6', trimester: 'IIIT' }, { subject: 'technology', grade: '6', trimester: 'IIIT', month: 'october' }]) {

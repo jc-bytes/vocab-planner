@@ -1,6 +1,6 @@
 # Vocabulary content operations
 
-The school database is the classroom content authority. Bundled JSON remains demo/import content. Normal app deployments do not import, overwrite or delete school vocabulary. Teacher and authenticated student library routes do not fall back to bundled files when database reads fail.
+The school database is the classroom content authority. The old school JSON catalog has been removed. The empty `vocabularies/manifest.json` is a compatibility response for local demo mode, not a content source. Tests use fictional fixtures that are not shipped. The legacy catalog SQL generator refuses to run. Normal app deployments do not import, overwrite or delete school vocabulary. Teacher and authenticated student library routes do not fall back to bundled files when database reads fail.
 
 ## Teacher workflow
 

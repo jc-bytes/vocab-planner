@@ -1,5 +1,7 @@
 # Vocabulary Master
 
+School vocabulary is managed in the database through the teacher library. The old school JSON files have been removed. `vocabularies/manifest.json` is an empty compatibility index, not a place to author content. Student assignments and saved progress are independent of that file. See [content operations](docs/content-lifecycle-operations.md).
+
 A Vite/Tauri vocabulary and classroom practice app for teacher-managed content, student activities, local desktop packaging, and Supabase-backed cloud sync when online.
 
 ## Features

@@ -1,5 +1,7 @@
 # Sparks content lifecycle: audit and implementation plan
 
+Historical audit. Update on November 8: the school JSON catalog was removed after the database lifecycle release. References below describe the pre-cleanup state. Current behavior is documented in [content operations](content-lifecycle-operations.md).
+
 Date: 7 November 2026. Source baseline: `2cefa05b39a0d53b44b583a12dc306fe93affeb9` (upstream/main). Scope: vocabulary authoring, publication, assignment availability and preservation of student work. This is a read-only production audit, not an implementation or migration approval. No application or production data changed.
 
 ## Conclusion
