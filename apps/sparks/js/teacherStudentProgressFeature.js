@@ -67,6 +67,7 @@ export function createTeacherStudentProgressFeature(capabilities) {
             if (viewId === 'teacher-student-profile-view') return;
             context.studentProfileRequest = (context.studentProfileRequest || 0) + 1;
             context.studentInsightRequest = (context.studentInsightRequest || 0) + 1;
+            context.closeStudentInsightDialog?.();
             context.studentDashboardCharts?.dispose(); context.studentDashboardCharts = null;
         },
         destroy() {

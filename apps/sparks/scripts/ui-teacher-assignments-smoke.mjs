@@ -124,6 +124,8 @@ try {
     await page.evaluate(() => window.assignmentSmoke.workspace.show({ mode: 'review', classId: 'class-b', assignmentId: 'spark-b' }));
     assert.equal(await page.getByText('My private written answer', { exact: true }).count(), 1);
     assert.equal(await page.getByText('Written answers need teacher review.', { exact: true }).count(), 1);
+    assert.equal(await page.getByLabel('Note',{exact:true}).count(),0);
+    await page.getByRole('button',{name:'Teacher note for Cora',exact:true}).click();
     await page.getByLabel('Note',{exact:true}).fill('Explain your reasoning.');
     await page.getByLabel('Submission review').selectOption('reviewed');
     await page.getByRole('button',{name:'Save teacher note',exact:true}).click();
@@ -131,6 +133,7 @@ try {
     assert.equal(await page.getByText('Written answers need teacher review.',{exact:true}).count(),0);
     assert.equal(await page.locator('[data-feedback-student="c"]').innerText(),'In progress');
     await page.evaluate(()=>window.assignmentSmoke.workspace.show({mode:'review',classId:'class-b',assignmentId:'spark-b'}));
+    await page.getByRole('button',{name:'Teacher note for Cora (saved)',exact:true}).click();
     assert.equal(await page.getByLabel('Note',{exact:true}).inputValue(),'Explain your reasoning.');
     // A note-save response cannot repopulate another teacher's review panel.
     await page.evaluate(()=>{const s=window.assignmentSmoke;s.repository.saveStudentFeedback=()=>new Promise(resolve=>{s.resolveNote=resolve;});});
@@ -182,7 +185,11 @@ try {
         const s = window.assignmentSmoke;
         await s.workspace.show({ mode: 'review', classId: 'class-a', assignmentId: 'vocab-a' });
         const picker = document.querySelector('select[name="student"]');
-        const filter = value => { picker.value = value; picker.dispatchEvent(new Event('change')); };
+        const filter = value => {
+            document.querySelector('dialog[open] .modal-footer button')?.click();
+            picker.value = value; picker.dispatchEvent(new Event('change'));
+            document.querySelector('.teacher-note-trigger')?.click();
+        };
         const editor = () => document.querySelector('.student-feedback-editor');
         const button = root => [...root.querySelectorAll('button')].find(b => b.textContent === 'Save teacher note');
         const flush = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -205,6 +212,7 @@ try {
         const detachedSave = editor().textContent.includes(`Note revision ${advancedRevision + 1}`);
         filter('b'); const preservedOther = editor() === ben && editor().querySelector('textarea').value === 'Ben unsaved draft';
         s.repository.saveStudentFeedback = original;
+        document.querySelector('dialog[open] .modal-footer button').click();
         return { sameEditor, pending, otherDraft, newerDraft, savedDraft, advancedRevision, detachedSave, preservedOther };
     });
     assert.equal(feedbackFilters.sameEditor, true); assert.equal(feedbackFilters.pending, true);

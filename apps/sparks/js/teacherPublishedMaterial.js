@@ -1,3 +1,4 @@
+import { getActivityLabel } from './activityMetadata.js';
 import { createAssignmentDialog, node } from './teacherAssignmentUi.js';
 
 // Inspect the assignment snapshot, never the editable Library material.
@@ -16,10 +17,7 @@ export function openPublishedMaterial({ assignment, repository, isCurrent, signa
             const body = node('section');
             body.append(node('p', 'Published copy. Later Library edits do not change this material.'));
             if (assignment.kind === 'vocabulary') {
-                const list = node('dl');
-                for (const word of content.words || []) list.append(node('dt', word.word), node('dd', word.definition));
-                body.append(list);
-                if (!content.words?.length) body.append(node('p', 'This published copy has no vocabulary words.'));
+                body.append(renderPublishedVocabulary(content));
             } else {
                 if (content.sparkText) body.append(node('p', content.sparkText, 'teacher-published-text'));
                 if (content.whyItMatters) body.append(node('p', content.whyItMatters));
@@ -49,4 +47,21 @@ export function openPublishedMaterial({ assignment, repository, isCurrent, signa
     }
     void load();
     return view.close;
+}
+
+export function renderPublishedVocabulary(content) {
+    const preview = node('section');
+    if (content.description) preview.append(node('p', content.description));
+    const settings = content.activitySettings || {};
+    for (const [label, activities] of [['Required', settings.requiredActivities], ['Optional', settings.additionalActivities]]) {
+        if (Array.isArray(activities) && activities.length) preview.append(node('p', `${label}: ${activities.map(getActivityLabel).join(', ')}`));
+    }
+    if (!Array.isArray(content.words) || !content.words.length) {
+        preview.append(node('p', 'This published copy has no vocabulary words.'));
+        return preview;
+    }
+    const list = node('dl', undefined, 'published-vocabulary-terms');
+    for (const word of content.words) list.append(node('dt', word.word), node('dd', word.definition));
+    preview.append(list);
+    return preview;
 }

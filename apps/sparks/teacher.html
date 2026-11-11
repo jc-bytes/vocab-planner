@@ -92,12 +92,14 @@
             <div class="teacher-top-bar-copy">
                 <strong id="teacher-top-bar-section">Home</strong>
             </div>
+            <div id="teacher-class-controls" class="teacher-class-controls classrooms">
             <label id="teacher-class-switcher" class="teacher-class-switcher" hidden>
                 <svg class="teacher-class-switcher-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m2 9 10-5 10 5-10 5-10-5Z"/><path d="M6 11v6c4 3 8 3 12 0v-6M22 9v7"/></svg>
                 <span class="teacher-class-switcher-copy" aria-hidden="true"><strong id="teacher-class-name">Choose a class</strong><small id="teacher-class-year">Switch class</small></span>
                 <svg class="teacher-class-switcher-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
                 <select id="teacher-class-select" aria-label="Current class" disabled><option value="">Choose a class</option></select>
             </label>
+            </div>
             <div id="teacher-school-name" class="teacher-top-bar-school" aria-live="polite"></div>
         </aside>
 
@@ -608,6 +610,12 @@
                     </div>
 
                     <div id="student-profile-activity-panel" class="student-profile-panel hidden" role="tabpanel">
+                        <section class="teacher-panel">
+                            <div class="teacher-panel-header"><div><h3>Recorded activity</h3><p>Latest and best scores, lifetime accuracy, finished runs, timing, and late status.</p></div></div>
+                            <div id="detail-activity-list" class="student-profile-activity-list"></div>
+                        </section>
+                        <details class="teacher-panel">
+                            <summary>Activity totals and vocabulary progress</summary>
                         <div class="teacher-stat-grid student-profile-stat-grid">
                             <div class="mini-stat"><div class="mini-stat-label">Completed recorded activities</div><div class="mini-stat-value" id="detail-total-activities">-</div></div>
                             <div class="mini-stat"><div class="mini-stat-label">Avg Completed Score</div><div class="mini-stat-value" id="detail-avg-score">-</div></div>
@@ -625,10 +633,7 @@
                                 <div id="student-profile-units" class="student-profile-units"></div>
                             </section>
                         </div>
-                        <section class="teacher-panel">
-                            <div class="teacher-panel-header"><div><h3>Recorded activity</h3><p>Latest and best scores, lifetime accuracy, finished runs, timing, and late status.</p></div></div>
-                            <div id="detail-activity-list" class="student-profile-activity-list"></div>
-                        </section>
+                        </details>
                     </div>
 
                     <div id="student-profile-account-panel" class="student-profile-panel hidden" role="tabpanel">
@@ -650,7 +655,7 @@
                             </section>
                             <section class="teacher-panel student-detail-section">
                                 <div class="teacher-panel-header"><div><h3>Account</h3><p>Password change required: <strong id="detail-password-flag">No</strong></p></div></div>
-                                <button id="reset-student-password-btn" disabled title="Use Forgot password on the sign-in page" class="btn secondary-btn student-detail-action-button" type="button">Reset Password</button>
+                                <p>Students can reset their password using <strong>Forgot password</strong> on the sign-in page.</p>
                                 <div id="reset-password-status" class="form-feedback student-detail-status"></div>
                                 <div id="temporary-password-output" class="modal-code student-detail-temp-password"></div>
                             </section>

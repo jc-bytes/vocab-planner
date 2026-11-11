@@ -69,3 +69,13 @@
     .classrooms .class-progress .class-progress-review[data-empty="true"] { display: none; }
     .class-progress .class-directory-footer { gap: .75rem; }
 }
+
+.class-progress-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: .75rem; }
+.classrooms .class-progress-toolbar .class-directory-filters { border: 0; padding-bottom: 0; }
+.class-progress thead th:nth-child(2) { width: 42%; }
+.class-progress thead th:last-child { width: 5rem; }
+.class-progress .class-progress-actions { text-align: right; }
+@media (max-width: 600px) {
+    .class-progress tbody tr { grid-template-columns: minmax(0, 1fr) auto auto; }
+    .class-progress .class-progress-actions { grid-column: 3; grid-row: 1; }
+}

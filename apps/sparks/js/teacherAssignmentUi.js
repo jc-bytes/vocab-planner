@@ -1,3 +1,5 @@
+import '../css/teacher-assignments.css';
+
 // Small DOM primitives shared by the assignment tools; no retained account data.
 export function node(tag, text, className) {
     const result = document.createElement(tag);

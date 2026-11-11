@@ -32,6 +32,7 @@ export function createTeacherWorkspaceFeature(manager) {
     });
     const classOptions = {
         getUserId, repository,
+        headerRoot: document.getElementById('teacher-class-controls'),
         getSchoolCalendar,
         onProgressState: context => manager.setRoute({ view: 'students', ...context }, { replace: true }),
         onGradebookState: context => manager.setRoute({ view: 'students', ...context }, { replace: true }),
@@ -55,7 +56,6 @@ export function createTeacherWorkspaceFeature(manager) {
             root: document.getElementById('teacher-assignments-view'), getUserId, repository, getSchoolCalendar,
             onNavigate: ({ mode, ...context }) => navigate('assignments', context),
             reviewOnly: true,
-            onBackToClasswork: context => navigate('classes', context),
             onWordHuntReview: () => navigate('word-hunt-review')
         });
         return assignments;

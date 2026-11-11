@@ -1,5 +1,25 @@
 import { node, action, selectField } from './teacherAssignmentUi.js';
 
+export function createTeacherNoteButton(context, open, saved = false) {
+    const button = action('', open);
+    button.className = 'btn secondary-btn teacher-note-trigger';
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(icon.namespaceURI, 'path');
+    path.setAttribute('d', 'M5 3h14a1 1 0 0 1 1 1v16l-4-3H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm3 5h8m-8 4h6');
+    icon.append(path);
+    button.append(icon);
+    updateTeacherNoteButton(button, context, saved);
+    return button;
+}
+
+export function updateTeacherNoteButton(button, context, saved) {
+    button.dataset.hasNote = String(saved);
+    button.title = `Teacher note for ${context}${saved ? ' (saved)' : ''}`;
+    button.setAttribute('aria-label', button.title);
+}
+
 // Shared by the student profile and class assignment review. Notes are teacher-only.
 export function createStudentFeedbackEditor({ repository, assignmentId, studentId, activityType = '', kind,
     responseRevision = null, feedback = null, isCurrent = () => true, onSaved = () => {} }) {
