@@ -29,6 +29,7 @@ export async function loadStudentInsight(manager, studentId, schoolYear = manage
         && (manager.studentProgressSessionGeneration || 0) === session
         && manager.getSelectedTeacherClassId?.() === classId;
     await import('../css/teacher-student-feedback.css');
+    await import('../css/teacher-assignments.css');
     await import('../css/teacher-student-dashboard.css');
     if (!current()) return;
     const repository = manager.classroomRepository || classroomRepository;
