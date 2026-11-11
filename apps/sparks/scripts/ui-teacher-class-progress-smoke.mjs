@@ -119,6 +119,7 @@ try {
     const ben = page.getByRole('row').filter({ has: page.getByRole('button', { name: 'Ben', exact: true }) });
     assert.match(await ben.textContent(), /4 \/ 10.*40%.*2/);
     await page.locator('.class-progress-filter-menu > summary').click();
+    assert.ok(await page.getByLabel('Unfinished only').evaluate(el=>el.closest('label').getBoundingClientRect().height>=44), 'Checkbox label has a full touch target');
     await page.getByLabel('Unfinished only').check();
     assert.equal(await page.getByRole('button', { name: 'Cara', exact: true }).count(), 0);
     await page.getByLabel('Unfinished only').uncheck();
@@ -155,6 +156,8 @@ try {
     await page.getByText('Complete', { exact: true }).waitFor();
     await page.evaluate(async () => { await document.fonts.ready; window.scrollTo(0, 0); });
     await page.screenshot({ path: '/tmp/sparks-trimester-progress-desktop.png', fullPage: true, animations: 'disabled' });
+    await page.setViewportSize({ width: 320, height: 844 });
+    assert.ok(await page.getByRole('button', { name: 'Ben', exact: true }).evaluate(el=>el.getBoundingClientRect().height>=44), 'Student names have a full mobile touch target');
     await page.setViewportSize({ width: 390, height: 844 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await page.screenshot({ path: '/tmp/sparks-trimester-progress-mobile.png', fullPage: true, animations: 'disabled' });

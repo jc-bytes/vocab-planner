@@ -17,7 +17,7 @@
 .class-progress-filter-menu > summary::after { content: '⌄'; margin-left: .65rem; color: var(--color-text-muted); }
 .class-progress-filter-menu[open] > summary { background: var(--color-surface-subtle); }
 .class-progress-filter-body { position: absolute; z-index: 5; top: calc(100% + .5rem); right: 0; display: grid; gap: 1rem; width: 15rem; max-width: calc(100vw - 3rem); padding: 1rem; border: 1px solid var(--color-border); border-radius: .65rem; background: var(--color-surface-container-high, #222a3d); box-shadow: 0 .5rem 1.5rem rgb(0 0 0 / .2); }
-.classrooms .class-progress label.class-progress-unfinished { display: flex; align-items: center; gap: .6rem; font-size: .85rem; }
+.classrooms .class-progress label.class-progress-unfinished { display: flex; min-height: var(--touch-target, 2.75rem); align-items: center; gap: .6rem; font-size: .85rem; }
 .classrooms .class-progress input[type="checkbox"] { appearance: auto; width: 1rem; height: 1rem; min-height: 1rem; flex: 0 0 1rem; padding: 0; margin: 0; accent-color: var(--primary-color, #818cf8); }
 .classrooms .class-progress [hidden] { display: none; }
 .class-progress-caption { margin: 0; color: var(--color-text-muted); font-size: .8rem; }
@@ -29,7 +29,7 @@
 .classrooms .class-progress th:first-child { padding-left: 0; }
 .classrooms .class-progress td:last-child { padding-right: 0; }
 .classrooms .class-progress thead th { padding-top: 0; padding-bottom: .65rem; font-size: .75rem; font-weight: 500; color: var(--color-text-muted); }
-.classrooms .class-progress .class-table-link { min-height: 2rem; padding: 0; font-weight: 600; text-decoration: none; text-align: left; color: var(--color-text); }
+.classrooms .class-progress .class-table-link { min-height: var(--touch-target, 2.75rem); padding: 0; font-weight: 600; text-decoration: none; text-align: left; color: var(--color-text); }
 .classrooms .class-progress .class-table-link:hover { color: var(--color-primary, #b9c8ff); text-decoration: underline; }
 .class-progress-numbers { display: flex; justify-content: space-between; align-items: baseline; gap: .75rem; font-variant-numeric: tabular-nums; font-size: .8rem; }
 .class-progress-tasks { color: var(--color-text-muted); }
