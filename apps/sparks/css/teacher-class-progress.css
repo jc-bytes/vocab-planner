@@ -1,9 +1,9 @@
 .classrooms .class-progress { display: grid; gap: 1rem; min-width: 0; }
 .class-progress-heading h3 { margin: 0; font-size: 1.25rem; font-weight: 650; letter-spacing: -.025em; }
 .class-progress-heading p { margin: .25rem 0 0; color: var(--color-text-muted); font-size: .85rem; }
-.classrooms .class-progress .class-directory-filters { display: grid; grid-template-columns: minmax(9rem, 11rem) minmax(12rem, 22rem) max-content; justify-content: start; align-items: end; gap: .75rem; margin: 0; padding: .25rem 0 1rem; border-bottom: 1px solid var(--color-border); }
-.class-progress .class-directory-filters > .compact-table-filter { order: 1; }
-.class-progress .class-progress-search-label { order: 2; }
+.classrooms .class-progress .class-directory-filters { display: flex; flex-wrap: wrap; justify-content: start; align-items: end; gap: .75rem; margin: 0; padding: .25rem 0 1rem; border-bottom: 1px solid var(--color-border); }
+.class-progress .class-directory-filters > .compact-table-filter { order: 1; flex: 1 1 9rem; }
+.class-progress .class-progress-search-label { order: 2; flex: 2 1 12rem; }
 .class-progress .class-progress-filter-menu { order: 3; }
 .class-progress .class-progress-date { order: 4; }
 .class-progress .class-directory-filters > button { order: 5; }
@@ -53,9 +53,9 @@
 @media (max-width: 600px) {
     .classrooms.class-detail:has(> .class-progress) > .class-detail-header { flex-wrap: nowrap; gap: .65rem; }
     .classrooms.class-detail:has(> .class-progress) > .class-detail-header .class-detail-title { order: 0; flex: 1 1 auto; }
-    .classrooms .class-progress .class-directory-filters { grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; }
+    .classrooms .class-progress .class-directory-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
     .classrooms .class-progress .class-progress-search-label { grid-column: 1 / -1; order: 3; }
-    .class-progress .class-progress-filter-menu { order: 2; }
+    .class-progress .class-progress-filter-menu { order: 1; }
     .classrooms .class-progress .class-progress-date { order: 4; grid-column: 1 / -1; }
     .class-progress .class-directory-filters > button { grid-column: 1 / -1; }
     .class-progress-heading h3 { font-size: 1.1rem; }

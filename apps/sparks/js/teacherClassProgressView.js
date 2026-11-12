@@ -1,5 +1,5 @@
 import { compactFilter } from './compactAssignmentControls.js';
-import { defaultProgressPeriod, normalizeProgressContext, progressTerms, validProgressRange, progressPresentation } from './teacherClassProgressModel.js';
+import { defaultProgressPeriod, normalizeProgressContext, progressTerms, validProgressRange, progressPresentation, progressMonths, progressActivities } from './teacherClassProgressModel.js';
 import '../css/teacher-class-progress.css';
 
 const node = (tag, text, className) => {
@@ -12,16 +12,15 @@ const node = (tag, text, className) => {
 export async function mountClassProgress({ root, active, roster, calendar, timeZone, repository, signal, isCurrent, initial, onStateChange, onStudent, actions, invitationsHost, studentActions }) {
     let state = normalizeProgressContext(initial || defaultProgressPeriod(calendar, active.school_year, timeZone));
     const terms = progressTerms(calendar, active.school_year);
-    if (state.period !== 'custom') {
-        const term = terms.find(term => term.period === state.period);
-        state = { ...state, from: term?.from || '', to: term?.to || '' };
-    }
     const section = node('section', undefined, 'class-directory class-progress');
     section.setAttribute('aria-label', 'Trimester progress');
     const filters = node('div', undefined, 'class-directory-filters');
     const period = compactFilter(filters, 'Period', [...terms.map(term => [term.period, `Trimester ${term.period}`]), ['custom', 'Custom dates']]);
     if (!terms.some(term => term.period === state.period)) state.period = 'custom';
     period.value = state.period;
+    const month = compactFilter(filters, 'Month', [['', 'All months']]);
+    const activity = compactFilter(filters, 'Activity', [['', 'All activities'], ...progressActivities]);
+    activity.value = state.activity;
     function dateInput(label, value) {
         const wrapper = node('label', label, 'class-progress-date'), input = node('input'); input.type = 'date'; input.required = true; input.value = value;
         input.setAttribute('aria-label', label); wrapper.append(input); filters.append(wrapper); return input;
@@ -53,6 +52,14 @@ export async function mountClassProgress({ root, active, roster, calendar, timeZ
     let rows = rosterRows, loading = false, available = false, request = 0, readController;
     const notify = () => { if (isCurrent()) onStateChange?.({ ...state }); };
     function syncDates() {
+        const term = terms.find(item => item.period === state.period);
+        const months = progressMonths(term);
+        const selected = months.find(item => item.id === state.month);
+        state.month = selected?.id || '';
+        month.replaceChildren(new Option('All months', ''), ...months.map(item => new Option(item.label, item.id)));
+        month.value = state.month;
+        month.parentElement.hidden = !term;
+        if (term) ({ from: state.from, to: state.to } = selected || term);
         from.disabled = to.disabled = state.period !== 'custom'; apply.hidden = state.period !== 'custom';
         from.parentElement.hidden = to.parentElement.hidden = state.period !== 'custom';
         from.value = state.from; to.value = state.to;
@@ -123,7 +130,7 @@ export async function mountClassProgress({ root, active, roster, calendar, timeZ
         if (signal.aborted || !isCurrent()) return;
         loading = true; section.setAttribute('aria-busy', 'true'); message.textContent = 'Loading progress…'; render(); notify();
         try {
-            const result = await repository.classProgress(active.id, state.from, state.to, { signal: readController.signal });
+            const result = await repository.classProgress(active.id, state.from, state.to, { signal: readController.signal, ...(state.activity ? { activity: state.activity } : {}) });
             if (token !== request || signal.aborted || !isCurrent()) return;
             if (!Array.isArray(result)) throw new Error('Invalid progress response.');
             const summaries = new Map(result.map(summary => [summary.studentId, summary]));
@@ -139,10 +146,15 @@ export async function mountClassProgress({ root, active, roster, calendar, timeZ
         }
     }
     period.addEventListener('change', () => {
-        state.period = period.value; state.offset = 0; state.scroll = 0;
-        const term = terms.find(term => term.period === state.period);
-        if (term) { state.from = term.from; state.to = term.to; }
-        syncDates(); void load();
+        state.period = period.value; state.month = ''; state.activity = ''; activity.value = '';
+        state.offset = 0; state.scroll = 0; syncDates(); void load();
+    });
+    month.addEventListener('change', () => {
+        state.month = month.value; state.activity = ''; activity.value = '';
+        state.offset = 0; state.scroll = 0; syncDates(); void load();
+    });
+    activity.addEventListener('change', () => {
+        state.activity = activity.value; state.offset = 0; state.scroll = 0; void load();
     });
     apply.addEventListener('click', () => {
         if (!from.reportValidity() || !to.reportValidity()) return;

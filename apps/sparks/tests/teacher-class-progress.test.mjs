@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { schoolDay, defaultProgressPeriod, assignmentInProgressPeriod, progressPresentation, normalizeProgressContext, readProgressContext, writeProgressContext } from '../js/teacherClassProgressModel.js';
+import { schoolDay, defaultProgressPeriod, assignmentInProgressPeriod, progressPresentation, normalizeProgressContext, progressMonths, readProgressContext, writeProgressContext } from '../js/teacherClassProgressModel.js';
 import { installTeacherRoutingMethods } from '../js/teacherRouting.js';
 import { installTeacherClassSelectionMethods } from '../js/teacherClassSelection.js';
 
@@ -13,6 +13,13 @@ test('period defaults use school dates and custom dates include the full end day
     assert.equal(assignmentInProgressPeriod({ releaseAt: '2026-04-02T05:00Z' }, range, 'America/Panama'), false);
     assert.equal(assignmentInProgressPeriod({ releaseAt: '2026-04-01' }, { from: 'bad', to: '2026-04-01' }, 'UTC'), false);
     assert.equal(defaultProgressPeriod(null, 2026, 'UTC').period, 'custom');
+});
+test('months are clipped to trimester edges, including February in a leap year', () => {
+    assert.deepEqual(progressMonths({ from: '2024-01-22', to: '2024-03-08' }), [
+        { id: '2024-01', label: 'January', from: '2024-01-22', to: '2024-01-31' },
+        { id: '2024-02', label: 'February', from: '2024-02-01', to: '2024-02-29' },
+        { id: '2024-03', label: 'March', from: '2024-03-01', to: '2024-03-08' }
+    ]);
 });
 test('bar bands change at 20% and never call unfinished or unknown work complete', () => {
     for (const [completed, band] of [[0, '0'], [19, '0'], [20, '1'], [39, '1'], [40, '2'], [60, '3'], [80, '4'], [100, '4']]) {
@@ -27,7 +34,7 @@ test('bar bands change at 20% and never call unfinished or unknown work complete
 test('summary and student routes preserve period and return context through class resolution', () => {
     class Manager {} installTeacherRoutingMethods(Manager); installTeacherClassSelectionMethods(Manager);
     const manager = new Manager(); manager.selectTeacherClass = () => {}; manager.getSelectedTeacherClassId = () => 'class-a';
-    const progressContext = normalizeProgressContext({ period: 'custom', from: '2026-03-31', to: '2026-04-01', search: 'Ana & Ben', sort: 'completion-asc', unfinished: true, offset: 25, scroll: 200 });
+    const progressContext = normalizeProgressContext({ period: '1', month: '2026-03', activity: 'flashcards', from: '2026-03-01', to: '2026-03-31', search: 'Ana & Ben', sort: 'completion-asc', unfinished: true, offset: 25, scroll: 200 });
     for (const route of [{ view: 'students', classId: 'class-a', progressContext }, { view: 'student-profile', studentId: 'student-a', classId: 'class-a', tab: 'assigned', progressContext }]) {
         assert.deepEqual(manager.parseRoute(manager.buildRoute(route)), route);
         assert.deepEqual(manager.resolveTeacherClassRoute(route), route);

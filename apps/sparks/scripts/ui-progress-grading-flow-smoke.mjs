@@ -52,9 +52,17 @@ try {
     await teacher.route(`${teacherBackend}teacher_class_progress_v1`, route => {
         const args = route.request().postDataJSON();
         assert.equal(args.p_school_id, teacherIds.school); assert.equal(args.p_class_id, teacherIds.class);
-        assert.equal(args.p_from, '2026-09-01'); assert.equal(args.p_to, '2026-12-31');
+        assert.ok([['2026-09-01','2026-12-31'], ['2026-10-01','2026-10-31']]
+            .some(([from, to]) => args.p_from === from && args.p_to === to));
         return failProgress ? reply(route, { message: 'Controlled progress read failure' }, 503)
             : reply(route, [{ studentId: teacherIds.student, required: 2, completed: 1, review: 0, unknown: 0 }]);
+    });
+    await teacher.route(`${teacherBackend}teacher_class_progress_v2`, route => {
+        assert.deepEqual(route.request().postDataJSON(), {
+            p_school_id: teacherIds.school, p_class_id: teacherIds.class,
+            p_from: '2026-10-01', p_to: '2026-10-31', p_activity_type: 'flashcards'
+        });
+        return reply(route, [{ studentId: teacherIds.student, required: 1, completed: 1, review: 0, unknown: 0 }]);
     });
     await teacher.route(`${teacherBackend}teacher_class_gradebook_v1`, route => failGrades
         ? reply(route, { message: 'Controlled gradebook read failure' }, 503)
@@ -81,6 +89,17 @@ try {
     assert.match(new URL(teacher.url()).hash, /display=progress/);
     await teacher.reload(); await settledTeacher(teacher);
     await teacher.getByRole('table', { name: 'Required work completion' }).waitFor();
+    const progress = teacher.getByRole('region', { name: 'Trimester progress' });
+    await progress.getByLabel('Month', { exact: true }).selectOption('2026-10');
+    await progress.getByLabel('Activity', { exact: true }).selectOption('flashcards');
+    await progress.getByText('1 / 1 tasks', { exact: true }).waitFor();
+    await teacher.reload(); await settledTeacher(teacher);
+    await progress.getByText('1 / 1 tasks', { exact: true }).waitFor();
+    assert.equal(await progress.getByLabel('Month', { exact: true }).inputValue(), '2026-10');
+    assert.equal(await progress.getByLabel('Activity', { exact: true }).inputValue(), 'flashcards');
+    await teacher.setViewportSize({ width: 320, height: 844 });
+    assert.equal(await noOverflow(teacher), true, 'progress filters fit at 320px');
+    await teacher.setViewportSize({ width: 1440, height: 1000 });
     await teacher.getByRole('button', { name: 'Grades', exact: true }).click();
     let table = teacher.getByRole('table', { name: 'Class vocabulary grades' });
     await table.waitFor();

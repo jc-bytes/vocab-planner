@@ -26,6 +26,7 @@ try {
         ['20261006022529_student_insight_teacher_reads.sql', "select to_regprocedure('public.teacher_student_attempts_v1(uuid,uuid,uuid,text,integer,integer)') is not null"],
         ['20261006025409_student_feedback_teacher_review.sql', "select to_regclass('private.student_assignment_feedback') is not null"],
         ['20261104043424_class_trimester_progress.sql', "select to_regprocedure('public.teacher_class_progress_v1(uuid,uuid,date,date)') is not null"],
+        ['20261112014455_class_progress_activity_filter.sql', "select to_regprocedure('public.teacher_class_progress_v2(uuid,uuid,date,date,text)') is not null"],
         ['20261104045454_vocabulary_grading_and_gradebook.sql', "select to_regprocedure('public.teacher_class_gradebook_v1(uuid,uuid,date,date)') is not null"]
     ];
     for (const [name, present] of migrations) {
@@ -36,6 +37,7 @@ try {
     sql(database, readFileSync(new URL('../supabase/migrations/20261015191054_optimize_teacher_dashboard_analytics.sql', import.meta.url), 'utf8'), migrationOwner);
     sql(database, 'create extension if not exists plpgsql_check schema extensions;');
     for (const signature of [
+        'private.teacher_class_progress_v2(uuid,uuid,date,date,text)',
         'private.normalize_vocabulary_grading_v1(jsonb)',
         'private.vocabulary_assignment_grade_v1(uuid,uuid,jsonb)',
         'private.teacher_class_gradebook_v1(uuid,uuid,date,date)',
