@@ -32,7 +32,7 @@ try {
                 const route = location.hash;
                 const rows = await teacherApp.getStudentRosterData();
                 return { ids: rows.map(row => row.id), same: rows === teacherApp.allStudentData, route, after: location.hash,
-                    createDisabled: document.querySelector('#create-student-account-btn').disabled, resetDisabled: document.querySelector('#reset-student-password-btn').disabled };
+                    createDisabled: document.querySelector('#create-student-account-btn').disabled, resetDisabled: !document.querySelector('#reset-student-password-btn:not([disabled])') };
             });
             assert.deepEqual(result.ids, [ids.student]); assert.equal(result.same, true); assert.equal(result.route, result.after);
             assert.equal(result.createDisabled, true); assert.equal(result.resetDisabled, true);

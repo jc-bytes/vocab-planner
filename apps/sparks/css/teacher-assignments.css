@@ -56,3 +56,7 @@
     .assignment-details-metadata { grid-template-columns: minmax(0, 1fr); gap: 4px; }
     .assignment-details-metadata dd { margin-bottom: 12px; }
 }
+
+.assignment-workspace .assignment-list-return { width: fit-content; justify-self: start; margin: 0; }
+.published-vocabulary-terms dd { margin: .2rem 0 .75rem; overflow-wrap: anywhere; }
+.published-vocabulary-terms dt { font-weight: 650; }

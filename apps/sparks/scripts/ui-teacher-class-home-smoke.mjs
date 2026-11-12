@@ -117,8 +117,16 @@ try {
  assert.equal(await review.getByRole('button',{name:'Assign material',exact:true}).count(),0);
  assert.equal(await review.getByRole('tab',{name:'Scheduled',exact:true}).count(),0);
  await page.locator('#tab-classes').click();await classroom.getByText('Vocabulary B',{exact:true}).waitFor();
+ const toolbarPositions=await classroom.locator('.class-directory-toolbar').evaluate(el=>{
+  const search=el.querySelector('input').getBoundingClientRect();
+  return [...el.querySelectorAll('button')].map(button=>Math.abs(button.getBoundingClientRect().top-search.top)<3);
+ });
+ assert.ok(toolbarPositions.every(Boolean),'Search, filters and assign share the desktop toolbar row');
+ await page.screenshot({path:`${output}/classwork-desktop.png`,animations:'disabled'});
  await classroom.getByRole('button',{name:'Review work Vocabulary B',exact:true}).click();
- await review.getByRole('button',{name:'Back to Classwork',exact:true}).click();
+ await review.getByRole('heading',{name:'Vocabulary B',exact:true}).waitFor();
+ assert.equal(await review.getByRole('button',{name:'Back to Classwork',exact:true}).count(),0);
+ await page.locator('#tab-classes').click();
  await classroom.getByText('Vocabulary B',{exact:true}).waitFor();
  await classroom.getByRole('button',{name:'Assign material',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Assign material',exact:true});
  await dialog.locator('input[name=classIds]:checked').waitFor();assert.deepEqual(await dialog.locator('input[name=classIds]:checked').evaluateAll(nodes=>nodes.map(n=>n.value)),['b']);

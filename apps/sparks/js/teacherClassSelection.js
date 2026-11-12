@@ -53,7 +53,7 @@ export function installTeacherClassSelectionMethods(TeacherManager, { sessionKey
             if (!select) return;
             const selected = this.getSelectedTeacherClassId();
             this.teacherClassOptions = classes;
-            select.replaceChildren(new Option('Choose a class', ''));
+            select.replaceChildren(new Option('All classes', ''));
             for (const classroom of classes.filter(c => !c.archived || c.id === selected)) {
                 select.add(new Option(`${classroom.name} · ${classroom.subject?.name || 'Subject'} · ${classroom.school_year}${classroom.archived ? ' · Archived' : ''}`, classroom.id));
             }

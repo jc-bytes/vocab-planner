@@ -184,13 +184,14 @@ class TeacherStudentProgressRenderMethods {
         this.studentProgressPeriod = gradebookContext || progressContext || null;
         this.studentGradebookReturn = gradebookContext || null;
         const backButton = $('#student-profile-back-btn');
-        if (backButton) backButton.textContent = gradebookContext ? 'Back to grades' : progressContext ? 'Back to trimester progress' : 'Back to Students';
+        if (backButton) backButton.textContent = gradebookContext ? 'Back to grades' : 'Back to Students';
         const classId = this.getSelectedTeacherClassId?.();
         const navigation = this.captureTeacherNavigation?.();
         const generation = this.studentProgressSessionGeneration || 0;
         const request = (this.studentProfileRequest || 0) + 1;
         this.studentProfileRequest = request;
         this.studentInsightRequest = (this.studentInsightRequest || 0) + 1;
+        this.closeStudentInsightDialog?.();
         this.studentDashboardCharts?.dispose();
         this.studentDashboardCharts = null;
         $('#student-profile-assigned-work')?.replaceChildren();

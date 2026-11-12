@@ -20,7 +20,7 @@ try {
   manager.ensureAuthenticated=()=>true;manager.switchView=()=>{};manager.updateCoinStatus=()=>{};manager.refreshIcons=()=>{};manager.setRoute=()=>{};
   manager.ensureStudentProgressDetail=async seed=>({...seed,progressDetailLoaded:true});
   supabaseService.getProfile=async()=>({name:'Alex Rivera',email:'alex@example.test',grade:'8',group:'B'});
-  const common={enrolled:true,schoolYear:new Date().getFullYear(),className:'Technology 8B',releaseAt:'2026-01-01',dueAt:'2026-01-02',kind:'vocabulary',content:{activitySettings:{requiredActivities:['quiz','matching']}}};
+  const common={enrolled:true,schoolYear:new Date().getFullYear(),className:'Technology 8B',releaseAt:'2026-01-01',dueAt:'2026-01-02',kind:'vocabulary',content:{words:[{word:'Phishing',definition:'A deceptive message'}],activitySettings:{requiredActivities:['quiz','matching']}}};
   const assignments=[{...common,id:'vocab',title:'Online safety',progress:[{activity_type:'quiz',score:40,verified:true,is_complete:false,finished_runs:3,latestAttempt:{finishedAt:'2026-10-01',accuracy:40,score:40,attemptedActions:5,metricLabel:'correct answers',activeSeconds:90,timeLimitSeconds:60,isLate:true}}]},
    {...common,id:'reading',kind:'spark',title:'Suspicious messages',content:{checkMode:'required',questions:[{id:'q1',type:'multiple_choice',prompt:'What would you do?',options:['Verify the sender','Click immediately']},{id:'q2',type:'short_text',prompt:'Why?'}]},response:{submitted_at:'2026-10-01',revision:1,answers:{q1:0,q2:'<script>unsafe</script> I would verify the sender.'},evaluation:{automaticTotal:1,correct:1,needsTeacherReview:true,isComplete:true}},progress:[]},
    {...common,id:'future',title:'Next week',releaseAt:'2099-01-01',progress:[]}];
@@ -107,37 +107,54 @@ try {
  await page.getByRole('button',{name:'Open these attempts',exact:true}).click();
  await page.getByText('Student: A safe link',{exact:false}).waitFor();
  assert.match(await page.locator('#student-insight-attempts').innerText(),/1:30 foreground time/);
+ await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
  await page.locator('#student-insight-filter').selectOption('all');
+ const reading=page.locator('[data-assignment-card="reading"]');
+ await reading.locator('summary').first().click();
  assert.match(await page.locator('#student-insight-summary').innerText(),/0 of 3 required tasks completed/);
  assert.match(await page.locator('#student-profile-assigned-work').innerText(),/Needs review/);
  assert.match(await page.locator('#student-profile-assigned-work').innerText(),/Verify the sender/);
  assert.equal(await page.locator('#student-profile-assigned-work script').count(),0);
- const reading=page.locator('.student-insight-assignment').filter({has:page.getByRole('heading',{name:'Suspicious messages',exact:true})});
- await reading.locator('textarea[name="teacher-note"]').fill('Explain why the sender needs checking. <img src=x>');
- await reading.locator('select[name="review-status"]').selectOption('reviewed');
- await reading.getByRole('button',{name:'Save teacher note',exact:true}).click();
- await reading.getByText('Teacher note saved.',{exact:true}).waitFor();
+ await reading.getByRole('button',{name:'Teacher note for Suspicious messages',exact:true}).click();
+ const noteDialog=page.getByRole('dialog',{name:'Teacher note for Suspicious messages',exact:true});
+ await noteDialog.locator('textarea[name="teacher-note"]').fill('Explain why the sender needs checking. <img src=x>');
+ await noteDialog.locator('select[name="review-status"]').selectOption('reviewed');
+ await noteDialog.getByRole('button',{name:'Save teacher note',exact:true}).click();
+ await noteDialog.getByText('Teacher note saved.',{exact:true}).waitFor();
  assert.match(await page.locator('#student-insight-summary').innerText(),/1 of 3 required tasks completed/);
  assert.equal(await reading.locator('[data-reading-status]').innerText(),'Completed');
  assert.match(await page.locator('.student-dashboard-graph-values').innerText(),/1 of 1 complete · 0 still to do · 0 for review/);
  await page.evaluate(()=>{window.insightFixture.manager.classroomRepository.conflict=true;});
- await reading.locator('textarea').fill('Unsaved draft must survive a conflict.');
- await reading.getByRole('button',{name:'Save teacher note',exact:true}).click();
- await reading.getByText('This review changed.',{exact:false}).waitFor();
- assert.equal(await reading.locator('textarea').inputValue(),'Unsaved draft must survive a conflict.');
+ await noteDialog.locator('textarea').fill('Unsaved draft must survive a conflict.');
+ await noteDialog.getByRole('button',{name:'Save teacher note',exact:true}).click();
+ await noteDialog.getByText('This review changed.',{exact:false}).waitFor();
+ assert.equal(await noteDialog.locator('textarea').inputValue(),'Unsaved draft must survive a conflict.');
  await page.evaluate(()=>{window.insightFixture.manager.classroomRepository.conflict=false;});
- await reading.getByRole('button',{name:'Load saved note',exact:true}).click();
- await reading.getByText('Loaded saved note.',{exact:false}).waitFor();
- assert.match(await reading.locator('textarea').inputValue(),/Explain why/);
- await reading.getByRole('button',{name:'View latest 20 note revisions',exact:true}).click();
- await reading.locator('.student-feedback-history').waitFor();
- assert.equal(await reading.locator('.student-feedback-history img').count(),0);
+ await noteDialog.getByRole('button',{name:'Load saved note',exact:true}).click();
+ await noteDialog.getByText('Loaded saved note.',{exact:false}).waitFor();
+ assert.match(await noteDialog.locator('textarea').inputValue(),/Explain why/);
+ await noteDialog.getByRole('button',{name:'View latest 20 note revisions',exact:true}).click();
+ await noteDialog.locator('.student-feedback-history').waitFor();
+ await page.screenshot({path:'/tmp/sparks-teacher-note-dialog.png',animations:'disabled'});
+ assert.equal(await noteDialog.locator('.student-feedback-history img').count(),0);
  await page.evaluate(async()=>{const f=window.insightFixture;f.assignments.find(a=>a.id==='reading').response.revision=2;await f.manager.showStudentProfileById('student',{tab:'assigned'});});
+ await reading.locator('summary').first().click();
  assert.equal(await reading.locator('[data-reading-status]').innerText(),'Needs review');
- assert.match(await reading.locator('.student-feedback-editor').innerText(),/different submission revision/);
+ await reading.getByRole('button',{name:'Teacher note for Suspicious messages (saved)',exact:true}).click();
+ assert.match(await noteDialog.locator('.student-feedback-editor').innerText(),/different submission revision/);
  // Restore the original unresolved reading so the remaining profile checks keep their original denominator.
  await page.evaluate(async()=>{const f=window.insightFixture;const a=f.assignments.find(a=>a.id==='reading');a.response.revision=1;a.feedback=[];await f.manager.showStudentProfileById('student',{tab:'assigned'});});
 
+ await page.locator('[data-assignment-card="vocab"] summary').first().click();
+ await page.locator('[data-insight-vocabulary="vocab"]').click();
+ const vocabularyDialog=page.getByRole('dialog',{name:'Online safety',exact:true});
+ assert.equal(await vocabularyDialog.evaluate(el=>getComputedStyle(el).paddingTop),'24px','A direct profile visit loads dialog styles');
+ const modalBounds=await vocabularyDialog.boundingBox();
+ assert.ok(Math.abs(modalBounds.x*2+modalBounds.width-1440)<3,'Vocabulary dialog is centered');
+
+ await vocabularyDialog.getByText('Phishing',{exact:true}).waitFor();
+ await page.screenshot({path:'/tmp/sparks-teacher-vocabulary-dialog.png',animations:'disabled'});
+ await vocabularyDialog.getByRole('button',{name:'Close',exact:true}).click();
  await page.locator('[data-insight-activity="quiz"]').first().click();
  await page.getByText('Student: A safe link',{exact:false}).waitFor();
  assert.match(await page.locator('#student-insight-attempts').innerText(),/Expected: A deceptive message/);
@@ -145,6 +162,7 @@ try {
  await page.getByRole('button',{name:'More attempts',exact:true}).click();
  await page.getByText('Partial capture: some evidence may be unavailable').waitFor();
  assert.match(await page.locator('#student-insight-attempts').innerText(),/Time unavailable/);
+ await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
  await page.locator('#student-insight-filter').selectOption('overdue');
  assert.equal(await page.locator('.student-insight-assignment').count(),1);
  await page.screenshot({path:'/tmp/sparks-student-insight-desktop.png',fullPage:true});
@@ -153,8 +171,12 @@ try {
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),'mobile must not overflow horizontally');
  const feedbackFilters=await page.evaluate(async()=>{
   const f=window.insightFixture,repository=f.manager.classroomRepository;
-  const filter=value=>{const select=document.querySelector('#student-insight-filter');select.value=value;select.dispatchEvent(new Event('change'));};
-  const editor=()=>document.querySelector('[data-feedback-assignment="vocab"] .student-feedback-editor');
+  const filter=value=>{
+   document.querySelector('dialog[open] .modal-footer button')?.click();
+   const select=document.querySelector('#student-insight-filter');select.value=value;select.dispatchEvent(new Event('change'));
+   document.querySelector('[data-feedback-assignment="vocab"] .teacher-note-trigger')?.click();
+  };
+  const editor=()=>document.querySelector('dialog[open] .student-feedback-editor');
   const button=root=>[...root.querySelectorAll('button')].find(b=>b.textContent==='Save teacher note');
   const flush=()=>new Promise(resolve=>setTimeout(resolve,0));
   filter('all');const originalEditor=editor();originalEditor.querySelector('textarea').value='Unsent insight draft';
@@ -183,7 +205,7 @@ try {
   const failed=document.querySelector('#student-profile-assigned-work').textContent.includes('could not be loaded');
   f.setFailure(false);document.querySelector('#student-insight-retry').click();return {staleIgnored,failed};
  });assert.deepEqual(checks,{staleIgnored:true,failed:true});
- await page.getByText('Required work includes vocabulary activities and reading checks.',{exact:false}).waitFor();
+ await page.locator('#student-insight-filter').waitFor();
  const periodChecks=await page.evaluate(async()=>{
   const {loadStudentInsight}=await import('/js/teacherStudentInsightView.js');const f=window.insightFixture;
   f.manager.studentProgressPeriod={period:'custom',from:'2026-01-01',to:'2026-01-01'};

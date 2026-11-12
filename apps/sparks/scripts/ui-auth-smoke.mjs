@@ -145,7 +145,7 @@ try {
     if (!(await teacherPage.locator('#detail-student-name').innerText()).includes('Audit')) {
         throw new Error('The enrolled audit student profile did not render from the real backend.');
     }
-    if (!await teacherPage.locator('#reset-student-password-btn').isDisabled()) {
+    if (await teacherPage.locator('#reset-student-password-btn:not([disabled])').count()) {
         throw new Error('The legacy password-reset control became enabled in the profile.');
     }
 

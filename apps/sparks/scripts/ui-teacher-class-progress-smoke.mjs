@@ -86,11 +86,10 @@ try {
         await window.progressWorkspace.show({ classId: 'class-a', tab: 'students' });
         return result;
     });
-    assert.deepEqual(isolatedReads.progress, { calls: ['calendar', 'progress', 'roster'], progress: true, grades: false, error: false, retry: false, busy: 'false' });
+    assert.deepEqual(isolatedReads.progress, { calls: ['calendar', 'invitations', 'progress', 'roster'], progress: true, grades: false, error: false, retry: false, busy: 'false' });
     assert.deepEqual(isolatedReads.grades, { calls: ['calendar', 'gradebook'], progress: false, grades: true, error: false, retry: false, busy: 'false' });
-    assert.deepEqual(isolatedReads.roster.calls, ['invitations', 'roster']);
-    assert.equal(isolatedReads.rosterFailure.error, true, 'Roster retains its invitation error and retry behavior.');
-    assert.equal(isolatedReads.rosterFailure.retry, true, 'The safe Roster recovery still offers an in-place retry.');
+    assert.deepEqual(isolatedReads.roster, isolatedReads.progress);
+    assert.deepEqual(isolatedReads.rosterFailure, isolatedReads.progress, 'An invitation failure must leave the roster and progress available.');
 
     const obsoleteRoster = await page.evaluate(async () => {
         window.progressReadCalls = []; window.holdProgressRoster = true; window.resolveProgressRoster = null;
@@ -109,9 +108,8 @@ try {
         await window.progressWorkspace.show({ classId: 'class-a', tab: 'students' });
         return result;
     });
-    assert.deepEqual(obsoleteRoster, { aborted: true, tabsWhileLoading: ['Roster', 'Trimester progress', 'Grades'], busyWhileLoading: 'true',
+    assert.deepEqual(obsoleteRoster, { aborted: true, tabsWhileLoading: ['Progress', 'Grades'], busyWhileLoading: 'true',
         calls: ['calendar', 'calendar', 'gradebook', 'roster'], grades: true, progress: false, staleText: false });
-    await page.getByRole('button', { name: 'Trimester progress', exact: true }).click();
     await page.getByRole('table', { name: 'Required work completion' }).getByText('Complete', { exact: true }).waitFor();
     assert.equal(await page.locator('progress[data-band="0"]').count(), 1);
     assert.equal(await page.locator('progress[data-band="2"]').count(), 1);
@@ -121,31 +119,32 @@ try {
     const ben = page.getByRole('row').filter({ has: page.getByRole('button', { name: 'Ben', exact: true }) });
     assert.match(await ben.textContent(), /4 \/ 10.*40%.*2/);
     await page.locator('.class-progress-filter-menu > summary').click();
+    assert.ok(await page.getByLabel('Unfinished only').evaluate(el=>el.closest('label').getBoundingClientRect().height>=44), 'Checkbox label has a full touch target');
     await page.getByLabel('Unfinished only').check();
     assert.equal(await page.getByRole('button', { name: 'Cara', exact: true }).count(), 0);
     await page.getByLabel('Unfinished only').uncheck();
     await page.locator('.class-progress-filter-menu > summary').click();
     await page.getByLabel('Period', { exact: true }).selectOption('custom');
-    await page.getByLabel('Assigned from').fill('2026-03-31'); await page.getByLabel('Assigned through').fill('2026-04-01');
+    await page.getByLabel('Available from').fill('2026-03-31'); await page.getByLabel('Available through').fill('2026-04-01');
     await page.getByRole('button', { name: 'Apply dates', exact: true }).click();
-    await page.getByText(/Assigned between 2026-03-31 and 2026-04-01/).waitFor();
+    await page.getByText(/Work available from 2026-03-31 through 2026-04-01/).waitFor();
     assert.equal(await page.evaluate(() => window.progressCalls.at(-1).to), '2026-04-01');
-    await page.getByLabel('Search progress students').fill('Ben');
+    await page.getByLabel('Search students').fill('Ben');
     await page.getByRole('button', { name: 'Ben', exact: true }).click();
     const opened = await page.evaluate(() => window.openedProgressStudent);
-    assert.equal(opened.tab, 'assigned'); assert.equal(opened.progressContext.from, '2026-03-31'); assert.equal(opened.progressContext.search, 'Ben');
+    assert.equal(opened.tab, 'overview'); assert.equal(opened.progressContext.from, '2026-03-31'); assert.equal(opened.progressContext.search, 'Ben');
     await page.evaluate(async () => {
         window.progressWorkspace.hide();
         await window.progressWorkspace.show({ classId: 'class-a', tab: 'students', progressContext: window.openedProgressStudent.progressContext });
     });
-    assert.equal(await page.getByLabel('Search progress students').inputValue(), 'Ben');
-    await page.getByLabel('Search progress students').fill('');
+    assert.equal(await page.getByLabel('Search students').inputValue(), 'Ben');
+    await page.getByLabel('Search students').fill('');
     // A slow, obsolete range cannot overwrite a newer result, even if transport ignores abort.
     await page.evaluate(() => { window.holdProgress = true; });
     await page.getByLabel('Period', { exact: true }).selectOption('1');
     await page.waitForFunction(() => Boolean(window.resolveOldProgress));
     await page.getByLabel('Period', { exact: true }).selectOption('2');
-    await page.getByText(/Assigned between 2026-04-01 and 2026-06-30/).waitFor();
+    await page.getByText(/Work available from 2026-04-01 through 2026-06-30/).waitFor();
     await page.evaluate(() => window.resolveOldProgress([]));
     assert.equal(await page.getByRole('button', { name: 'Ben', exact: true }).count(), 1);
     await page.evaluate(() => { window.failProgress = true; });
@@ -157,6 +156,8 @@ try {
     await page.getByText('Complete', { exact: true }).waitFor();
     await page.evaluate(async () => { await document.fonts.ready; window.scrollTo(0, 0); });
     await page.screenshot({ path: '/tmp/sparks-trimester-progress-desktop.png', fullPage: true, animations: 'disabled' });
+    await page.setViewportSize({ width: 320, height: 844 });
+    assert.ok(await page.getByRole('button', { name: 'Ben', exact: true }).evaluate(el=>el.getBoundingClientRect().height>=44), 'Student names have a full mobile touch target');
     await page.setViewportSize({ width: 390, height: 844 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await page.screenshot({ path: '/tmp/sparks-trimester-progress-mobile.png', fullPage: true, animations: 'disabled' });

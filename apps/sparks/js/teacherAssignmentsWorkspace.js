@@ -6,7 +6,9 @@ import { assignmentTrimester, assignmentTrimesterLabel, assignmentTrimesterOptio
 import { classroomRepository } from './services/classroomRepository.js';
 import { node, action, selectField, createAssignmentDialog } from './teacherAssignmentUi.js';
 import { assignmentResultRows, assignmentStatus } from './teacherAssignmentResults.js';
-import { createStudentFeedbackEditor } from './teacherStudentFeedbackEditor.js';
+import { openPublishedMaterial } from './teacherPublishedMaterial.js';
+import { getActivityLabel } from './activityMetadata.js';
+import { createTeacherNoteButton, createStudentFeedbackEditor, updateTeacherNoteButton } from './teacherStudentFeedbackEditor.js';
 import { openAssignmentExport } from './teacherAssignmentExport.js';
 import '../css/teacher-assignments.css';
 import '../css/classrooms.css';
@@ -15,7 +17,7 @@ import { createClassWorkspaceLoading } from './classWorkspaceLoading.js';
 import { compactFilter, sortAssignments, assignmentDate, assignmentWhen, assignmentSortOptions, assignmentTypeOptions } from './compactAssignmentControls.js';
 import '../css/teacher-student-feedback.css';
 
-export function createTeacherAssignmentsWorkspace({ root, getUserId, repository = classroomRepository, onNavigate, onPublish, onWordHuntReview, reviewOnly = false, onBackToClasswork, getSchoolCalendar = async () => null }) {
+export function createTeacherAssignmentsWorkspace({ root, getUserId, repository = classroomRepository, onNavigate, onPublish, onWordHuntReview, reviewOnly = false, getSchoolCalendar = async () => null }) {
     let generation = 0, destroyed = false, controller, dialog;
     let context = { mode: 'assignments' }, studentFilter = '', stateOwner, restoreTabFocus = false;
     const defaults = () => ({ search: '', trimester: 'all', type: 'all', sort: 'release-desc', offset: 0, listTab: reviewOnly ? 'needs-review' : 'current' });
@@ -83,6 +85,12 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 }
                 details.body.append(metadata, node('p', 'This assignment uses the saved material published to this class. Editing Library does not change this copy.'));
 
+                if (assignment.kind === 'vocabulary') details.footer.append(action('View vocabulary', () => {
+                    if (!current(id, owner)) return;
+                    closeDialog();
+                    dialog = { close: openPublishedMaterial({ assignment, repository, signal: controller.signal, isCurrent: () => current(id, owner) }) };
+                }));
+
                 if (assignment.kind === 'vocabulary' && ownClass.canTeach === true) details.footer.append(action('Manage vocabulary publications', async () => {
                     if (!current(id, owner)) return;
                     const detail = await repository.readAssignment(assignment.id);
@@ -110,7 +118,12 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 if (!assignment) { status.textContent = 'This assignment is unavailable.'; return; }
                 const ownClass = classes.find(c => c.id === assignment.class_id);
                 if (!ownClass) { status.textContent = 'This class is unavailable.'; return; }
-                root.append(action(context.returnTo === 'classwork' && onBackToClasswork ? 'Back to Classwork' : reviewOnly ? 'Back to Review' : 'Back to assignments', () => context.returnTo === 'classwork' && onBackToClasswork ? onBackToClasswork({classId}) : navigate({ mode: 'assignments', classId, tab: listTab })), node('h3', assignment.title), node('p', classLabel(ownClass)));
+                if (context.returnTo !== 'classwork') {
+                    const back = action(reviewOnly ? 'All reviews' : 'Back to assignments', () => navigate({ mode: 'assignments', classId, tab: listTab }));
+                    back.className = 'btn text-btn assignment-list-return';
+                    root.append(back);
+                }
+                root.append(node('h3', assignment.title));
                 const detailTab = context.tab === 'details' ? 'details' : 'student-work';
                 tabs([['student-work', 'Student work'], ['details', 'Details']], detailTab, tab => navigate({ mode: 'assignments', classId, assignmentId, tab, listTab }), 'Assignment sections');
                 const panel = node('section'); panel.id = 'assignment-panel'; panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', `assignment-tab-${detailTab}`); root.append(panel);
@@ -133,6 +146,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                     if (people.some(([studentId]) => studentId === studentFilter)) student.value = studentFilter; else studentFilter = '';
                     const content = node('section');
                     const editors = new Map();
+                    let noteView = null, refreshReviewRows = false;
                     function renderRows() {
                         studentFilter = student.value;
                         const visible = rows.filter(r => (!studentFilter || r.studentId === studentFilter) && (reviewFilter?.value !== 'needs-review' || r.needsTeacherReview));
@@ -145,7 +159,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                                 if (row.automaticTotal !== '') card.append(node('p', `${row.score} of ${row.automaticTotal} automatic answers correct.`));
                                 const reviewNeeded = node('p', row.needsTeacherReview ? 'Written answers need teacher review.' : ''); reviewNeeded.dataset.reviewNeededStudent = row.studentId; card.append(reviewNeeded);
                                 if (row.updatedAt) card.append(node('p', new Date(row.updatedAt).toLocaleString()));
-                                card.append(editor(row));
+                                card.append(noteButton(row));
                                 content.append(card);
                             }
                         } else {
@@ -153,28 +167,54 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                             const head = node('thead'), heading = node('tr');
                             for (const text of ['Student', 'Activity', 'Status', 'Score', 'Accuracy', 'Teacher note']) { const cell = node('th', text); cell.scope = 'col'; heading.append(cell); }
                             head.append(heading); table.append(head); const body = node('tbody');
-                            for (const row of visible) { const tr = node('tr'); for (const value of [row.name, row.activity, row.status, row.score, row.accuracy]) tr.append(node('td', String(value))); const feedbackCell = node('td'); const general = feedback.find(f => f.student_id === row.studentId && f.activity_type === ''); if (row.activity && general?.note) feedbackCell.append(node('p', `Assignment note: ${general.note}`)); feedbackCell.append(editor(row)); tr.append(feedbackCell); body.append(tr); }
+                            for (const row of visible) { const tr = node('tr'); for (const value of [row.name, row.activity, row.status, row.score, row.accuracy]) tr.append(node('td', String(value))); const feedbackCell = node('td'); feedbackCell.append(noteButton(row)); tr.append(feedbackCell); body.append(tr); }
                             table.append(body); content.append(table);
                         }
                     }
-                    function editor(row) {
-                        const key = JSON.stringify([row.studentId, row.activity]);
-                        if (editors.has(key)) return editors.get(key);
-                        const result = createStudentFeedbackEditor({ repository, assignmentId: assignment.id, studentId: row.studentId,
-                            activityType: assignment.kind === 'spark' ? '' : row.activity || '', kind: assignment.kind,
-                            responseRevision: row.responseRevision, feedback: row.feedback,
-                            isCurrent: () => current(id, owner), onSaved: record => {
-                                const index = feedback.findIndex(f => f.student_id === record.student_id && f.activity_type === record.activity_type);
-                                if (index < 0) feedback.push(record); else feedback[index] = record;
-                                rows = assignmentResultRows(assignment.kind, records, roster, feedback);
-                                const updated = rows.find(item => item.studentId === row.studentId && item.activity === row.activity);
-                                if (reviewFilter?.value === 'needs-review') { renderRows(); return; }
-                                for (const label of content.querySelectorAll('[data-feedback-student]')) if (label.dataset.feedbackStudent === row.studentId) label.textContent = updated.status;
-                                for (const label of content.querySelectorAll('[data-review-needed-student]')) if (label.dataset.reviewNeededStudent === row.studentId) label.textContent = updated.needsTeacherReview ? 'Written answers need teacher review.' : '';
-
-                            } });
-                        editors.set(key, result);
-                        return result;
+                    function noteButton(row) {
+                        const label = assignment.kind === 'vocabulary' && row.activity ? `${row.name} · ${getActivityLabel(row.activity)}` : row.name;
+                        const trigger = createTeacherNoteButton(label, () => {
+                            if (!current(id, owner)) return;
+                            closeDialog();
+                            const view = createAssignmentDialog(`Teacher note for ${label}`, () => {
+                                dialog = null; noteView = null;
+                                if (refreshReviewRows && current(id, owner)) {
+                                    refreshReviewRows = false;
+                                    renderRows(); reviewFilter.focus();
+                                }
+                            });
+                            dialog = view; noteView = view;
+                            view.footer.firstElementChild.textContent = 'Close';
+                            const general = feedback.find(f => f.student_id === row.studentId && f.activity_type === '');
+                            if (row.activity && general?.note) view.body.append(node('p', `Assignment note: ${general.note}`));
+                            const key = JSON.stringify([row.studentId, row.activity]);
+                            if (!editors.has(key)) editors.set(key, createStudentFeedbackEditor({
+                                repository, assignmentId: assignment.id, studentId: row.studentId,
+                                activityType: assignment.kind === 'spark' ? '' : row.activity || '', kind: assignment.kind,
+                                responseRevision: row.responseRevision, feedback: row.feedback,
+                                isCurrent: () => current(id, owner), onSaved: record => {
+                                    const index = feedback.findIndex(f => f.student_id === record.student_id && f.activity_type === record.activity_type);
+                                    if (index < 0) feedback.push(record); else feedback[index] = record;
+                                    rows = assignmentResultRows(assignment.kind, records, roster, feedback);
+                                    const updated = rows.find(item => item.studentId === row.studentId && item.activity === row.activity);
+                                    updateTeacherNoteButton(content.querySelector(`[data-note-key="${CSS.escape(key)}"]`) || trigger, label, Boolean(record.note));
+                                    for (const status of content.querySelectorAll('[data-feedback-student]')) {
+                                        if (status.dataset.feedbackStudent === row.studentId) status.textContent = updated.status;
+                                    }
+                                    for (const status of content.querySelectorAll('[data-review-needed-student]')) {
+                                        if (status.dataset.reviewNeededStudent === row.studentId) status.textContent = updated.needsTeacherReview ? 'Written answers need teacher review.' : '';
+                                    }
+                                    if (reviewFilter?.value === 'needs-review' && !updated.needsTeacherReview) {
+                                        if (noteView?.dialog.open) refreshReviewRows = true;
+                                        else renderRows();
+                                    }
+                                }
+                            }));
+                            view.body.append(editors.get(key));
+                            view.body.querySelector('textarea')?.focus();
+                        }, Boolean(row.feedback?.note));
+                        trigger.dataset.noteKey = JSON.stringify([row.studentId, row.activity]);
+                        return trigger;
                     }
                     student.addEventListener('change', renderRows);
                     reviewFilter?.addEventListener('change', renderRows);

@@ -34,9 +34,6 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
     function clearHeader() {
         if (!externalHeader) return;
         externalHeader.remove(); externalHeader = null;
-        headerRoot?.classList.remove('has-class-context');
-        const label = headerRoot?.querySelector('#teacher-top-bar-section');
-        if (label) label.hidden = false;
     }
     const status = element('p', '', 'inline-status');
     status.setAttribute('role', 'status');
@@ -141,20 +138,10 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         directory.append(element('p', 'Choose a class to open its current work. Students and Review keep the same selected class.', 'teacher-library-scope'), toolbar, cards, footer); root.append(directory); render();
     }
     function renderClassHeader(active, id, owner, signal) {
-        const header = element('header', undefined, 'class-detail-header');
-        const back = button('←', () => navigate({ classId: null, tab: 'students' }));
-        back.className = 'class-back-link'; back.setAttribute('aria-label', 'Back to all classes'); back.title = 'All classes';
-        const title = element('div', undefined, 'class-detail-title');
-        title.append(element('h3', active.name), element('span', `${active.subject?.name || 'Subject'} · ${active.school_year}${active.archived ? ' · Archived' : ''}`));
-        const teachers = element('span', '', 'class-detail-teachers');
-        title.append(teachers); header.append(back);
-        if (headerRoot) {
-            const context = element('span', undefined, 'class-top-bar-context');
-            context.append(element('span', active.name), element('span', String(active.school_year)));
-            headerRoot.classList.add('has-class-context'); headerRoot.append(context); externalHeader = context;
-        } else header.append(title);
-        root.append(header);
         if (!schoolContext.hasRole('school_admin')) return;
+        const header = element('div', undefined, 'class-detail-header');
+        (headerRoot || root).append(header);
+        if (headerRoot) externalHeader = header;
         const trigger = button('Class actions', () => {});
         trigger.setAttribute('aria-label', 'Class actions'); trigger.title = 'Class actions';
         const menu = element('div'); menu.setAttribute('aria-label', 'Class actions');
@@ -207,9 +194,9 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
     async function renderStudents(active, id, owner, signal) {
         const views = element('div', undefined, 'class-detail-tabs');
         views.setAttribute('aria-label', 'Student views');
-        for (const [label, contextKey] of [['Roster', null], ['Trimester progress', 'progressContext'], ['Grades', 'gradebookContext']]) {
-            const control = button(label, () => navigate({ classId: active.id, tab: 'students', ...(contextKey ? { [contextKey]: studentStates.get(`${contextKey}:${active.id}`) || {} } : {}) }));
-            const selected = contextKey ? Boolean(route[contextKey]) : !route.progressContext && !route.gradebookContext;
+        for (const [label, contextKey] of [['Progress', null], ['Grades', 'gradebookContext']]) {
+            const control = button(label, () => navigate({ classId: active.id, tab: 'students', ...(contextKey ? { [contextKey]: studentStates.get(`${contextKey}:${active.id}`) || {} } : { progressContext: studentStates.get(`progressContext:${active.id}`) }) }));
+            const selected = contextKey ? Boolean(route[contextKey]) : !route.gradebookContext;
             control.className = 'class-detail-tab'; control.setAttribute('aria-pressed', String(selected)); views.append(control);
         }
         root.append(views);
@@ -227,94 +214,46 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
                     onStudent?.({ ...studentContext, gradebookContext: { ...route.gradebookContext } });
                 } });
         }
-        if (route.progressContext) {
-            const [roster, calendar] = await Promise.all([
-                repository.getRoster(active.id, { signal }), getSchoolCalendar({ signal })
-            ]);
-            if (!current(id, owner)) return;
-            return mountClassProgress({ root, active, roster, calendar, timeZone: schoolContext.getSchool()?.timezone || 'UTC', repository, signal,
-                isCurrent: () => current(id, owner), initial: Object.keys(route.progressContext).length ? route.progressContext : undefined,
-                onStateChange: context => {
-                    studentStates.set(`progressContext:${active.id}`, context); route.progressContext = context;
-                    onProgressState?.({ classId: active.id, progressContext: context });
-                }, onStudent });
-        }
-        const [roster, invitations] = await Promise.all([
-            repository.getRoster(active.id, { signal }), repository.listInvitations(active.id, { signal })
+        const [roster, calendar] = await Promise.all([
+            repository.getRoster(active.id, { signal }), getSchoolCalendar({ signal })
         ]);
         if (!current(id, owner)) return;
-        const block = element('section', undefined, 'class-directory class-student-directory'); block.setAttribute('aria-label', 'Class students');
-        const toolbar = element('div', undefined, 'class-directory-toolbar');
-        const filters = element('div', undefined, 'class-directory-filters');
-        const saved = studentStates.get(active.id) || { search: '', offset: 0 };
-        studentStates.set(active.id, saved);
-        const search = element('input'); search.type = 'search'; search.value = saved.search; search.placeholder = 'Search students'; search.setAttribute('aria-label', 'Search students'); filters.append(search);
         const actions = element('div', undefined, 'class-workspace-actions');
         if (!active.archived) actions.append(button('Invite students', () => dialog('Invite students', [
             { name: 'emails', label: 'Student emails', type: 'textarea', maxLength: 76500 }
         ], data => repository.inviteStudents(active.id, [...new Set(String(data.get('emails')).toLowerCase().split(/[\s,;]+/).filter(Boolean))]),
         'Enter one email or paste an email column from a spreadsheet. Invitations appear when students sign in with those emails.'), true));
         if (onGroups && !active.archived) actions.append(button('Make groups', () => onGroups({ classId: active.id })));
-        toolbar.append(filters, actions);
-        const scroll = element('div', undefined, 'class-directory-scroll'); scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', 'Students table');
-        const table = element('table'); table.setAttribute('aria-label', 'Class students');
-        const head = element('thead'), headings = element('tr');
-        for (const label of ['Name', 'Email', 'Actions']) { const cell = element('th', label); cell.scope = 'col'; headings.append(cell); }
-        head.append(headings); const body = element('tbody'); table.append(head, body); scroll.append(table);
-        const footer = element('div', undefined, 'class-directory-footer'), paging = element('div'), count = element('span'); count.setAttribute('role', 'status');
-        let offset = saved.offset;
-        const previous = button('Previous', () => { offset -= 10; render(); }); previous.setAttribute('aria-label', 'Previous students page');
-        const next = button('Next', () => { offset += 10; render(); }); next.setAttribute('aria-label', 'Next students page');
-        paging.append(previous, next); footer.append(paging, count);
-        function render() {
-            const query = search.value.trim().toLocaleLowerCase();
-            const filtered = roster.filter(student => `${student.name} ${student.email}`.toLocaleLowerCase().includes(query));
-            offset = Math.min(offset, Math.max(0, Math.ceil(filtered.length / 10) - 1) * 10);
-            Object.assign(saved, { search: search.value, offset });
-            body.replaceChildren();
-            for (const student of filtered.slice(offset, offset + 10)) {
-                const row = element('tr'), name = element('th'); name.scope = 'row';
-                if (onStudent) {
-                    const progress = button(student.name, () => onStudent({ classId: active.id, studentId: student.studentId, tab: 'overview' }));
-                    progress.className = 'class-table-link'; progress.setAttribute('aria-label', `View progress for ${student.name}`); name.append(progress);
-                } else name.textContent = student.name;
-                const actions = element('td');
-                if (onStudent || !active.archived) {
-                    const menu = element('div', undefined, 'class-student-menu');
-                    menu.popover = 'auto'; menu.id = `class-student-menu-${student.studentId}`;
-                    menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', `Actions for ${student.name}`);
-                    const closeMenu = () => { if (menu.matches(':popover-open')) menu.hidePopover(); };
-                    const trigger = element('button');
-                    trigger.setAttribute('aria-label', `Actions for ${student.name}`);
-                    if (onStudent) for (const [label, tab] of [['View profile', 'overview'], ['Assigned work', 'assigned'], ['Activity history', 'activity'], ['Account and coins', 'account']]) {
-                        menu.append(button(label, () => {
-                            closeMenu();
-                            return onStudent({ classId: active.id, studentId: student.studentId, tab });
-                        }));
-                    }
-                    if (!active.archived) {
-                        const remove = button('Remove from class', () => {
-                            closeMenu();
-                            dialog('Remove student', [], () => repository.removeStudent(active.id, student.studentId),
-                                `Remove ${student.name} from ${active.name}? They will lose access to this class. Saved work remains in its history.`);
-                        });
-                        menu.append(remove);
-                    }
-                    for (const item of menu.querySelectorAll('button')) item.setAttribute('role', 'menuitem');
-                    bindFloatingActionMenu({trigger, menu});
-                    actions.append(trigger, menu);
-                } else actions.textContent = '—';
-                row.append(name, element('td', student.email), actions); body.append(row);
-            }
-            if (!filtered.length) {
-                const row = element('tr'), cell = element('td', roster.length ? 'No students match your search.' : 'No students have joined yet.'); cell.colSpan = 3; row.append(cell); body.append(row);
-            }
-            previous.disabled = offset === 0; next.disabled = offset + 10 >= filtered.length;
-            count.textContent = `Students ${filtered.length ? offset + 1 : 0}–${Math.min(offset + 10, filtered.length)} of ${filtered.length}`;
+        const invitationsHost = element('div');
+        const initial = route.progressContext || studentStates.get(`progressContext:${active.id}`);
+        const progress = mountClassProgress({ root, active, roster, calendar, timeZone: schoolContext.getSchool()?.timezone || 'UTC', repository, signal,
+            isCurrent: () => current(id, owner), initial: initial && Object.keys(initial).length ? initial : undefined,
+            onStateChange: context => {
+                studentStates.set(`progressContext:${active.id}`, context); route.progressContext = context;
+                onProgressState?.({ classId: active.id, progressContext: context });
+            }, onStudent, actions, invitationsHost, studentActions });
+        const invitations = await repository.listInvitations(active.id, { signal }).catch(() => null);
+        if (!current(id, owner)) return;
+        if (!invitations) {
+            invitationsHost.append(element('p', 'Invitations could not be loaded.'));
+            return progress;
         }
-        search.addEventListener('input', () => { offset = 0; render(); });
-        if (onStudent) block.append(element('p', 'Open a student’s name to see their progress and work in this class.', 'teacher-library-scope'));
-        block.append(toolbar, scroll, footer); render();
+        function studentActions(student, openStudent) {
+            const menu = element('div', undefined, 'class-student-menu');
+            menu.setAttribute('aria-label', `Actions for ${student.name}`);
+            const trigger = element('button');
+            trigger.setAttribute('aria-label', `Actions for ${student.name}`);
+            if (onStudent) for (const [label, tab] of [['View profile', 'overview'], ['Assigned work', 'assigned'], ['Rewards and account', 'account']]) {
+                menu.append(button(label, () => openStudent(tab)));
+            }
+            if (!active.archived) menu.append(button('Remove from class', () => {
+                dialog('Remove student', [], () => repository.removeStudent(active.id, student.studentId),
+                    `Remove ${student.name} from ${active.name}? They will lose access to this class. Saved work remains in its history.`);
+            }));
+            if (!menu.childElementCount) return element('span', '—');
+            bindFloatingActionMenu({ trigger, menu });
+            const controls = element('div'); controls.append(trigger, menu); return controls;
+        }
         const pending = invitations.filter(invite => !invite.acceptedAt && !invite.revokedAt);
         if (pending.length) {
             const details = element('details', undefined, 'class-pending-invitations'); details.append(element('summary', `Invitations (${pending.length})`));
@@ -326,22 +265,25 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
                 }
                 details.append(row);
             }
-            block.append(details);
+            invitationsHost.append(details);
         }
-        root.append(block);
+        return progress;
     }
     async function renderWork(active, id, owner, signal, requestedView) {
         const [assignments, calendar] = await Promise.all([repository.listAssignments(active.id, { signal }), getSchoolCalendar({ signal })]);
         const trimesterOf = assignment => assignmentTrimester(assignment, calendar, active.school_year, schoolContext.getSchool()?.timezone || 'UTC');
         if (!current(id, owner)) return;
         const block = element('section', undefined, 'class-directory class-work-directory'); block.setAttribute('aria-label', 'Class work');
-        const saved = workStates.get(active.id) || { view: 'current', search: '', trimester: 'all', status: 'all', type: 'all', sort: 'release-desc', offset: 0, filtersOpen: false };
+        const saved = workStates.get(active.id) || { view: 'current', search: '', trimester: 'all', status: 'all', type: 'all', sort: 'release-desc', offset: 0 };
         if (['current','upcoming','history','all'].includes(requestedView)) saved.view = requestedView;
         workStates.set(active.id, saved);
         const toolbar = element('div', undefined, 'class-directory-toolbar'), filters = element('div', undefined, 'class-directory-filters');
         const search = element('input'); search.type = 'search'; search.placeholder = 'Search work'; search.setAttribute('aria-label', 'Search work'); filters.append(search); toolbar.append(filters);
-        const advanced = element('details', undefined, 'class-work-filters'); advanced.open = saved.filtersOpen;
-        advanced.append(element('summary', 'Filters and sort'));
+        const tools = element('div', undefined, 'class-workspace-actions');
+        const filterButton = button('Filters and sort', () => {});
+        const advanced = element('div', undefined, 'class-work-filters'); advanced.popover = 'auto';
+        filterButton.popoverTargetElement = advanced;
+        tools.append(filterButton); toolbar.append(tools);
         const extraFilters = element('div', undefined, 'class-directory-filters'); advanced.append(extraFilters);
         const trimester = compactFilter(extraFilters, 'Trimester', assignmentTrimesterOptions);
         trimester.title = 'Based on availability date and the school academic calendar';
@@ -350,7 +292,6 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         const sort = compactFilter(extraFilters, 'Sort', assignmentSortOptions);
         search.value = saved.search; trimester.value = saved.trimester; states.value = saved.status; types.value = saved.type; sort.value = saved.sort;
         let workView = saved.view;
-        advanced.addEventListener('toggle', () => { saved.filtersOpen = advanced.open; });
         const viewBar = element('div', undefined, 'class-work-views');
         viewBar.setAttribute('role', 'group'); viewBar.setAttribute('aria-label', 'Work views');
         const viewOf = assignment => {
@@ -367,7 +308,7 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
             control.setAttribute('aria-label', label); viewButtons.set(value, control); viewBar.append(control);
         }
         const viewHelp = element('p', undefined, 'teacher-library-scope');
-        if (!active.archived && active.canTeach === true && onPublish) toolbar.append(button('Assign material', () => onPublish({ classId: active.id }), true));
+        if (!active.archived && active.canTeach === true && onPublish) tools.append(button('Assign material', () => onPublish({ classId: active.id }), true));
         const scroll = element('div', undefined, 'class-directory-scroll'); scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', 'Work table');
         const table = element('table'); table.setAttribute('aria-label', 'Class work');
         const head = element('thead'), headings = element('tr');
@@ -380,6 +321,8 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         paging.append(previous, next); footer.append(paging, count);
         function render() {
             const query = search.value.trim().toLocaleLowerCase();
+            const filterCount = [trimester, states, types].filter(control => control.value !== 'all').length;
+            filterButton.textContent = filterCount ? `Filters and sort (${filterCount})` : 'Filters and sort';
             for (const [value, control] of viewButtons) control.setAttribute('aria-pressed', String(value === workView));
             viewHelp.textContent = {
                 current: 'Work students can open now. Upcoming lessons and closed work are in their own views.',

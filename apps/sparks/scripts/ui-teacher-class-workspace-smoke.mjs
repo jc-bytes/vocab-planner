@@ -89,12 +89,14 @@ try {
         window.originalGetClient = supabaseService.getClient;
         supabaseService.getClient = () => ({rpc: () => {const q = {abortSignal(){return q;},then(resolve){return Promise.resolve({data:{schools:[{id:'school-a',roles:['school_admin'],active:true}]},error:null}).then(resolve);}};return q;}});
         await schoolContext.load('teacher-a');
-        window.classRoster = Array.from({length: 23}, (_, i) => ({studentId: `student-${i}`, name: `Student ${String(i + 1).padStart(2, '0')}`, email: `student${i + 1}@example.org`}));
+        window.classRoster = Array.from({length: 53}, (_, i) => ({studentId: `student-${i}`, name: `Student ${String(i + 1).padStart(2, '0')}`, email: `student${i + 1}@example.org`}));
         window.classInvitations = [{ id: 'invite', email: 'pending@example.org', expiresAt: '2099-01-01' }];
         await window.workspace.show({classId: 'class-a', tab: 'students'});
     });
-    const roster = page.getByRole('table', {name: 'Class students', exact: true});
-    assert.equal(await roster.locator('tbody tr').count(), 10);
+    const roster = page.getByRole('table', {name: 'Required work completion', exact: true});
+    assert.equal(await roster.locator('tbody tr').count(), 25);
+    assert.equal(await roster.getByRole('columnheader', {name: 'Email'}).count(), 0);
+    assert.equal(await roster.getByText('@example.org').count(), 0);
     for (const width of [1440,390,320]) {
         await page.setViewportSize({width,height:900});
         for (const student of ['Student 01','Student 10']) {
@@ -117,33 +119,30 @@ try {
             assert.equal(await page.locator('.class-student-menu:popover-open').count(),0);
             assert.equal(await trigger.evaluate(el=>el===document.activeElement),true);
             await trigger.click();
-            await page.getByRole('menuitem',{name:'View profile',exact:true}).click();
-            assert.deepEqual(await page.evaluate(()=>window.calls.at(-1)),['student',{classId:'class-a',studentId:student === 'Student 01' ? 'student-0' : 'student-9',tab:'overview'}]);
-            await trigger.click();
             await page.getByRole('searchbox',{name:'Search students'}).click();
             assert.equal(await page.locator('.class-student-menu:popover-open').count(),0);
         }
     }
     await page.setViewportSize({width:1440,height:900});
-    await page.getByRole('button', {name: 'Next students page'}).click();
-    await page.getByText('Students 11–20 of 23', {exact: true}).waitFor();
+    await page.getByRole('button', {name: 'Next'}).click();
+    await page.getByText('Students 26–50 of 53', {exact: true}).waitFor();
     await page.evaluate(async()=>{window.workspace.hide();await window.workspace.show({classId:'class-a',tab:'students'});});
-    await page.getByText('Students 11–20 of 23', {exact: true}).waitFor();
+    await page.getByText('Students 26–50 of 53', {exact: true}).waitFor();
     assert.equal(await roster.getByText('Student 01', {exact: true}).count(), 0);
-    await page.getByRole('button', {name: 'Next students page'}).click();
-    await page.getByText('Students 21–23 of 23', {exact: true}).waitFor();
+    await page.getByRole('button', {name: 'Next'}).click();
+    await page.getByText('Students 51–53 of 53', {exact: true}).waitFor();
     assert.equal(await roster.locator('tbody tr').count(), 3);
-    await page.getByRole('searchbox', {name: 'Search students'}).fill('student1@example.org');
-    await page.getByText('Students 1–1 of 1', {exact: true}).waitFor();
-    await page.getByRole('button',{name:'View progress for Student 01',exact:true}).click();
-    assert.deepEqual(await page.evaluate(()=>window.calls.at(-1)),['student',{classId:'class-a',studentId:'student-0',tab:'overview'}]);
+    await page.getByRole('searchbox', {name: 'Search students'}).fill('Student 01');
+    await page.getByText('1 student', {exact: true}).waitFor();
+    await page.getByRole('button',{name:'Student 01',exact:true}).click();
+    assert.deepEqual(await page.evaluate(()=>{const [action,{progressContext,...context}]=window.calls.at(-1);return [action,context];}),['student',{classId:'class-a',studentId:'student-0',tab:'overview'}]);
     await page.evaluate(async()=>{window.workspace.hide();await window.workspace.show({classId:'class-a',tab:'students'});});
-    assert.equal(await page.getByRole('searchbox',{name:'Search students'}).inputValue(),'student1@example.org');
-    await page.getByText('Students 1–1 of 1',{exact:true}).waitFor();
-    for (const [label, tab] of [['View profile','overview'], ['Assigned work','assigned'], ['Activity history','activity'], ['Account and coins','account']]) {
+    assert.equal(await page.getByRole('searchbox',{name:'Search students'}).inputValue(),'Student 01');
+    await page.getByText('1 student',{exact:true}).waitFor();
+    for (const [label, tab] of [['View profile','overview'], ['Assigned work','assigned'], ['Rewards and account','account']]) {
         await page.getByRole('button', {name:'Actions for Student 01', exact:true}).click();
         await page.getByRole('menuitem', {name: label, exact: true}).click();
-        assert.deepEqual(await page.evaluate(() => window.calls.at(-1)), ['student', {classId:'class-a',studentId:'student-0', tab}]);
+        assert.deepEqual(await page.evaluate(() => {const [action,{progressContext,...context}]=window.calls.at(-1);return [action,context];}), ['student', {classId:'class-a',studentId:'student-0', tab}]);
         assert.equal(await page.locator('.class-student-menu:popover-open').count(),0);
     }
     await page.getByRole('button', {name:'Actions for Student 01', exact:true}).click();
@@ -191,7 +190,7 @@ try {
     await page.getByRole('dialog').getByText('Saved assignment definition.', {exact:true}).waitFor();
     await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
     assert.deepEqual(await page.evaluate(()=>window.calls.find(c=>c[0]==='read-published')),['read-published','work-one']);
-    assert.equal(await page.locator('.class-work-filters').getAttribute('open'),null);
+    assert.equal(await page.locator('.class-work-filters:popover-open').count(),0);
     await page.evaluate(()=>{window.failPublishedOnce=true;});
     await page.getByRole('button', {name:'View published material Vocabulary One',exact:true}).click();
     await page.getByRole('dialog').getByText('Published copy request failed.',{exact:true}).waitFor();
@@ -225,7 +224,8 @@ try {
     await page.getByRole('button',{name:'Assignment details Work 01',exact:true}).click();
     assert.deepEqual(await page.evaluate(()=>window.calls.filter(c=>c[0]==='review').at(-1)),['review',{classId:'class-a',assignmentId:'work-0',tab:'details'}]);
     assert.equal(await page.getByLabel('Sort', {exact:true}).inputValue(), 'release-asc');
-    await page.locator('.class-work-filters summary').click();
+    await page.getByRole('button',{name:'Filters and sort',exact:true}).click();
+    await page.locator('.class-work-filters:popover-open').waitFor();
     await page.getByRole('button', {name:'History',exact:true}).click();
     await workTable.getByText('Work 02', {exact:true}).waitFor();
     await page.getByRole('button', {name:'All work',exact:true}).click();
@@ -234,6 +234,7 @@ try {
     assert.equal(await workTable.getByText('Withdrawn · ',{exact:true}).count(),1);
     assert.equal(await workTable.getByRole('columnheader',{name:'When',exact:true}).count(),1);
     assert.equal(await workTable.locator('tbody tr').filter({hasText:'Work 02'}).locator('td').nth(1).textContent(),'Withdrawn · Due Oct 20');
+    await page.getByRole('button',{name:'Filters and sort',exact:true}).click();
     await page.getByLabel('Trimester',{exact:true}).selectOption('3');
     await page.getByText('Work 1–10 of 22',{exact:true}).waitFor();
     assert.equal(await workTable.getByText('Scheduled',{exact:false}).count(),0);
@@ -251,6 +252,7 @@ try {
     await page.getByLabel('Type',{exact:true}).selectOption('all');
     await page.getByLabel('Sort',{exact:true}).selectOption('release-desc');
 
+    await page.keyboard.press('Escape');
     await page.getByRole('button',{name:'Next work page'}).click();
     await page.getByText('Work 11–20 of 23',{exact:true}).waitFor();
     await page.evaluate(async()=>{window.workspace.hide();await window.workspace.show({classId:'class-a',tab:'work'});});
@@ -266,7 +268,7 @@ try {
     await page.getByRole('searchbox',{name:'Search work'}).fill('missing');
     await page.getByText('No work matches your search.').waitFor();
     await page.evaluate(() => window.workspace.show({classId:'class-a',tab:'students'}));
-    await page.getByRole('table',{name:'Class students',exact:true}).waitFor();
+    await page.getByRole('table',{name:'Required work completion',exact:true}).waitFor();
     assert.equal(await page.getByRole('tab').count(),0);
     await page.evaluate(()=>{window.classWork=null;});
     await page.evaluate(() => window.workspace.show({ classId: 'missing' }));

@@ -80,3 +80,7 @@
     .class-work-directory td:last-child { display: table-cell; }
     .classrooms .class-work-directory .class-table-link { display: block; white-space: normal; text-align: left; padding-inline: 0; margin: .25rem 0; }
 }
+
+.teacher-class-controls .class-detail-header { flex: none; }
+.classrooms .class-directory-toolbar > .class-workspace-actions { margin-inline-start: auto; }
+.class-work-filters:popover-open { margin: auto; padding: 1rem; width: min(34rem, calc(100% - 2rem)); border: 1px solid var(--color-border); border-radius: .75rem; background: var(--color-surface); color: var(--color-text); }

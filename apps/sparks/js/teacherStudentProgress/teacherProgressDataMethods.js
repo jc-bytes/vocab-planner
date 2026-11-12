@@ -210,6 +210,7 @@ async getStudentRosterData({ forceRefresh = false, signal, isCurrent = () => tru
         this.rosterReadController?.abort();
         this.studentInsightYear = undefined;
         this.studentInsightRequest = (this.studentInsightRequest || 0) + 1;
+        this.closeStudentInsightDialog?.();
         this.studentDashboardCharts?.dispose();
         this.studentDashboardCharts = null;
         this.studentProfileRequest = (this.studentProfileRequest || 0) + 1;
