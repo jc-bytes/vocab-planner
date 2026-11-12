@@ -49,9 +49,9 @@ try {
         }, role);
         assert.equal(await page.evaluate(role => !!(role === 'student' ? window.studentApp : window.teacherApp).currentUser, role), true);
         assert.equal(await page.evaluate(role => role === 'student' ? !!window.studentApp.authInitialized : window.teacherApp.isAuthenticated, role), false);
-        // Verify bounded retries stop instead of continuously hammering the API.
+        // Verify the early retries are paced before the longer recovery interval.
         await page.waitForTimeout(4600);
-        assert.equal(reads, 3, `${role}: initial request plus two automatic retries`);
+        assert.equal(reads, 3, `${role}: initial request plus two early automatic retries`);
         await page.setViewportSize({ width: 390, height: 844 });
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         await page.screenshot({ path: join(output, `${role}-recovery-phone.png`), fullPage: true });
@@ -62,6 +62,17 @@ try {
         assert.equal(await page.evaluate(role => role === 'teacher' ? window.teacherApp.vocabSet.startupTestDraft : 'Keep this unsaved teacher draft', role), 'Keep this unsaved teacher draft');
         assert.equal(await page.evaluate(role => role === 'student' ? window.studentApp.studentProfile.grade : window.teacherApp.schoolAccess.getSchoolId(), role), student ? '6' : seeded.schoolId);
         if (student) await page.waitForFunction(() => window.studentApp.activities.vocabularyData.classSelection?.classes.length > 0);
+        // The network can recover while Wi-Fi remains connected, so there may
+        // be no online event or focus change to restart the access check.
+        unavailable = true;
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await recovery.waitFor({ state: 'visible' });
+        await page.waitForTimeout(4600);
+        const beforeRecovery = reads;
+        unavailable = false;
+        await recovery.waitFor({ state: 'detached', timeout: 15000 });
+        assert.ok(reads > beforeRecovery, 'A later automatic retry detects service recovery');
+        await page.waitForFunction(role => role === 'student' ? window.studentApp.authInitialized : window.teacherApp.isAuthenticated, role);
         // A restored persisted session must also recover after losing connectivity.
         unavailable = true;
         await page.reload({ waitUntil: 'domcontentloaded' });
@@ -86,7 +97,7 @@ try {
         assert.equal(reads, atSignOut, 'Sign-out cancels retry timers');
         assert.equal(await page.evaluate(role => (role === 'student' ? window.studentApp : window.teacherApp).currentUser, role), null);
         assert.deepEqual(errors, []);
-        console.log(`${role}: bounded retries, manual recovery, saved session reconnect, phone layout, and sign-out cancellation passed.`);
+        console.log(`${role}: paced retries, late service recovery, manual recovery, saved session reconnect, phone layout, and sign-out cancellation passed.`);
         await context.close();
     }
     console.log(`Local startup recovery screenshots: ${output}`);
