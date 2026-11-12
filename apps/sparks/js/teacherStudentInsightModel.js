@@ -1,9 +1,9 @@
 import { readingReviewStatus, assignmentFeedback } from './teacherStudentFeedbackModel.js';
 const date = value => value ? Date.parse(value) : NaN;
 const number = value => value === null || value === undefined || value === '' ? null : Number.isFinite(Number(value)) ? Number(value) : null;
-export function buildStudentInsight({ assignments = [] } = {}, now = Date.now()) {
+export function buildStudentInsight({ assignments = [], activity = '' } = {}, now = Date.now()) {
     const summary = { required: 0, completed: 0, notStarted: 0, inProgress: 0, review: 0, needsRevision: 0, overdue: 0, unknown: 0 };
-    const work = assignments.map(assignment => {
+    const work = assignments.flatMap(assignment => {
         const current = !assignment.archived && assignment.enrolled && !assignment.withdrawn
             && date(assignment.releaseAt) <= now && !assignment.content?.activitySettings?.retiredWeeklySet;
         const lifecycle = assignment.content?.activitySettings?.retiredWeeklySet ? 'Retired' : assignment.withdrawn ? 'Withdrawn' : assignment.archived || !assignment.enrolled ? 'Historical'
@@ -13,8 +13,12 @@ export function buildStudentInsight({ assignments = [] } = {}, now = Date.now())
         const readingRequired = assignment.kind === 'spark' && checkMode === 'required';
         const known = assignment.kind === 'spark' ? ['required', 'optional', 'reading_only'].includes(checkMode) : Array.isArray(configured);
         const required = new Set(Array.isArray(configured) ? configured : []);
+        if (activity && (activity === 'reading-check'
+            ? assignment.kind !== 'spark' || known && !readingRequired
+            : assignment.kind === 'spark' || known && !required.has(activity))) return [];
+
         const recorded = new Map((assignment.progress || []).map(p => [p.activity_type, p]));
-        const activities = assignment.kind === 'spark' ? [] : [...new Set([...required, ...recorded.keys()])].map(type => {
+        const activities = assignment.kind === 'spark' ? [] : [...new Set([...required, ...recorded.keys()])].filter(type => !activity || type === activity).map(type => {
             const progress = recorded.get(type);
             const complete = progress?.verified === true && (progress.is_complete === true || number(progress.score) >= 100);
             return { type, required: required.has(type), progress,

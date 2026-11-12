@@ -50,9 +50,9 @@ try {
                 window.progressReadCalls.push('gradebook');
                 return {assignments:[{id:'vocab-a',title:'Vocabulary one',releaseAt:'2026-01-01',grading:{enabled:false,maxPoints:100,bonusPerActivity:0,bonusCap:null,capAtMaxPoints:false},revision:0}],students:roster.map(student=>({...student,grades:[{assignmentId:'vocab-a',enabled:false,status:'ungraded',published:null}]}))};
             },
-            classProgress: async (classId, from, to, { signal }) => {
+            classProgress: async (classId, from, to, { signal, activity }) => {
                 window.progressReadCalls.push('progress');
-                window.progressCalls.push({ classId, from, to });
+                window.progressCalls.push({ classId, from, to, activity });
                 if (window.holdProgress) { window.holdProgress = false; return new Promise(resolve => { window.resolveOldProgress = resolve; }); }
                 if (window.failProgress) throw new Error('Fixture failure');
                 return roster.map((student, i) => ({ studentId: student.studentId, required: i === 4 ? 0 : 10, completed: [0, 4, 10, 10, 0][i], review: i === 1 ? 2 : 0, unknown: i === 3 ? 1 : 0 }));
@@ -118,13 +118,24 @@ try {
     assert.equal(await page.locator('progress[data-band="empty"]').count(), 1);
     const ben = page.getByRole('row').filter({ has: page.getByRole('button', { name: 'Ben', exact: true }) });
     assert.match(await ben.textContent(), /4 \/ 10.*40%.*2/);
-    await page.locator('.class-progress-filter-menu > summary').click();
+    await page.setViewportSize({ width: 980, height: 844 });
+    await page.getByRole('button', { name: 'Filters', exact: true }).click();
     assert.ok(await page.getByLabel('Unfinished only').evaluate(el=>el.closest('label').getBoundingClientRect().height>=44), 'Checkbox label has a full touch target');
     await page.getByLabel('Unfinished only').check();
     assert.equal(await page.getByRole('button', { name: 'Cara', exact: true }).count(), 0);
     await page.getByLabel('Unfinished only').uncheck();
-    await page.locator('.class-progress-filter-menu > summary').click();
+    await page.getByRole('button', { name: 'Done', exact: true }).click();
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const progressPanel = page.getByRole('region', { name: 'Trimester progress' });
+    await progressPanel.getByLabel('Period', { exact: true }).selectOption('1');
+    await progressPanel.getByLabel('Month', { exact: true }).selectOption('2026-03');
+    await progressPanel.getByLabel('Activity', { exact: true }).selectOption('quiz');
+    await page.getByText('Work available from 2026-03-01 through 2026-03-31').waitFor();
+    assert.equal(await page.evaluate(() => window.progressCalls.at(-1).activity), 'quiz');
+    assert.equal(await page.getByRole('table', { name: 'Required work completion' }).locator('tbody tr').count(), 5);
     await page.getByLabel('Period', { exact: true }).selectOption('custom');
+    assert.equal(await progressPanel.getByLabel('Activity', { exact: true }).inputValue(), '');
+    assert.equal(await progressPanel.getByLabel('Month', { exact: true }).isVisible(), false);
     await page.getByLabel('Available from').fill('2026-03-31'); await page.getByLabel('Available through').fill('2026-04-01');
     await page.getByRole('button', { name: 'Apply dates', exact: true }).click();
     await page.getByText(/Work available from 2026-03-31 through 2026-04-01/).waitFor();

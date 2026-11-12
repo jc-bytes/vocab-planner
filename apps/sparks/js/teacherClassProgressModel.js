@@ -1,4 +1,5 @@
-import { parseUtcDateOnly } from './services/dateOnly.js';
+import { ACTIVITY_DEFINITIONS } from './activityMetadata.js';
+import { formatUtcDateOnly, parseUtcDateOnly } from './services/dateOnly.js';
 
 const termKeys = ['IT', 'IIT', 'IIIT'];
 export function schoolDay(value, timeZone = 'UTC') {
@@ -17,9 +18,35 @@ export function defaultProgressPeriod(calendar, year, timeZone, now = Date.now()
     const current = terms.find(term => term.from <= today && term.to >= today);
     return current || [...terms].reverse().find(term => term.from <= today) || terms[0] || { period: 'custom', from: '', to: '' };
 }
+export const progressActivities = [
+    ...ACTIVITY_DEFINITIONS.map(({ id, label }) => [id, label]),
+    ['reading-check', 'Reading check']
+];
+
+export function progressMonths(term) {
+    if (!validProgressRange(term)) return [];
+    const first = parseUtcDateOnly(term.from);
+    first.setUTCDate(1);
+    const months = [];
+    const label = new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' });
+    const through = parseUtcDateOnly(term.to);
+    while (first <= through) {
+        const start = formatUtcDateOnly(first);
+        const monthLabel = label.format(first);
+        first.setUTCMonth(first.getUTCMonth() + 1);
+        const last = new Date(first.getTime());
+        last.setUTCDate(0);
+        const end = formatUtcDateOnly(last);
+        months.push({ id: start.slice(0, 7), label: monthLabel, from: start < term.from ? term.from : start, to: end > term.to ? term.to : end });
+    }
+    return months;
+}
+
 export function normalizeProgressContext(value = {}) {
     const context = {
         period: ['1', '2', '3', 'custom'].includes(value.period) ? value.period : 'custom',
+        month: /^\d{4}-(0[1-9]|1[0-2])$/.test(value.month || '') ? value.month : '',
+        activity: progressActivities.some(([id]) => id === value.activity) ? value.activity : '',
         from: parseUtcDateOnly(value.from) ? value.from : '', to: parseUtcDateOnly(value.to) ? value.to : '',
         search: String(value.search || '').slice(0, 200),
         sort: ['name', 'completion-asc', 'completion-desc'].includes(value.sort) ? value.sort : 'name',
@@ -47,14 +74,14 @@ export function progressPresentation(summary) {
 }
 export function readProgressContext(params) {
     if (params.get('display') !== 'progress') return {};
-    return { progressContext: normalizeProgressContext({ period: params.get('period'), from: params.get('from'), to: params.get('to'),
+    return { progressContext: normalizeProgressContext({ period: params.get('period'), month: params.get('month'), activity: params.get('activity'), from: params.get('from'), to: params.get('to'),
         search: params.get('search'), sort: params.get('sort'), unfinished: params.get('unfinished') === '1', offset: params.get('offset'), scroll: params.get('scroll') }) };
 }
 export function writeProgressContext(params, context) {
     if (!context) return;
     const state = normalizeProgressContext(context);
     params.set('display', 'progress');
-    for (const key of ['period', 'from', 'to', 'search', 'sort']) if (state[key]) params.set(key, state[key]);
+    for (const key of ['period', 'month', 'activity', 'from', 'to', 'search', 'sort']) if (state[key]) params.set(key, state[key]);
     if (state.unfinished) params.set('unfinished', '1');
     if (state.offset) params.set('offset', String(state.offset));
     if (state.scroll) params.set('scroll', String(state.scroll));

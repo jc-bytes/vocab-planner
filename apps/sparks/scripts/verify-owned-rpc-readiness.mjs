@@ -15,6 +15,7 @@ export const OWNED_RPC_PROBES = Object.freeze({
     teacher_set_assignment_grading_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_assignment_id: zero, p_config: {}, p_expected_revision: 0 }),
     teacher_publish_vocabulary_grades_v1: Object.freeze({ p_expected_user_id: zero, p_school_id: zero, p_assignment_id: zero, p_expected_revision: 0 }),
     teacher_class_progress_v1: Object.freeze({ p_school_id: zero, p_class_id: zero, p_from: '2000-01-01', p_to: '2000-01-01' }),
+    teacher_class_progress_v2: Object.freeze({ p_school_id: zero, p_class_id: zero, p_from: '2000-01-01', p_to: '2000-01-01', p_activity_type: 'flashcards' }),
     teacher_class_gradebook_v1: Object.freeze({ p_school_id: zero, p_class_id: zero, p_from: '2000-01-01', p_to: '2000-01-01' }),
     my_class_vocabulary_grades_v1: Object.freeze({ p_school_id: zero, p_class_id: zero }),
     save_vocabulary_revision_v1: Object.freeze({ p_school_id: zero, p_id: 'readiness-probe', p_payload: {}, p_expected_revision: 0, p_request_key: zero }),

@@ -8,7 +8,7 @@ import { getActivityLabel } from './activityMetadata.js';
 import { buildStudentInsight, attemptTiming, comparableTrend, activityAttention, capturedAnswerRows } from './teacherStudentInsightModel.js';
 import { mountStudentDashboardCharts } from './teacherStudentDashboardCharts.js';
 import { renderStudentDashboard } from './teacherStudentDashboard.js';
-import { assignmentInProgressPeriod } from './teacherClassProgressModel.js';
+import { assignmentInProgressPeriod, progressActivities } from './teacherClassProgressModel.js';
 import { schoolContext } from './services/schoolContext.js';
 const text = escapeHtml;
 const formatDate = value => value ? new Date(value).toLocaleString() : 'No deadline';
@@ -44,7 +44,7 @@ export async function loadStudentInsight(manager, studentId, schoolYear = manage
         const allData = classId ? { ...result, assignments: (result.assignments || []).filter(a => a.classId === classId) } : result;
         const period = manager.studentProgressPeriod;
         const timeZone = schoolContext.getSchool()?.timezone || 'UTC';
-        const data = { ...allData, assignments: period ? allData.assignments.filter(a => assignmentInProgressPeriod(a, period, timeZone)) : allData.assignments };
+        const data = { ...allData, activity: period?.activity || '', assignments: period ? allData.assignments.filter(a => assignmentInProgressPeriod(a, period, timeZone)) : allData.assignments };
         let model = buildStudentInsight(data);
         function renderSummary() {
             if (!overview) return;
@@ -63,15 +63,18 @@ export async function loadStudentInsight(manager, studentId, schoolYear = manage
         if (period) {
             const controls = document.createElement('div'), label = document.createElement('p'), toggle = document.createElement('button');
             let showAll = false;
-            label.textContent = `Assigned between ${period.from} and ${period.to}, inclusive. Current completion shown.`;
+            const activityLabel = progressActivities.find(([id]) => id === period.activity)?.[1];
+            const periodLabel = `Assigned between ${period.from} and ${period.to}, inclusive.${activityLabel ? ` Activity: ${activityLabel}.` : ''} Current completion shown.`;
+            label.textContent = periodLabel;
             toggle.type = 'button'; toggle.className = 'btn secondary-btn'; toggle.textContent = 'Show all work';
             toggle.addEventListener('click', () => {
                 if (!current()) return;
                 showAll = !showAll;
+                data.activity = showAll ? '' : period.activity || '';
                 data.assignments = showAll ? allData.assignments : allData.assignments.filter(a => assignmentInProgressPeriod(a, period, timeZone));
                 model = buildStudentInsight(data); renderSummary(); render(host.querySelector('#student-insight-filter').value);
                 toggle.textContent = showAll ? 'Show selected period' : 'Show all work';
-                label.textContent = showAll ? 'All work in this class and school year.' : `Assigned between ${period.from} and ${period.to}, inclusive. Current completion shown.`;
+                label.textContent = showAll ? 'All work in this class and school year.' : periodLabel;
             });
             controls.append(label, toggle); host.prepend(controls);
         }

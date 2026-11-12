@@ -49,9 +49,11 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
             p_school_id: getSchoolId(), p_assignment_id: assignmentId, p_student_id: studentId,
             p_activity_type: activityType, p_offset: offset
         }, options),
-        classProgress: (classId, from, to, options) => rpc('teacher_class_progress_v1', {
-            p_school_id: getSchoolId(), p_class_id: classId, p_from: from, p_to: to
-        }, options),
+        classProgress: (classId, from, to, { activity, ...options } = {}) => {
+            const args = { p_school_id: getSchoolId(), p_class_id: classId, p_from: from, p_to: to };
+            if (!activity) return rpc('teacher_class_progress_v1', args, options);
+            return rpc('teacher_class_progress_v2', { ...args, p_activity_type: activity === 'reading-check' ? '' : activity }, options);
+        },
         classGradebook: (classId, from, to, options) => rpc('teacher_class_gradebook_v1', {
             p_school_id: getSchoolId(), p_class_id: classId, p_from: from, p_to: to
         }, options),

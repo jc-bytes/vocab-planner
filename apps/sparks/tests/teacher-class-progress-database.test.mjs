@@ -33,15 +33,22 @@ test('class progress agrees with individual details and enforces class, school a
  ('${student}','assignment:${assignment}','${assignment}','matching',100,true,false);`);
  const from='2026-03-31',to='2026-04-01';
  const read=(actor=teacher,schoolId=school,start=from,end=to)=>JSON.parse(as(actor,`select public.teacher_class_progress_v1('${schoolId}','${classId}','${start}','${end}')`));
- const parity=()=>{
+ const filtered=(activity,actor=teacher,start=from,end=to)=>JSON.parse(as(actor,
+  `select public.teacher_class_progress_v2('${school}','${classId}','${start}','${end}','${activity}')`))[0];
+ const parity=(activity='')=>{
   const detail=JSON.parse(as(teacher,`select public.teacher_student_insight_v1('${school}','${student}',2026)`));
-  const model=buildStudentInsight({assignments:detail.assignments.filter(a=>a.classId===classId && assignmentInProgressPeriod(a,{from,to},'America/Panama'))});
-  const row=read().find(r=>r.studentId===student);
+  const model=buildStudentInsight({activity,assignments:detail.assignments.filter(a=>a.classId===classId && assignmentInProgressPeriod(a,{from,to},'America/Panama'))});
+  const row=activity ? filtered(activity==='reading-check'?'':activity) : read().find(r=>r.studentId===student);
   for(const key of ['required','completed','review','unknown']) assert.equal(row[key],model.summary[key],`${key} differs from individual view`);
   return row;
  };
  assert.deepEqual(parity(),{studentId:student,required:4,completed:1,review:0,unknown:0});
  assert.equal(read(coTeacher)[0].required,4);
+ assert.deepEqual(parity('quiz'),{studentId:student,required:2,completed:1,review:0,unknown:0});
+ assert.deepEqual(filtered('matching',coTeacher),{studentId:student,required:2,completed:0,review:0,unknown:0});
+ assert.equal(filtered('quiz',teacher,'2026-04-01','2026-04-30').completed,0);
+ assert.equal(filtered('quiz',teacher,'2026-04-01','2026-04-30').required,1);
+ assert.throws(()=>filtered('quiz',outsider),/unavailable/);
  // Start/end boundaries are in school time. Future, withdrawn and retired assignments do not count.
  for(const [when,withdrawn,retired] of [['2026-03-31T04:59:59Z',false,false],['2026-04-02T05:00Z',false,false],['2099-04-01T05:00Z',false,false],['2026-04-01T05:00Z',true,false],['2026-04-01T05:00Z',false,true]]) {
   const v=randomUUID(),a=randomUUID();
@@ -55,6 +62,8 @@ test('class progress agrees with individual details and enforces class, school a
  insert into public.class_assignments(id,owner_id,school_id,class_id,version_id,title,kind,release_at,close_at,publication_key) values('${reading}','${teacher}','${school}','${classId}','${readingVersion}','Closed reading','spark','2026-04-01T05:00Z','2026-04-02T05:00Z',gen_random_uuid());
  insert into public.class_assignment_responses(assignment_id,student_id,response,answers,evaluation,revision) values('${reading}','${student}','Student explanation','{}','{"needsTeacherReview":true,"isComplete":true}',1);`);
  assert.equal(parity().required,5);assert.equal(parity().review,1);
+ assert.deepEqual(parity('reading-check'),{studentId:student,required:1,completed:0,review:1,unknown:0});
+ assert.equal(filtered('quiz').review,0);
  sql(`insert into private.student_assignment_feedback(school_id,assignment_id,student_id,activity_type,review_status,response_revision,revision,updated_by) values('${school}','${reading}','${student}','','reviewed',1,1,'${teacher}');`);
  assert.equal(parity().completed,2);
  sql(`update public.class_assignment_responses set revision=2 where assignment_id='${reading}' and student_id='${student}';`);
