@@ -104,6 +104,12 @@ try {
             page.off('response', loginResponse);
             page.off('requestfailed', loginRequestFailed);
         }
+        if (blocked) await page.evaluate(() => {
+            // These cases inject a foreground launch failure. An optional idle
+            // preload can otherwise hit the blocked URL first and trigger the
+            // menu's automatic update recovery before the activity is opened.
+            studentApp.activities.progressFlow.scheduleActivityPreload = () => {};
+        });
         await page.evaluate(id => studentApp.navigateTo({ view: 'unit', unitId: `assignment.${id}` }), seeded.vocabularyAssignmentId);
         await page.waitForFunction(id => studentApp.currentVocab?.assignmentId === id && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false', seeded.vocabularyAssignmentId);
         await page.locator('#activity-menu-view [data-activity="flashcards"]').click();
