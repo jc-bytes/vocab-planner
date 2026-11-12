@@ -118,12 +118,14 @@ try {
     assert.equal(await page.locator('progress[data-band="empty"]').count(), 1);
     const ben = page.getByRole('row').filter({ has: page.getByRole('button', { name: 'Ben', exact: true }) });
     assert.match(await ben.textContent(), /4 \/ 10.*40%.*2/);
-    await page.locator('.class-progress-filter-menu > summary').click();
+    await page.setViewportSize({ width: 980, height: 844 });
+    await page.getByRole('button', { name: 'Filters', exact: true }).click();
     assert.ok(await page.getByLabel('Unfinished only').evaluate(el=>el.closest('label').getBoundingClientRect().height>=44), 'Checkbox label has a full touch target');
     await page.getByLabel('Unfinished only').check();
     assert.equal(await page.getByRole('button', { name: 'Cara', exact: true }).count(), 0);
     await page.getByLabel('Unfinished only').uncheck();
-    await page.locator('.class-progress-filter-menu > summary').click();
+    await page.getByRole('button', { name: 'Done', exact: true }).click();
+    await page.setViewportSize({ width: 1280, height: 900 });
     const progressPanel = page.getByRole('region', { name: 'Trimester progress' });
     await progressPanel.getByLabel('Period', { exact: true }).selectOption('1');
     await progressPanel.getByLabel('Month', { exact: true }).selectOption('2026-03');
