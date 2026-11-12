@@ -4,6 +4,8 @@ function retryableAccessError(error) {
     return !/^(22|23|28|42|PGRST30|REQUEST_ABORTED)/.test(String(error?.code || ''));
 }
 
+const retryDelays = [1000, 3000, 10000, 30000];
+
 // Loaded only after a startup failure. The auth owners retain the session;
 // this module owns retry UI and its short-lived event/timer subscriptions.
 export function createStartupRecovery({ root, retry, signOut, isCurrent,
@@ -14,7 +16,7 @@ export function createStartupRecovery({ root, retry, signOut, isCurrent,
     card.className = 'card';
     card.dataset.startupRecovery = '';
     const title = doc.createElement('h2');
-    title.textContent = 'School access could not load';
+    title.textContent = 'Connecting to your school';
     const status = doc.createElement('p');
     status.setAttribute('role', 'status');
     const button = doc.createElement('button');
@@ -30,28 +32,47 @@ export function createStartupRecovery({ root, retry, signOut, isCurrent,
         cancelTimer(); running = true; button.disabled = true;
         status.textContent = 'Checking your school access...';
         try { await retry(); }
+        catch (error) { failed(error); }
         finally { running = false; if (current()) button.disabled = false; }
     };
-    const reconnect = () => { if (retryable && doc.visibilityState !== 'hidden') void run(); };
+    function showFailure() {
+        title.textContent = retryable ? 'Connecting to your school' : 'School access needs attention';
+        if (retryable && nav.onLine === false) {
+            status.textContent = 'You are still signed in. You are offline. We will try again when your connection returns.';
+        } else {
+            status.textContent = retryable
+                ? 'You are still signed in. We could not finish checking your school access. We will keep trying automatically. You can also choose Try again.'
+                : 'You are still signed in, but school access could not be verified. Try again or ask your school administrator.';
+        }
+    }
+    function failed(error) {
+        if (!current()) return;
+        retryable = retryableAccessError(error);
+        showFailure(); cancelTimer();
+        if (retryable && nav.onLine !== false && doc.visibilityState !== 'hidden') {
+            const delay = retryDelays[Math.min(attempts++, retryDelays.length - 1)];
+            timer = win.setTimeout(() => { void run(); }, delay);
+        }
+    }
+    const reconnect = () => {
+        if (!current() || !retryable) return;
+        if (nav.onLine === false || doc.visibilityState === 'hidden') {
+            cancelTimer(); showFailure();
+        } else void run();
+    };
     button.addEventListener('click', () => { void run(); });
     exit.addEventListener('click', () => { if (current()) void signOut(); });
     win.addEventListener('online', reconnect);
+    win.addEventListener('offline', reconnect);
     win.addEventListener('focus', reconnect);
+    doc.addEventListener('visibilitychange', reconnect);
     return {
-        failed(error) {
-            if (!current()) return;
-            retryable = retryableAccessError(error);
-            status.textContent = retryable
-                ? 'You are still signed in. We could not load your school access. Check your connection and try again.'
-                : 'You are still signed in, but school access could not be verified. Try again or ask your school administrator.';
-            cancelTimer();
-            if (retryable && nav.onLine !== false && attempts < 2) {
-                timer = win.setTimeout(() => { void run(); }, ++attempts === 1 ? 1000 : 3000);
-            }
-        },
+        failed,
         dispose() {
             disposed = true; cancelTimer();
             win.removeEventListener('online', reconnect);
+            win.removeEventListener('offline', reconnect);
+            doc.removeEventListener('visibilitychange', reconnect);
             win.removeEventListener('focus', reconnect);
             if (root?.contains(card)) root.replaceChildren(...original);
         }
