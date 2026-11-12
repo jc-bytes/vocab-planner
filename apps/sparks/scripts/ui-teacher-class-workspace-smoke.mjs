@@ -114,7 +114,7 @@ try {
             const bounds = await menu.boundingBox();
             assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= width && bounds.y >= 0 && bounds.y + bounds.height <= 900);
             await page.keyboard.press('ArrowDown');
-            assert.equal(await page.getByRole('menuitem',{name:'Rewards and account',exact:true}).evaluate(el=>el===document.activeElement),true);
+            assert.equal(await page.getByRole('menuitem',{name:'Assigned work',exact:true}).evaluate(el=>el===document.activeElement),true);
             await page.keyboard.press('Escape');
             assert.equal(await page.locator('.class-student-menu:popover-open').count(),0);
             assert.equal(await trigger.evaluate(el=>el===document.activeElement),true);
@@ -139,7 +139,7 @@ try {
     await page.evaluate(async()=>{window.workspace.hide();await window.workspace.show({classId:'class-a',tab:'students'});});
     assert.equal(await page.getByRole('searchbox',{name:'Search students'}).inputValue(),'Student 01');
     await page.getByText('1 student',{exact:true}).waitFor();
-    for (const [label, tab] of [['Assigned work','assigned'], ['Rewards and account','account']]) {
+    for (const [label, tab] of [['View profile','overview'], ['Assigned work','assigned'], ['Rewards and account','account']]) {
         await page.getByRole('button', {name:'Actions for Student 01', exact:true}).click();
         await page.getByRole('menuitem', {name: label, exact: true}).click();
         assert.deepEqual(await page.evaluate(() => {const [action,{progressContext,...context}]=window.calls.at(-1);return [action,context];}), ['student', {classId:'class-a',studentId:'student-0', tab}]);

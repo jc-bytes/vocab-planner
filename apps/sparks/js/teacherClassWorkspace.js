@@ -243,7 +243,7 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
             menu.setAttribute('aria-label', `Actions for ${student.name}`);
             const trigger = element('button');
             trigger.setAttribute('aria-label', `Actions for ${student.name}`);
-            if (onStudent) for (const [label, tab] of [['Assigned work', 'assigned'], ['Rewards and account', 'account']]) {
+            if (onStudent) for (const [label, tab] of [['View profile', 'overview'], ['Assigned work', 'assigned'], ['Rewards and account', 'account']]) {
                 menu.append(button(label, () => openStudent(tab)));
             }
             if (!active.archived) menu.append(button('Remove from class', () => {
