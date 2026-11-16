@@ -15,7 +15,7 @@ class Element extends EventTarget {
     contains(node) { return this.childNodes.includes(node); }
 }
 
-function fixture() {
+function fixture({ incompleteRetry = false } = {}) {
     const win = new EventTarget(), doc = new EventTarget(), root = new Element();
     const original = new Element(); root.append(original);
     doc.createElement = () => new Element();
@@ -36,6 +36,7 @@ function fixture() {
         retry: async () => {
             requests.push(now);
             if (available) { recovered = true; recovery.dispose(); }
+            else if (incompleteRetry) return false;
             else recovery.failed(error);
         }
     });
@@ -55,6 +56,17 @@ function fixture() {
         available: () => { available = true; }, recovered: () => recovered,
         fail: (failure = error) => recovery.failed(failure) };
 }
+
+test('an incomplete retry never leaves the student stuck checking access', async () => {
+    const f = fixture({ incompleteRetry: true }); f.fail();
+    await f.advance(1000);
+    assert.doesNotMatch(f.status.textContent, /^Checking/);
+    assert.equal(f.button.disabled, false);
+    assert.equal(f.timers.size, 1);
+    f.available();
+    await f.advance(3000);
+    assert.equal(f.recovered(), true);
+});
 
 test('a temporary school outage recovers after the initial retry window with Wi-Fi still connected', async () => {
     const f = fixture(); f.fail();

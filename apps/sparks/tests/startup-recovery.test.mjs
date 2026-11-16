@@ -19,6 +19,35 @@ test('only successful startup is memoized, including after a forced retry', asyn
     assert.equal(await coordinator.run('a', async () => true), true);
 });
 
+test('a stalled student startup times out and can retry without signing out', async context => {
+    context.mock.timers.enable({ apis: ['setTimeout'] });
+    const manager = { currentUser: { uid: 'stalled-student' } };
+    const auth = new StudentAuth(manager);
+    let failures = 0, staleContext;
+    auth.initializeBackendSignIn = async (user, startupContext) => {
+        staleContext = startupContext;
+        return new Promise(() => {});
+    };
+    auth.showStartupRecovery = async (user, startupContext, error) => {
+        assert.equal(startupContext.isCurrent(), true);
+        assert.equal(error.code, 'REQUEST_TIMEOUT');
+        failures++;
+    };
+    let result = 'pending';
+    const startup = auth.handleBackendSignIn(manager.currentUser).then(value => { result = value; });
+    for (let turn = 0; turn < 8; turn++) await Promise.resolve();
+    context.mock.timers.tick(45000);
+    for (let turn = 0; turn < 16; turn++) await Promise.resolve();
+    assert.equal(result, false);
+    await startup;
+    assert.equal(failures, 1);
+    assert.equal(staleContext.isCurrent(), false);
+    assert.equal(staleContext.signal.aborted, true);
+    assert.equal(manager.currentUser.uid, 'stalled-student');
+    auth.initializeBackendSignIn = async () => true;
+    assert.equal(await auth.handleBackendSignIn(manager.currentUser), true);
+});
+
 test('student retries failed school setup without signing out or overwriting local work', async () => {
     let unavailable = true, reads = 0, restores = 0, localLoads = 0;
     const previous = { init: supabaseService.init, getClient: supabaseService.getClient, getProfile: supabaseService.getProfile };

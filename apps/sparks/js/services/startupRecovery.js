@@ -10,7 +10,7 @@ const retryDelays = [1000, 3000, 10000, 30000];
 // this module owns retry UI and its short-lived event/timer subscriptions.
 export function createStartupRecovery({ root, retry, signOut, isCurrent,
     window: win = window, document: doc = document, navigator: nav = navigator }) {
-    let disposed = false, running = false, attempts = 0, timer, retryable = false;
+    let disposed = false, running = false, attempts = 0, timer, retryable = false, failures = 0;
     const original = root ? [...root.childNodes] : [];
     const card = doc.createElement('div');
     card.className = 'card';
@@ -31,7 +31,11 @@ export function createStartupRecovery({ root, retry, signOut, isCurrent,
         if (!current() || running || nav.onLine === false || doc.visibilityState === 'hidden') return;
         cancelTimer(); running = true; button.disabled = true;
         status.textContent = 'Checking your school access...';
-        try { await retry(); }
+        const previousFailures = failures;
+        try {
+            await retry();
+            if (current() && failures === previousFailures) failed({ code: 'STARTUP_INCOMPLETE' });
+        }
         catch (error) { failed(error); }
         finally { running = false; if (current()) button.disabled = false; }
     };
@@ -47,6 +51,7 @@ export function createStartupRecovery({ root, retry, signOut, isCurrent,
     }
     function failed(error) {
         if (!current()) return;
+        failures++;
         retryable = retryableAccessError(error);
         showFailure(); cancelTimer();
         if (retryable && nav.onLine !== false && doc.visibilityState !== 'hidden') {
