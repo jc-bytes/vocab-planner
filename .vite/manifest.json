@@ -410,8 +410,8 @@
     "file": "assets/teacherWorkspaceFeature-B6WGwa5k.css",
     "src": "_teacherWorkspaceFeature-B6WGwa5k.css"
   },
-  "_teacherWorkspaceFeature-n17TgS68.js": {
-    "file": "assets/teacherWorkspaceFeature-n17TgS68.js",
+  "_teacherWorkspaceFeature-CSjyen5X.js": {
+    "file": "assets/teacherWorkspaceFeature-CSjyen5X.js",
     "name": "teacherWorkspaceFeature",
     "isDynamicEntry": true,
     "imports": [
@@ -921,7 +921,7 @@
     ]
   },
   "js/services/startupRecovery.js": {
-    "file": "assets/startupRecovery-CWd_wSK4.js",
+    "file": "assets/startupRecovery-Cdnmmyf1.js",
     "name": "startupRecovery",
     "src": "js/services/startupRecovery.js",
     "isDynamicEntry": true
@@ -1103,7 +1103,7 @@
     "src": "js/student/studentFeatureStyles.js"
   },
   "js/student/studentGames.js": {
-    "file": "assets/studentGames-KR45ZCJt.js",
+    "file": "assets/studentGames-D6AYU9NH.js",
     "name": "studentGames",
     "src": "js/student/studentGames.js",
     "isDynamicEntry": true,
@@ -1377,7 +1377,7 @@
     ]
   },
   "js/teacherActivitySettingsView.js": {
-    "file": "assets/teacherActivitySettingsView-Bjw5JWzu.js",
+    "file": "assets/teacherActivitySettingsView-BvUAsVOR.js",
     "name": "teacherActivitySettingsView",
     "src": "js/teacherActivitySettingsView.js",
     "isDynamicEntry": true,
@@ -1415,7 +1415,7 @@
     ]
   },
   "js/teacherDataManagement.js": {
-    "file": "assets/teacherDataManagement-BkK2b7SX.js",
+    "file": "assets/teacherDataManagement-DScmuC2Z.js",
     "name": "teacherDataManagement",
     "src": "js/teacherDataManagement.js",
     "isDynamicEntry": true,
@@ -1520,7 +1520,7 @@
     ]
   },
   "js/teacherSchoolCalendarSettingsMethods.js": {
-    "file": "assets/teacherSchoolCalendarSettingsMethods-B1S59g_X.js",
+    "file": "assets/teacherSchoolCalendarSettingsMethods-B7Jb626Z.js",
     "name": "teacherSchoolCalendarSettingsMethods",
     "src": "js/teacherSchoolCalendarSettingsMethods.js",
     "isDynamicEntry": true,
@@ -1590,7 +1590,7 @@
     ]
   },
   "js/teacherStudentInsightView.js": {
-    "file": "assets/teacherStudentInsightView-B7WQH3qO.js",
+    "file": "assets/teacherStudentInsightView-bBd90HQ4.js",
     "name": "teacherStudentInsightView",
     "src": "js/teacherStudentInsightView.js",
     "isDynamicEntry": true,
@@ -1643,7 +1643,7 @@
     ]
   },
   "js/teacherStudentProgressFeature.js": {
-    "file": "assets/teacherStudentProgressFeature-rDyqEWly.js",
+    "file": "assets/teacherStudentProgressFeature-CSWMw3qT.js",
     "name": "teacherStudentProgressFeature",
     "src": "js/teacherStudentProgressFeature.js",
     "isDynamicEntry": true,
@@ -1738,12 +1738,12 @@
     ]
   },
   "js/teacherVocabularyGradebook.js": {
-    "file": "assets/teacherVocabularyGradebook-CRB8wEN7.js",
+    "file": "assets/teacherVocabularyGradebook-bEIwL2ri.js",
     "name": "teacherVocabularyGradebook",
     "src": "js/teacherVocabularyGradebook.js",
     "isDynamicEntry": true,
     "imports": [
-      "_teacherWorkspaceFeature-n17TgS68.js",
+      "_teacherWorkspaceFeature-CSjyen5X.js",
       "teacher.html",
       "_teacherAssignmentUi-CBA-3uNp.js",
       "_activityMetadata-C4K0p82d.js",
@@ -1834,7 +1834,7 @@
     ]
   },
   "student.html": {
-    "file": "assets/student-LJIN2EvV.js",
+    "file": "assets/student-Dzez_Gn9.js",
     "name": "student",
     "src": "student.html",
     "isEntry": true,
@@ -1883,7 +1883,7 @@
     ]
   },
   "teacher.html": {
-    "file": "assets/teacher-FnZ4eD3A.js",
+    "file": "assets/teacher-CMuZR4WU.js",
     "name": "teacher",
     "src": "teacher.html",
     "isEntry": true,
@@ -1911,7 +1911,7 @@
       "js/teacherStudentProgressFeature.js",
       "js/schoolAdminView.js",
       "_sectionRead-BW5OAasQ.js",
-      "_teacherWorkspaceFeature-n17TgS68.js",
+      "_teacherWorkspaceFeature-CSjyen5X.js",
       "js/teacherSparks.js",
       "js/teacherGroups.js",
       "js/teacherDataManagement.js",
