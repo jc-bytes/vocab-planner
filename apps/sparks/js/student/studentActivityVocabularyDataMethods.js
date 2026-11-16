@@ -326,7 +326,7 @@ export class StudentActivityVocabularyData {
                 if (!isCurrentLoad()) return;
                 console.warn('Could not load the class assignment:', error);
                 this.renderVocabularyLoadError(vocabMeta, options);
-                return;
+                return false;
             }
         }
         const overridePromise = this.loadVocabularyOverride(vocabMeta, { signal });
@@ -345,7 +345,7 @@ export class StudentActivityVocabularyData {
         if (!vocabData?.words?.length) {
             console.error('Failed to load vocabulary data for:', vocabMeta);
             this.renderVocabularyLoadError(vocabMeta, options);
-            return;
+            return false;
         }
 
         this.applyVocabularyData(vocabData);
@@ -456,6 +456,16 @@ export class StudentActivityVocabularyData {
         this.sm.switchView(options.deferActivityMenu ? 'activity-view' : 'activity-menu-view');
     }
 
+    retryVocabularyLoad(vocabMeta, options) {
+        if (options.fromRoute) {
+            const route = this.sm.parseRoute();
+            if (route?.view !== 'activity' && route?.view !== 'unit') return false;
+            if (vocabMeta.assignmentId && route.unitId !== `assignment.${vocabMeta.assignmentId}`) return false;
+            return this.sm.navigateTo(route, { replace: true });
+        }
+        return this.loadVocabulary(vocabMeta, options);
+    }
+
     renderVocabularyLoadError(vocabMeta = {}, options = {}) {
         if (options.deferActivityMenu) {
             const activityView = $('#activity-view');
@@ -477,7 +487,7 @@ export class StudentActivityVocabularyData {
                     </div>
                 `;
                 activityContainer.querySelector('[data-retry-vocabulary]')?.addEventListener('click', () => {
-                    this.loadVocabulary(vocabMeta, options);
+                    this.retryVocabularyLoad(vocabMeta, options);
                 }, { once: true });
                 activityContainer.querySelector('[data-return-to-units]')?.addEventListener('click', () => {
                     this.sm.navigateTo({ view: 'units' });
@@ -511,7 +521,7 @@ export class StudentActivityVocabularyData {
                 <button type="button" class="btn btn-primary" data-retry-vocabulary>Try again</button>
             `;
             state.querySelector('[data-retry-vocabulary]')?.addEventListener('click', () => {
-                this.loadVocabulary(vocabMeta, options);
+                this.retryVocabularyLoad(vocabMeta, options);
             }, { once: true });
         }
 

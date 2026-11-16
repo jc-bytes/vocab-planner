@@ -5,6 +5,30 @@ globalThis.document = { getElementById: () => ({}), querySelector: () => null,
     querySelectorAll: () => [], addEventListener() {}, readyState: 'loading' };
 globalThis.window = { addEventListener() {}, setTimeout, clearTimeout };
 const { StudentActivityBrowser } = await import('../js/student/studentActivityBrowserMethods.js');
+const { StudentActivityVocabularyData } = await import('../js/student/studentActivityVocabularyDataMethods.js');
+
+test('vocabulary retry replays the entire activity route, including the selected word', async () => {
+    const route = { view: 'activity', unitId: 'assignment.work', activityType: 'illustration', word: 3, hasWordParam: true };
+    const navigations = [];
+    const data = new StudentActivityVocabularyData({ sm: {
+        parseRoute: () => route,
+        navigateTo: async (...args) => navigations.push(args)
+    } });
+    data.loadVocabulary = () => { throw new Error('Retry must restart activity routing, not only reload words'); };
+    await data.retryVocabularyLoad({ assignmentId: 'work' }, { fromRoute: true, deferActivityMenu: true });
+    assert.deepEqual(navigations, [[route, { replace: true }]]);
+});
+
+test('a stale vocabulary retry cannot reopen work after navigation away', () => {
+    for (const route of [{ view: 'arcade' }, { view: 'unit', unitId: 'assignment.other' }]) {
+        const data = new StudentActivityVocabularyData({ sm: {
+            parseRoute: () => route,
+            navigateTo: () => { throw new Error('Stale retry must not navigate'); }
+        } });
+        data.loadVocabulary = () => { throw new Error('Stale retry must not load old work'); };
+        assert.equal(data.retryVocabularyLoad({ assignmentId: 'work' }, { fromRoute: true }), false);
+    }
+});
 
 function fixture(view, automatic) {
     const routes = [], remembered = [];
