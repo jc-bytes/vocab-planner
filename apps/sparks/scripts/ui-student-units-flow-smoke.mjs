@@ -77,5 +77,22 @@ try {
     await joinPage.locator('[data-activity="matching"]').first().click();
     await joinPage.waitForFunction(() => window.studentApp?.currentActivityType === 'matching' && window.studentApp.activityInstance?.container?.querySelector('.matching-shell'));
     assert.deepEqual(joined.errors, []); await joinPage.close();
-    console.log('Actual student Units → published vocabulary → activity menu → Matching controller passed; no activity completed.');
+    const retryPage = await browser.newPage();
+    const retryFixture = await installStudentAssignedFlowFixture(retryPage);
+    await retryPage.goto(`${baseUrl}/student.html#/units`);
+    await retryPage.getByRole('button').filter({ hasText: retryFixture.detail.title }).first().waitFor();
+    let failedRead = false;
+    await retryPage.route('https://fixture.supabase.co/rest/v1/rpc/read_class_assignment_v1', async route => {
+        if (failedRead) return route.fallback();
+        failedRead = true;
+        await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Temporary connection failure', code: 'PGRST000' }) });
+    });
+    await retryPage.evaluate(assignmentId => studentApp.navigateTo({ view: 'activity', unitId: `assignment.${assignmentId}`, activityType: 'matching' }), retryFixture.ids.assignment);
+    await retryPage.locator('[data-retry-vocabulary]').waitFor();
+    await retryPage.locator('[data-retry-vocabulary]').click();
+    await retryPage.waitForFunction(() => studentApp.currentActivityType === 'matching' && studentApp.activityInstance?.container?.querySelector('.matching-shell'), null, { timeout: 10000 });
+    assert.equal(await retryPage.evaluate(() => studentApp.currentUser?.uid), retryFixture.ids.user, 'Recovering vocabulary must keep the student signed in');
+    assert.deepEqual(retryFixture.errors, []);
+    await retryPage.close();
+    console.log('Actual student Units → published vocabulary → activity menu → Matching controller passed; transient activity vocabulary failures recover without sign-out; no activity completed.');
 } finally { await browser?.close(); server?.kill(); }
