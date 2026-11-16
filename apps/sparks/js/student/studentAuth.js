@@ -102,7 +102,11 @@ export class StudentAuth {
             user?.uid,
             async context => {
                 try {
-                    return await this.initializeBackendSignIn(user, context);
+                    return await requestWithTimeout(signal => this.initializeBackendSignIn(user, {
+                        ...context,
+                        signal,
+                        isCurrent: () => context.isCurrent() && !signal.aborted
+                    }), { signal: context.signal, timeoutMs: 45000, label: 'Student startup' });
                 } catch (error) {
                     if (context.isCurrent()) await this.showStartupRecovery(user, context, error);
                     return false;
