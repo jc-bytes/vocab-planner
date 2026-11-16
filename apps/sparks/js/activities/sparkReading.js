@@ -63,16 +63,20 @@ export class SparkReadingActivity {
         this.answers = {};
         this.completedAt = '';
         this.feedback = '';
+        this.destroyed = false;
         this.renderLoading();
         this.init();
     }
 
     async init() {
         if (globalThis.document?.nodeType === 9) await loadStudentSparkStyles();
+        if(this.destroyed)return;
         try {
             const sparks = await this.loadEligibleSparks();
+            if(this.destroyed)return;
             this.sparks = sparks.length > 0 ? sparks : [this.createFallbackSpark()];
         } catch (error) {
+            if(this.destroyed)return;
             console.error('Failed to load Spark reading', error);
             this.sparks = [this.createFallbackSpark()];
         }
@@ -246,6 +250,8 @@ export class SparkReadingActivity {
     }
 
     render() {
+        if(this.destroyed)return;
+        this.scoredRuntime?.destroy();this.scoredRuntime=null;this.renderGeneration=(this.renderGeneration || 0)+1;
         this.container.innerHTML = '';
         const activity = createElement('div', 'spark-reading-activity');
         const sourceHtml = this.spark.sourceUrl
@@ -352,6 +358,18 @@ export class SparkReadingActivity {
         });
 
         this.container.appendChild(activity);
+        if(this.context.mountScoredCheck && this.getQuestions().some(q=>q.type===SPARK_QUESTION_TYPES.MULTIPLE_CHOICE) && !this.unscoredSparkIds?.has(this.spark.id)){
+            const article=activity.querySelector('.spark-reading-copy'),spark=this.spark,generation=this.renderGeneration;
+            const current=()=>this.spark===spark && this.renderGeneration===generation && article?.isConnected;
+            if(article){article.replaceChildren(createElement('p',undefined,'Loading your saved reading check…'));
+                void this.context.mountScoredCheck(spark,article,current).then(runtime=>{
+                    if(!current()){runtime?.destroy();return;}
+                    if(runtime)this.scoredRuntime=runtime;
+                    else{this.unscoredSparkIds ||= new Set();this.unscoredSparkIds.add(spark.id);this.render();}
+                }).catch(()=>{if(current()){article.textContent='Your reading check could not be loaded. Reopen this Spark to try again.';}});
+            }
+        }
         refreshIcons(activity);
     }
+    destroy(){this.destroyed=true;this.renderGeneration=(this.renderGeneration || 0)+1;this.scoredRuntime?.destroy();this.onProgress=null;this.onSaveState=null;}
 }

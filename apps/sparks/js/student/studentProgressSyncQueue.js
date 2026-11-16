@@ -19,6 +19,7 @@ export class StudentProgressSyncQueue {
             clearTimeout: timer => clearTimeout(timer)
         };
         this.retryTimer = null;
+        this.additionalDrains = new Map();
         this.latestUnitSnapshots = new Map();
         this.durableUnitSnapshots = new Map();
         this.snapshotClock = 0;
@@ -26,6 +27,12 @@ export class StudentProgressSyncQueue {
         this.drainScheduler = new StudentSyncDrainScheduler((owner, generation) =>
             this.cloud.isCurrentOwner(owner)
             && (generation === undefined || generation === this.cloud.cloudGeneration));
+    }
+
+    registerDrain(name, handler) {
+        if(this.additionalDrains.has(name))throw new Error(`A sync handler is already registered for ${name}.`);
+        this.additionalDrains.set(name,handler);
+        return ()=>{if(this.additionalDrains.get(name)===handler)this.additionalDrains.delete(name);};
     }
 
     hasUnpersistedUnitDraft(ownerUserId, unitKey) {
@@ -230,6 +237,22 @@ export class StudentProgressSyncQueue {
             || generation !== this.cloud.cloudGeneration) return;
 
         this.cancelRetry();
+        if(!this.additionalDrains.has('learning-results')){
+            let hasLearningWork=false;
+            try {
+                const db=await imageDB.open();
+                if(db.objectStoreNames.contains('learningOutbox'))hasLearningWork=(await db.getAllFromIndex('learningOutbox','owner',ownerUserId)).some(row=>row.status==='pending');
+                if(hasLearningWork){const {ensureLearningQueue}=await import('../learningResults/queue.js');ensureLearningQueue(this);}
+            }catch(error){if(hasLearningWork)this.scheduleRetry({...options,ownerUserId,generation},5000);}
+            if(!this.cloud.isCurrentOwner(ownerUserId,options) || generation!==this.cloud.cloudGeneration)return;
+        }
+        const additional=[];
+        for(const handler of this.additionalDrains.values()) {
+            additional.push(await handler({...options,ownerUserId,generation}));
+            if(!this.cloud.isCurrentOwner(ownerUserId,options) || generation!==this.cloud.cloudGeneration)return;
+        }
+        const earlyRetries=additional.map(state=>state?.retryAt).filter(value=>Number.isFinite(value));
+        if(earlyRetries.length)this.scheduleRetry({ownerUserId,generation},Math.min(...earlyRetries)-this.scheduler.now());
         let pending = [];
         try {
             await imageDB.reviveRetryableSyncActions({ ownerUserId });
@@ -301,19 +324,19 @@ export class StudentProgressSyncQueue {
         }
         if (!this.cloud.isCurrentOwner(ownerUserId, options)
             || generation !== this.cloud.cloudGeneration) return;
-        if (remaining.length > 0) {
-            const next = cycle.finish(remaining);
-            this.scheduleRetry({ ownerUserId, generation }, next - this.scheduler.now());
-        }
+        const additionalPending=additional.some(state=>state?.pending>0),additionalHeld=additional.some(state=>state?.held>0);
+        const retryTimes=additional.map(state=>state?.retryAt).filter(value=>Number.isFinite(value));
+        if(remaining.length>0)retryTimes.push(cycle.finish(remaining));
+        if(retryTimes.length)this.scheduleRetry({ownerUserId,generation},Math.min(...retryTimes)-this.scheduler.now());
         if ([...this.latestUnitSnapshots.keys()].some(key => this.hasUnpersistedUnitDraft(ownerUserId, key))
             || remaining.some(record => record.failureReason === 'unit_work_newer_draft')) {
             this.setQueueStatus('Newer work is not synced. Keep this page open.', ownerUserId, generation);
-        } else if (terminalFailures > 0 || failed.length > 0) {
+        } else if (terminalFailures > 0 || failed.length > 0 || additionalHeld) {
             this.setQueueStatus('Some local changes need attention', ownerUserId, generation);
             if (!options.silent) {
                 notifications.warning('Some saved changes were rejected, but other work continued syncing.');
             }
-        } else if (remaining.length > 0) {
+        } else if (remaining.length > 0 || additionalPending) {
             this.setQueueStatus('Saved locally - checking in background', ownerUserId, generation);
         } else if (retryableFailures > 0) {
             this.setQueueStatus('Sync paused - saved locally', ownerUserId, generation);

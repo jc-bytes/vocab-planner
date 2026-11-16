@@ -137,7 +137,7 @@ async renderSparkLibrary({ loadStyles = loadStudentSparkStyles, timeoutMs = 1000
             const dateRange = this.getCurrentSparkDateRange();
             const { SparkReadingActivity } = await import('../activities/sparkReading.js');
             if (!current()) return;
-            new SparkReadingActivity(
+            const reader = new SparkReadingActivity(
                 container,
                 {
                     subjectSlug: this.sm.selectedSubjectSlug || 'technology',
@@ -145,12 +145,14 @@ async renderSparkLibrary({ loadStyles = loadStudentSparkStyles, timeoutMs = 1000
                     scheduledDate: dateRange.onOrBefore,
                     onOrAfter: dateRange.onOrAfter,
                     loadSparks: async () => sparks,
-                    getSparkState: sparkId => progress[sparkId] || null
+                    getSparkState: sparkId => progress[sparkId] || null,
+                    mountScoredCheck:async(spark,root,isCurrent)=>{const {mountReadingLearning}=await import('./studentLearningResults.js');if(!current() || !isCurrent())return null;return mountReadingLearning(this.sm,root,{source:{kind:'spark',id:spark.id},grade:Number(this.getStudentGradeLevel()),isCurrent:()=>current() && isCurrent(),signal:navigation});}
                 },
                 null,
                 state => this.saveSparkLibraryState(state),
                 progress[sparks[0].id] || null
             );
+            this.activities.session.activityInstance=reader;navigation?.addEventListener('abort',()=>reader.destroy(),{once:true});
         } catch (error) {
             if (!current()) return;
             console.error('Failed to render Spark library', error);

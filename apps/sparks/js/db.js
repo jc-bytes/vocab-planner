@@ -31,7 +31,7 @@ export class ImageDB {
 
     async open() {
         if (!this.dbPromise) {
-            this.dbPromise = import('idb').then(({ openDB }) => openDB(this.dbName, 6, {
+            this.dbPromise = import('idb').then(({ openDB }) => openDB(this.dbName, 7, {
                 upgrade: (db, _oldVersion, _newVersion, transaction) => {
                     const drawingStore = db.objectStoreNames.contains(this.storeName)
                         ? transaction.objectStore(this.storeName)
@@ -56,6 +56,15 @@ export class ImageDB {
                     }
                     if (!syncStore.indexNames.contains('ownerDedupeKey')) {
                         syncStore.createIndex('ownerDedupeKey', ['ownerUserId', 'dedupeKey'], { unique: false });
+                    }
+
+                    for (const name of ['learningPackages', 'learningAttempts', 'learningOutbox']) {
+                        const store = db.objectStoreNames.contains(name)
+                            ? transaction.objectStore(name)
+                            : db.createObjectStore(name, { keyPath: ['ownerUserId', 'id'] });
+                        if (!store.indexNames.contains('ownerStatus')) store.createIndex('ownerStatus', ['ownerUserId', 'status']);
+                        if (!store.indexNames.contains('ownerAttempt')) store.createIndex('ownerAttempt', ['ownerUserId', 'attemptId']);
+                        if (!store.indexNames.contains('owner')) store.createIndex('owner', 'ownerUserId');
                     }
 
                     if (_oldVersion < 6) {

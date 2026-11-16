@@ -28,7 +28,7 @@ export async function mountTeacherSparkPreview(spark, grade) {
         }
     };
     const sm = {
-        currentUser: { uid: 'teacher-preview' }, studentProfile: { grade }, currentVocab: null,
+        isTeacherUnitPreview: true, currentUser: { uid: 'teacher-preview' }, studentProfile: { grade }, currentVocab: null,
         activities: { schoolCalendar: getDefaultSchoolCalendar(), vocabularyData: {
             classSelection: selection, async loadClassSelection() {}, renderSubjectPicker(selector) { document.querySelector(selector)?.replaceChildren(); }
         } },

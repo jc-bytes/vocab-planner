@@ -261,7 +261,7 @@ export class StudentActivityLauncher {
         $('#activity-view')?.classList.remove('flashcards-active');
         container.innerHTML = getStudentPageSkeleton('activity', 'Loading activity', { activityType: type });
 
-        let ActivityClass;
+        let ActivityClass,learningPrepared=null;
         const launchController = session.activityLaunchController;
         const cancelStartup = () => launchController?.abort();
         if (navigation?.aborted) cancelStartup();
@@ -278,7 +278,14 @@ export class StudentActivityLauncher {
                 runActivityStartupStage('module', () => this.activities.loadActivityClass(type), launchOptions),
                 runtimeReady.then(() => runActivityStartupStage('verification', signal => {
                     if (!isCurrentLaunch()) throw new DOMException('Activity launch changed.', 'AbortError');
-                    return this.activities.startVerifiedActivityAttempt(type, { ...launchOptions, signal });
+                    return (async()=>{
+                        if(!this.sm.authDisabled && this.sm.currentUser && vocab.assignmentId && !['illustration','word-hunt'].includes(type)){
+                            const {prepareVocabularyLearning}=await import('./studentLearningResults.js');
+                            learningPrepared=await prepareVocabularyLearning(this.sm,type,{signal});
+                        }
+                        if(learningPrepared)return learningPrepared.session?.attempt || learningPrepared;
+                        return this.activities.startVerifiedActivityAttempt(type, { ...launchOptions, signal });
+                    })();
                 }, { ...launchOptions, retry: false }))
             ]);
             ActivityClass = loadedActivityClass;
@@ -296,6 +303,17 @@ export class StudentActivityLauncher {
         }
 
         if (!isCurrentLaunch()) return;
+
+        if(learningPrepared){
+            try{
+                const {mountVocabularyLearning}=await import('./studentLearningResults.js');
+                const instance=await mountVocabularyLearning(this.sm,container,learningPrepared,{isCurrent:isCurrentLaunch});
+                if(!isCurrentLaunch()){await instance.destroy();return;}
+                this.sm.activityInstance=instance;
+            }catch(error){if(isCurrentLaunch()){this.renderActivityError(container,type,unitId,'Your saved activity could not be opened. Reopen it to try again.',error);}}
+            finally{if(isCurrentLaunch())setStudentPageLoading(activityView,false);}
+            return;
+        }
 
         const onProgress = scoreData => {
             if (isCurrentLaunch()) this.activities.handleAutoSave(scoreData);

@@ -1,0 +1,31 @@
+{
+  "projectRef": "ezmbgkmzimsldpizcqxv",
+  "hostedAuth": true,
+  "realPostgREST": true,
+  "fictionalOnly": true,
+  "checks": [
+    "Six fictional accounts sign in through hosted Auth",
+    "Teacher-only settings; school and grade access; two sections share one task and speed target",
+    "Individual passing targets do not change shared scoring settings",
+    "Offline-saved attempts sync through real REST; original scores and tied cross-section leaderboard confirmed",
+    "Ten concurrent real REST terminal replays return one result without duplicate coin awards",
+    "Replacement computer signs in and reads saved attempt without teacher approval",
+    "Changing shared speed target creates a new task and leaderboard",
+    "Grade six has its own task and leaderboard, inaccessible from grade seven",
+    "Finished below-target attempts qualify; two new failures flag help and passing clears it",
+    "Reading MC finalization and immutable writing revisions sync; retries retain written answers",
+    "Owner substitution and current-access removal reject protected reads"
+  ],
+  "startedAt": "2026-11-16T23:47:38.690Z",
+  "completedAt": "2026-11-16T23:50:13.317Z",
+  "fixture": {
+    "school": "1984944f-c433-43af-9a46-21f998176a6d",
+    "otherSchool": "60c71b21-2840-4ef5-b346-8528f4a81a8f",
+    "classA": "f70cebf3-3660-4d04-9b5a-26f2644e299e",
+    "classB": "b9c979ed-047c-430e-b09e-e2439bd484cd",
+    "assignmentA": "c18ba471-e5d3-48e2-a0ff-e6c24a8c22da",
+    "assignmentB": "a62aa1f3-b514-40f0-ac74-c2a99bb539bd",
+    "taskId": "313b9eb9-a978-48a5-a5a6-f39d39559290",
+    "attemptId": "95f6745e-a7fa-4b03-a1c4-0b00bafb7c82"
+  }
+}

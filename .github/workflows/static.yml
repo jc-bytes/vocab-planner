@@ -116,6 +116,10 @@ jobs:
         run: npm run test:school-platform:rest
       - name: Verify database authorization, receipts and progress contracts
         run: npm run test:arcade-purchase:database && npm run test:student-mutation-ownership:database && npm run test:school-setting-ownership:database && npm run test:school-progress-snapshot:database && npm run test:selected-profile-export:database && npm run test:student-queue-order:database && npm run test:school-progress-batch:database && npm run test:school-progress-permissions:database && npm run test:school-progress-groups:database && npm run test:policy-request-identity:database && npm run test:progress-lint-compatibility:database
+      - name: Verify learning result transactions and capacity
+        env:
+          SPARKS_LEARNING_ENFORCE_BUDGETS: '1'
+        run: npm run test:learning-results:database && npm run test:learning-results:capacity
       - name: Supabase authorization acceptance tests
         run: npm run test:acceptance:supabase && npm run test:private-classrooms
       - name: Diagnose local Supabase failure
@@ -214,6 +218,8 @@ jobs:
         run: AUTH_LAYOUT_DIST=1 npm run test:ui:auth-layout
       - name: Verify built Arcade sprites and gameplay
         run: npm run test:ui:arcade-gameplay
+      - name: Verify built learning games, reading and offline recovery
+        run: npm run test:learning-results:ui:built
       - name: Add Grade 9 risk practice pilot
         run: |
           mkdir -p dist-desktop/g9-risk-practice-site

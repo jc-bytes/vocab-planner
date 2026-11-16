@@ -1,0 +1,116 @@
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+import {readFile} from 'node:fs/promises';
+import {generateLayout} from '../js/learningResults/task.js';
+import {ensureViteServer} from './lib/local-vite-server.mjs';
+const built=process.argv.includes('--built'),manifest=built?JSON.parse(await readFile(new URL('../dist-desktop/.vite/manifest.json',import.meta.url),'utf8')):null;
+const teacherModule=built?'/'+manifest['js/teacherLearningResultsSettings.js'].file:'/js/teacherLearningResultsSettings.js';
+const runtimeModule=built?'/'+manifest['js/student/studentLearningResults.js'].file:'/js/student/studentLearningResults.js';
+const layouts=Object.fromEntries(['crossword','word-search'].map(activity=>[activity,generateLayout({words:[{id:'cat',word:'CAT'},{id:'art',word:'ART'}],activity,seed:7})]));
+const port=8797,baseUrl=`http://127.0.0.1:${port}`;let server,browser;
+try{
+ server=await ensureViteServer({baseUrl,probePath:'/student.html',host:'127.0.0.1',port,...(built?{args:['vite','preview','--outDir','dist-desktop','--host','127.0.0.1','--port',String(port),'--strictPort']}:{})});browser=await chromium.launch();const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/learning-results-test.html',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html lang="en"><head><title>Learning results test</title></head><body><main id="test"></main></body></html>'}));
+ await page.goto(`${baseUrl}/learning-results-test.html`);
+ const activities=['quiz','flashcards','synonym-antonym','fill-in-blank','scramble','wordle','hangman','matching','speed-match','crossword','word-search'];
+ async function mountVocabulary(activity){
+  await page.evaluate(async({activity,runtimeModule,layouts})=>{
+   const {studentLearningCoordinator,mountVocabularyLearning}=await import(runtimeModule);
+   await window.runtime?.destroy();window.clock=0;const owner='local-dev',sm={currentUser:{uid:owner}},coordinator=studentLearningCoordinator(sm);coordinator.store.database.dbName=`ui-learning-${crypto.randomUUID()}`;coordinator.now=()=>window.clock;window.learningCoordinator=coordinator;
+   const words=[{id:'cat',word:'CAT',definition:'A small cat',example:'A CAT sleeps.',relation:'synonym',options:[{id:'yes',text:'A small cat'},{id:'no',text:'A car'}],correctOptionId:'yes'},{id:'art',word:'ART',definition:'Creative work',example:'We make ART.',relation:'synonym',options:[{id:'yes',text:'Creative work'},{id:'no',text:'A road'}],correctOptionId:'yes'}];
+   const task={id:crypto.randomUUID(),contractVersion:'learning-results-v1',activity,sharedTargetMilliseconds:86400000,appearances:2,words};if(layouts[activity])task.variants=[layouts[activity]];
+   const canonical=value=>value===null || typeof value!=='object'?JSON.stringify(value):Array.isArray(value)?`[${value.map(canonical).join(',')}]`:`{${Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')}}`;
+   const content={task,source:{title:'Fixture'},contextKey:'fixture',target:80,startContext:{},writing:null},manifestHash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(canonical(content))))].map(n=>n.toString(16).padStart(2,'0')).join('');
+   const pkg={id:crypto.randomUUID(),preparationId:crypto.randomUUID(),ownerUserId:owner,task,content,manifestHash,passingTarget:80,startContext:{},ready:true,offlineReady:true};
+   window.learningPackage=pkg;window.learningStudent=sm;await coordinator.store.savePackage(pkg);const session=await coordinator.start(pkg);window.learningSession=session;window.runtime=await mountVocabularyLearning(sm,document.getElementById('test'),{coordinator,pkg,session});
+  },{activity,runtimeModule,layouts});
+ }
+ const settled=()=>page.waitForFunction(()=>!document.getElementById('test').hasAttribute('aria-busy'));
+ for(const activity of activities){
+  await mountVocabulary(activity);
+  for(const width of [360,1280]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`${activity} fits ${width}px`);}
+  for(let step=0;step<20;step++){
+   if(await page.getByRole('button',{name:'See my result',exact:true}).count()){await page.getByRole('button',{name:'See my result',exact:true}).click();break;}
+   if(await page.getByRole('button',{name:'Ready for the question',exact:true}).count()){await page.getByRole('button',{name:'Ready for the question',exact:true}).click();await page.waitForFunction(()=>!document.getElementById('test').hasAttribute('aria-busy'));continue;}
+   const next=await page.evaluate(()=>{const a=window.learningSession.attempt,o=a.schedule.find(o=>!a.state.originals[o.id]);return o?{...o,word:a.task.words.find(w=>w.id===o.wordId)}:null;});
+   if(!next)throw new Error(`${activity}: no next opportunity`);
+   if(['quiz','flashcards','synonym-antonym'].includes(activity))await page.getByRole('button',{name:next.word.options[0].text,exact:true}).click();
+   else if(activity==='fill-in-blank'){await page.getByLabel('Missing word').fill(next.word.word);await page.getByRole('button',{name:'Submit answer',exact:true}).click();}
+   else if(activity==='wordle'){await page.getByLabel('Next guess').fill(next.word.word);await page.getByRole('button',{name:'Submit guess',exact:true}).click();}
+   else if(activity==='hangman'){for(const letter of new Set(next.word.word)){await page.getByRole('button',{name:letter,exact:true}).click();await page.waitForFunction(()=>!document.getElementById('test').hasAttribute('aria-busy'));}}
+   else if(activity==='scramble'){for(const letter of next.word.word){await page.locator('.learning-tiles').nth(1).getByRole('button',{name:letter,exact:true}).first().click();}await page.getByRole('button',{name:'Submit arrangement',exact:true}).click();}
+   else if(activity==='matching'){await page.locator('.learning-match-column').first().getByRole('button',{name:next.word.word,exact:true}).click();await page.locator('.learning-match-column').nth(1).getByRole('button',{name:next.word.definition,exact:true}).click();}
+   else if(activity==='speed-match')await page.getByRole('button',{name:next.word.word,exact:true}).click({force:true});
+   else if(activity==='crossword'){
+    await page.evaluate(()=>{const a=window.learningSession.attempt,l=a.task.variants[0];l.gridRows.forEach((row,r)=>[...row].forEach((letter,c)=>{if(letter==='#')return;const input=document.querySelector(`[aria-label="Row ${r+1}, column ${c+1}"]`);input.value=letter;input.dispatchEvent(new Event('input',{bubbles:true}));}));});await page.getByRole('button',{name:'Submit whole puzzle',exact:true}).click();
+   }else{
+    const ends=await page.evaluate(wordId=>{const a=window.learningSession.attempt,l=a.task.variants[0],p=l.placements.find(p=>p.wordId===wordId),directions={N:[-1,0],NE:[-1,1],E:[0,1],SE:[1,1],S:[1,0],SW:[1,-1],W:[0,-1],NW:[-1,-1]},[dr,dc]=directions[p.direction],word=a.task.words.find(w=>w.id===wordId),r=p.startRow,c=p.startColumn,endR=r+dr*(word.word.length-1),endC=c+dc*(word.word.length-1);return [`${l.gridRows[r][c]}, row ${r+1}, column ${c+1}`,`${l.gridRows[endR][endC]}, row ${endR+1}, column ${endC+1}`];},next.wordId);
+    for(const label of ends){await page.getByRole('button',{name:label,exact:true}).focus();await page.keyboard.press('Enter');}
+   }
+   await page.waitForFunction(()=>!document.getElementById('test').hasAttribute('aria-busy'));
+  }
+  await page.getByText('1000 / 1000 points',{exact:true}).waitFor();assert.equal(await page.getByText('Waiting to sync',{exact:true}).count(),1,activity);console.log(`PASS ${activity}: full scheduled set and provisional 1000-point result`);
+ }
+ // Exercise saved original outcomes through the same browser controls as students.
+ await mountVocabulary('fill-in-blank');
+ const firstWord=await page.evaluate(()=>{const a=window.learningSession.attempt;return a.task.words.find(w=>w.id===a.schedule[0].wordId).word;});
+ await page.evaluate(()=>window.clock=4000);await page.getByLabel('Missing word').fill(firstWord.slice(0,2)+'X');await page.getByRole('button',{name:'Submit answer',exact:true}).click();await settled();
+ const beforeCorrection=await page.evaluate(()=>({original:window.learningSession.attempt.state.originals[window.learningSession.attempt.schedule[0].id],time:window.learningSession.attempt.state.recordedMilliseconds}));
+ assert.deepEqual(beforeCorrection.original.credit,{n:'2',d:'3'});assert.equal(beforeCorrection.time,4000);
+ await page.evaluate(()=>window.clock+=600000);await page.getByLabel(`Type ${firstWord} to correct this answer`).fill(firstWord);await page.getByRole('button',{name:'Save correction',exact:true}).click();await settled();
+ assert.deepEqual(await page.evaluate(()=>({original:window.learningSession.attempt.state.originals[window.learningSession.attempt.schedule[0].id],time:window.learningSession.attempt.state.recordedMilliseconds})),beforeCorrection);
+ console.log('PASS spelling: positional partial credit and correction preserve original score and time');
+ await mountVocabulary('quiz');await page.getByRole('button',{name:'Clue',exact:true}).click();await settled();await page.evaluate(()=>window.clock+=600000);await page.getByRole('button',{name:'Return to the activity',exact:true}).click();await settled();
+ const answer=await page.evaluate(()=>{const a=window.learningSession.attempt;return a.task.words.find(w=>w.id===a.schedule[0].wordId).options[0].text;});await page.getByRole('button',{name:answer,exact:true}).click();await settled();
+ assert.deepEqual(await page.evaluate(()=>window.learningSession.attempt.state.originals[window.learningSession.attempt.schedule[0].id].credit),{n:'1',d:'2'});assert.equal(await page.evaluate(()=>window.learningSession.combo().longest),0);assert.equal(await page.evaluate(()=>window.learningSession.attempt.state.recordedMilliseconds),0);
+ console.log('PASS clue: half credit, no combo and clue study excluded from time');
+ await mountVocabulary('crossword');await page.getByRole('button',{name:'Clue',exact:true}).first().click();await settled();await page.getByRole('button',{name:'Return to the activity',exact:true}).click();await settled();
+ const assistedCount=await page.evaluate(()=>window.learningSession.attempt.state.assisted.length);assert.equal(assistedCount,2,'intersection clue affects both words');
+ await page.evaluate(()=>{window.learningSession.attempt.task.variants[0].gridRows.forEach((row,r)=>[...row].forEach((letter,c)=>{if(letter==='#')return;const input=document.querySelector(`[aria-label="Row ${r+1}, column ${c+1}"]`);input.value=letter;input.dispatchEvent(new Event('input',{bubbles:true}));}));});await page.getByRole('button',{name:'Submit whole puzzle',exact:true}).click();await settled();
+ assert.deepEqual(await page.evaluate(()=>Object.values(window.learningSession.attempt.state.originals).map(o=>o.credit)),[{n:'1',d:'2'},{n:'1',d:'2'}]);console.log('PASS Crossword: clue covers intersecting words and whole-puzzle originals retain half credit');
+ await mountVocabulary('speed-match');const speed=await page.evaluate(()=>{const a=window.learningSession.attempt;return {word:a.task.words.find(w=>w.id===a.schedule[0].wordId).word,wrong:a.task.words.find(w=>w.id!==a.schedule[0].wordId).word,total:a.schedule.length};});
+ await page.getByRole('button',{name:speed.wrong,exact:true}).click({force:true});await settled();assert.equal(await page.getByRole('button',{name:'See my result',exact:true}).count(),0);assert.equal(await page.getByRole('button',{name:speed.word,exact:true}).count(),0);
+ await page.getByLabel(`Type ${speed.word} to correct this answer`).fill(speed.word);await page.getByRole('button',{name:'Save correction',exact:true}).click();await settled();
+ assert.equal(await page.evaluate(()=>window.learningSession.attempt.schedule.length),speed.total);assert.equal(await page.evaluate(()=>Object.values(window.learningSession.attempt.state.originals)[0].credit.n),'0');assert.equal(await page.getByLabel('Falling words').count(),1);
+ console.log('PASS Speed Match: wrong answer requires correction before the next scheduled appearance');
+ await mountVocabulary('quiz');await page.evaluate(()=>{window.clock=3000;Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
+ await page.getByRole('button',{name:'Resume activity',exact:true}).waitFor();assert.equal(await page.locator('.learning-game').isVisible(),false);
+ await page.evaluate(()=>{window.clock+=600000;Object.defineProperty(document,'hidden',{configurable:true,value:false});});await page.getByRole('button',{name:'Resume activity',exact:true}).click();await page.locator('.learning-game').waitFor({state:'visible'});assert.equal(await page.locator('.learning-game').isVisible(),true);assert.equal(await page.evaluate(()=>window.learningSession.attempt.state.recordedMilliseconds),3000);await page.evaluate(()=>{delete document.hidden;});
+ console.log('PASS pause: hidden answers, explicit resume and closed time excluded');
+ if(built){
+  await page.evaluate(async()=>{await navigator.serviceWorker.register('/student-sw.js');await navigator.serviceWorker.ready;});
+  await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
+  assert.equal(await page.evaluate(()=>window.learningCoordinator.prepareAssets('quiz')),true,'complete production student graph is cached');
+  await mountVocabulary('quiz');await page.evaluate(async()=>{window.clock=5000;await window.learningSession.checkpoint();await window.runtime.destroy();localStorage.setItem('learning-ui-recovery',JSON.stringify({dbName:window.learningCoordinator.store.database.dbName,attemptId:window.learningSession.attempt.id,packageId:window.learningPackage.id}));});
+  // Only the blank harness document is supplied by the fixture. Production modules must load from the real worker cache.
+  await page.context().setOffline(true);await page.reload();
+  await page.evaluate(async()=>{let blocked=false;try{await fetch('/offline-network-probe',{cache:'no-store'});}catch{blocked=true;}if(!blocked)throw new Error('Network is still available');Object.defineProperty(navigator,'onLine',{configurable:true,value:false});});
+  await page.evaluate(async runtimeModule=>{const {studentLearningCoordinator,mountVocabularyLearning}=await import(runtimeModule),saved=JSON.parse(localStorage.getItem('learning-ui-recovery')),sm={currentUser:{uid:'local-dev'}},coordinator=studentLearningCoordinator(sm);coordinator.store.database.dbName=saved.dbName;window.clock=900000;coordinator.now=()=>window.clock;const pkg=await coordinator.store.get('learningPackages','local-dev',saved.packageId),session=await coordinator.resume(saved.attemptId);window.learningSession=session;window.runtime=await mountVocabularyLearning(sm,document.getElementById('test'),{coordinator,pkg,session});if(await coordinator.prepareAssets('quiz')!==true)throw new Error('Cached graph unavailable offline');const next=await coordinator.start(pkg);if(next.id===session.attempt.id)throw new Error('Offline start did not create a new attempt');const unready={...pkg,offlineReady:false};try{await coordinator.start(unready);throw new Error('Accepted an unready offline package');}catch(error){if(error.code!=='PREVIOUS_DOWNLOAD_REQUIRED')throw error;}},runtimeModule);
+  assert.equal(await page.evaluate(()=>window.learningSession.attempt.state.recordedMilliseconds),5000);assert.equal(await page.getByRole('button',{name:'Clue',exact:true}).count(),1);await page.context().setOffline(false);await page.evaluate(()=>{delete navigator.onLine;});
+  console.log('PASS built offline: actual cached imports, saved timer resume, downloaded start and unready-package rejection');
+ }
+ await page.evaluate(async runtimeModule=>{
+  await window.runtime.destroy();const {studentLearningCoordinator,mountPreparedReading}=await import(runtimeModule);window.clock=0;const sm={currentUser:{uid:'local-dev'}},coordinator=studentLearningCoordinator(sm);coordinator.store.database.dbName=`ui-reading-${crypto.randomUUID()}`;coordinator.now=()=>window.clock;
+  const task={id:crypto.randomUUID(),contractVersion:'learning-results-v1',activity:'reading-check',sharedTargetMilliseconds:10000,words:[{id:'mc',word:'Choose CAT',options:[{id:'yes',text:'CAT'},{id:'no',text:'DOG'}],correctOptionId:'yes'}],writingQuestions:[{id:'write',prompt:'Explain your answer'}]};
+  const content={task,source:{title:'Reading timer test',sparkText:'Read this first.'}},canonical=value=>value===null || typeof value!=='object'?JSON.stringify(value):Array.isArray(value)?`[${value.map(canonical).join(',')}]`:`{${Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')}}`,manifestHash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(canonical(content))))].map(n=>n.toString(16).padStart(2,'0')).join('');
+  const pkg={id:crypto.randomUUID(),preparationId:crypto.randomUUID(),ownerUserId:'local-dev',task,content,manifestHash,passingTarget:80,startContext:{},ready:true,writing:{writingRevisionId:null,responses:{write:'My earlier written response.'},legacyRevision:0}};
+  const session=await coordinator.start(pkg);window.learningSession=session;window.runtime=await mountPreparedReading(sm,document.getElementById('test'),{coordinator,pkg,session});
+ },runtimeModule);
+ await page.evaluate(()=>window.clock+=100000);await page.getByRole('button',{name:'Multiple choice',exact:true}).click();await page.waitForFunction(()=>!document.getElementById('test').hasAttribute('aria-busy'));
+ await page.getByLabel('CAT',{exact:true}).check();await page.evaluate(()=>window.clock+=12000);await page.getByRole('button',{name:'Written responses',exact:true}).click();await page.waitForFunction(()=>!document.getElementById('test').hasAttribute('aria-busy'));
+ assert.equal(await page.getByLabel('Explain your answer').inputValue(),'My earlier written response.');assert.equal(await page.getByLabel('CAT',{exact:true}).count(),0,'choices are hidden during writing');
+ await page.evaluate(()=>window.clock+=500000);assert.equal(await page.evaluate(()=>window.learningSession.attempt.events.filter(e=>e.type==='reading-submission').length),0);
+ await page.getByRole('button',{name:'Submit whole reading check',exact:true}).click();await page.waitForFunction(()=>!document.getElementById('test').hasAttribute('aria-busy'));
+ await page.getByText('990 / 1000 points',{exact:true}).waitFor();assert.equal(await page.evaluate(()=>window.learningSession.attempt.state.recordedMilliseconds),12000);assert.equal(await page.getByRole('radio').count(),0,'submitted choices are locked');console.log('PASS reading: separate timed MC section, retained writing and whole-check locking');
+ await page.evaluate(async runtimeModule=>{await window.runtime.destroy();const {prepareSourceLearning}=await import(runtimeModule);const calls=[],pkg={preparationId:'recovered-package'},session={attempt:{preparationId:pkg.preparationId}},coordinator={owner:()=> 'local-dev',store:{list:async()=>[],get:async()=>pkg},history:async(context,activity,options)=>{calls.push(options.afterId || null);return options.afterId?{attempts:[{attemptId:'unfinished',finishedAt:null}],nextAfterId:null}:{attempts:Array.from({length:100},(_,i)=>({attemptId:`done-${i}`,finishedAt:'2026-11-16'})),nextAfterId:'done-99'};},recover:async id=>{if(id!=='unfinished')throw new Error('Wrong recovery');return session;}};const result=await prepareSourceLearning({currentUser:{uid:'local-dev'},learningResults:{coordinator}},{source:{kind:'assignment',id:crypto.randomUUID()},grade:7,activity:'quiz'});if(result.session!==session || JSON.stringify(calls)!==JSON.stringify([null,'done-99']))throw new Error('Unfinished attempt beyond the first history page was lost');},runtimeModule);
+ console.log('PASS replacement recovery: unfinished attempt found beyond 100 finished attempts');
+ await page.evaluate(async teacherModule=>{const {mountLearningResultsSettings}=await import(teacherModule);window.teacherCalls=[];window.teacherOwner='teacher';const repository={read:async()=>({source:{sourceDigest:'digest'},scoredContent:{words:[{id:'cat',word:'CAT'}]},settings:{revision:4,shared_target_milliseconds:60000,appearances:5,enabled:true},affectedSections:[{name:'7A'},{name:'7B'}],timing:{finishedAttempts:4,medianMilliseconds:42000},students:[{studentId:'pupil',name:'Student One',target:null,revision:0}]}),operation:async(kind,payload,owner)=>{window.teacherCalls.push({kind,payload,owner});return {revision:5,taskId:'published'};}};window.teacherView=mountLearningResultsSettings({root:document.getElementById('test'),source:{kind:'assignment',id:crypto.randomUUID()},grades:[7],getOwner:()=>window.teacherOwner,activities:['matching'],repository});},teacherModule);
+ await page.getByText('4 finished attempts. Median scored answer time: 42 seconds.',{exact:true}).waitFor();await page.getByLabel('Shared speed target in seconds').fill('90');assert.equal(await page.getByLabel('Scheduled appearances per word').inputValue(),'5');await page.getByRole('button',{name:'Publish settings',exact:true}).click();await page.getByText('Settings published. Existing attempts keep their saved settings.',{exact:true}).waitFor();assert.equal(await page.evaluate(()=>window.teacherCalls.at(-1).payload.sharedTargetMilliseconds),90000);
+ await page.getByLabel('Student One',{exact:true}).fill('75');await page.getByRole('button',{name:'Save target',exact:true}).click();await page.getByText('Target saved for new attempts.',{exact:true}).waitFor();assert.equal(await page.evaluate(()=>window.teacherCalls.at(-1).payload.target),75);assert.equal(await page.evaluate(()=>window.teacherCalls.at(-1).kind),'target');await page.evaluate(()=>window.teacherView.destroy());
+ console.log('PASS teacher controls: shared timing, five appearances, timing evidence and individual target publication');
+ if(!built){
+  await page.evaluate(async()=>{const {mountLearningBoard}=await import('/js/learningResults/presenter.js'),entry=(userId,name)=>({userId,name,rank:1,points:1000,recordedMilliseconds:1000});let page=0;window.boardView=mountLearningBoard({root:document.getElementById('test'),taskId:'task',owner:'own',repository:{read:async()=>++page===1?{status:'ok',boardRevision:1,orderingDigest:'digest',nextCursor:'next',pageUserIds:['amy'],entries:[entry('amy','Amy'),entry('own','Zoe')]}:{status:'ok',boardRevision:1,orderingDigest:'digest',nextCursor:null,pageUserIds:['bob','own'],entries:[entry('bob','Bob'),entry('own','Zoe')]}}});});
+  await page.getByRole('button',{name:'Show more tied students',exact:true}).click();await page.getByRole('button',{name:'Show more tied students',exact:true}).waitFor({state:'hidden'});assert.deepEqual(await page.locator('tbody tr td:nth-child(2)').allTextContents(),['Amy','Bob','Zoe (you)']);await page.evaluate(()=>window.boardView.destroy());console.log('PASS tied board: own entry stays after alphabetically earlier students across pages');
+ }
+ assert.deepEqual(errors,[]);await page.evaluate(()=>window.runtime.destroy());
+}finally{await browser?.close();server?.kill('SIGTERM');}

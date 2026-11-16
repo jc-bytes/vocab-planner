@@ -43,7 +43,7 @@ test('every gated suite is reachable from the release command and executes its r
 test('default validation keeps established script checks, insight, and worker upgrades', () => {
     const checks = scripts['test:checks'].split(' && ');
     const expected = [
-        'ui-school-admin-smoke', 'ui-school-shell-smoke', 'ui-teacher-loading-smoke', 'ui-school-account-access-smoke',
+        'ui-learning-results-local', 'ui-school-admin-smoke', 'ui-school-shell-smoke', 'ui-teacher-loading-smoke', 'ui-school-account-access-smoke',
         'ui-student-class-selector-smoke', 'ui-student-loading-smoke', 'ui-student-school-context-smoke', 'ui-student-units-flow-smoke', 'ui-student-spark-library-smoke',
         'ui-teacher-class-workspace-smoke', 'ui-teacher-class-home-smoke', 'ui-teacher-assignments-smoke', 'ui-teacher-class-progress-smoke', 'ui-teacher-vocabulary-gradebook-smoke', 'ui-vocabulary-grading-settings-smoke', 'ui-progress-grading-flow-smoke',
         'ui-weekly-vocabulary-smoke', 'ui-teacher-data-management-smoke', 'ui-teacher-student-progress-smoke',

@@ -190,6 +190,15 @@ openSparkModal(spark = null, options = {}) {
         this.setSparkModalStatus('');
         this.showEditorView({ materialId: this.editingSparkId || undefined });
         this.query('#spark-title-input')?.focus();
+        this.learningSettings?.destroy();this.learningSettings=null;this.query('#spark-learning-settings')?.remove();
+        const parent=this.query('#spark-form')?.parentElement;
+        if(parent && this.editingSparkId && source.questions.some(q=>q.type===SPARK_QUESTION_TYPES.MULTIPLE_CHOICE)){
+            const root=parent.ownerDocument.createElement('section');root.id='spark-learning-settings';parent.append(root);
+            const generation=this.weeklySparkEditorGeneration,lifecycle=this.weeklySparkLifecycleGeneration,owner=this.getCurrentUser()?.uid || this.getCurrentUser()?.id;
+            const current=()=>generation===this.weeklySparkEditorGeneration && lifecycle===this.weeklySparkLifecycleGeneration && owner===(this.getCurrentUser()?.uid || this.getCurrentUser()?.id) && root.isConnected;
+            void import('../teacherLearningResultsSettings.js').then(({mountLearningResultsSettings})=>{if(!current())return;this.learningSettings=mountLearningResultsSettings({root,source:{kind:'spark',id:source.id},grades:source.targetGrades.map(Number),activities:['reading-check'],getOwner:()=>this.getCurrentUser()?.uid || this.getCurrentUser()?.id,isCurrent:current});});
+        }
+
     },
 
 readSparkTargetGradesFromForm() {

@@ -16,9 +16,11 @@ import '../css/compact-workspace-table.css';
 import { createClassWorkspaceLoading } from './classWorkspaceLoading.js';
 import { compactFilter, sortAssignments, assignmentDate, assignmentWhen, assignmentSortOptions, assignmentTypeOptions } from './compactAssignmentControls.js';
 import '../css/teacher-student-feedback.css';
+import { mountAssignmentLearningSettings } from './teacherLearningResultsSettings.js';
+import { mountTeacherLearningResults } from './teacherLearningResults.js';
 
 export function createTeacherAssignmentsWorkspace({ root, getUserId, repository = classroomRepository, onNavigate, onPublish, onWordHuntReview, reviewOnly = false, getSchoolCalendar = async () => null }) {
-    let generation = 0, destroyed = false, controller, dialog;
+    let generation = 0, destroyed = false, controller, dialog, learningSettings, learningReport;
     let context = { mode: 'assignments' }, studentFilter = '', stateOwner, restoreTabFocus = false;
     const defaults = () => ({ search: '', trimester: 'all', type: 'all', sort: 'release-desc', offset: 0, listTab: reviewOnly ? 'needs-review' : 'current' });
     let listState = defaults();
@@ -28,7 +30,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
     function closeDialog() { dialog?.close(); dialog = null; }
     async function show(next = {}) {
         if (destroyed) return;
-        context = { mode: 'assignments', ...next }; closeDialog(); controller?.abort(); controller = new AbortController();
+        learningSettings?.destroy();learningSettings=null;learningReport?.destroy();learningReport=null;context = { mode: 'assignments', ...next }; closeDialog(); controller?.abort(); controller = new AbortController();
         const id = ++generation, owner = getUserId(), { mode, classId, assignmentId } = context;
         const focusAfterShow = restoreTabFocus; restoreTabFocus = false;
         if (stateOwner !== owner) { statesByClass.clear(); studentFilter = ''; stateOwner = owner; }
@@ -129,6 +131,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 const panel = node('section'); panel.id = 'assignment-panel'; panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', `assignment-tab-${detailTab}`); root.append(panel);
                 if (detailTab === 'details') {
                     panel.append(...openDetails(assignment, ownClass));
+                    if(ownClass.canTeach === true && !assignment.withdrawn)learningSettings=mountAssignmentLearningSettings({root:panel,source:{kind:'assignment',id:assignment.id},getOwner:getUserId,isCurrent:()=>current(id,owner),...(assignment.kind==='spark'?{activities:['reading-check']}:{})});
                 } else {
                     const [roster, records, feedback] = await Promise.all([
                         repository.getRoster(ownClass.id, { signal: controller.signal }),
@@ -136,6 +139,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                         repository.assignmentFeedback?.(assignment.id, { signal: controller.signal }) || Promise.resolve([])
                     ]);
                     if (!current(id, owner)) return;
+                    learningReport=mountTeacherLearningResults({root:panel,classId:ownClass.id,assignmentId:assignment.id,roster,getOwner:getUserId,isCurrent:()=>current(id,owner)});
                     let rows = assignmentResultRows(assignment.kind, records, roster, feedback);
                     const toolbar = node('div', undefined, 'teacher-library-control-row');
                     const reviewFilter = assignment.kind === 'spark' ? selectField(toolbar, 'Show work', 'reviewFilter', [['all', 'All work'], ['needs-review', 'Needs review']]) : null;
@@ -331,5 +335,5 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
             }
         }
     }
-    return { show, hide() { generation++; controller?.abort(); closeDialog(); root.replaceChildren(); root.removeAttribute('aria-busy'); }, destroy() { destroyed = true; generation++; controller?.abort(); closeDialog(); context = {}; studentFilter = ''; listState = defaults(); stateOwner = null; statesByClass.clear(); root.replaceChildren(); } };
+    return { show, hide() { learningSettings?.destroy();learningSettings=null;learningReport?.destroy();learningReport=null;generation++; controller?.abort(); closeDialog(); root.replaceChildren(); root.removeAttribute('aria-busy'); }, destroy() { learningSettings?.destroy();learningSettings=null;learningReport?.destroy();learningReport=null;destroyed = true; generation++; controller?.abort(); closeDialog(); context = {}; studentFilter = ''; listState = defaults(); stateOwner = null; statesByClass.clear(); root.replaceChildren(); } };
 }
