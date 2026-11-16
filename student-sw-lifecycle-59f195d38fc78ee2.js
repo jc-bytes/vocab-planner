@@ -134,4 +134,4 @@ self.installStudentWorkerLifecycle = function ({ cachePrefix, navigationGraceMs 
     };
 };
 
-self.installStudentWorkerLifecycle({"cachePrefix":"vocabulary-student-graph-13401098da42a58a"});
+self.installStudentWorkerLifecycle({"cachePrefix":"vocabulary-student-graph-59f195d38fc78ee2"});
