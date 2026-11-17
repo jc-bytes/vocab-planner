@@ -1661,7 +1661,7 @@ create trigger learning_attempt_identity_immutable before update on private.lear
 create function private.learning_attempt_protocol_immutable_v1() returns trigger language plpgsql set search_path='' as $f$
 begin
  if new.record_protocol is distinct from old.record_protocol or new.learning_attempt_id is distinct from old.learning_attempt_id
- or (old.record_protocol='learning-results-v1' and (new.user_id is distinct from old.user_id
+ or (old.record_protocol='learning-results-v1' and (new.id is distinct from old.id or new.user_id is distinct from old.user_id
  or new.unit_key is distinct from old.unit_key or new.assignment_id is distinct from old.assignment_id
  or new.activity_type is distinct from old.activity_type or new.vocabulary_id is distinct from old.vocabulary_id
  or new.spark_id is distinct from old.spark_id)) then raise exception 'IMMUTABLE_ATTEMPT_PROTOCOL';end if;
@@ -1686,8 +1686,10 @@ begin
  or preparation.target is distinct from learning.target then raise exception 'LEARNING_PREPARATION_MISMATCH';end if;
  return null;
 end $f$;
-create constraint trigger learning_pair_check after insert or update on private.learning_result_attempts deferrable initially deferred for each row execute function private.learning_pair_integrity_v1();
-create constraint trigger learning_compatibility_check after insert or update on private.student_activity_attempts deferrable initially deferred for each row execute function private.learning_pair_integrity_v1();
+-- Pair identity is checked at insertion and frozen by the two identity guards.
+-- Mutable timer, validation and reward updates cannot change this relationship.
+create constraint trigger learning_pair_check after insert on private.learning_result_attempts deferrable initially deferred for each row execute function private.learning_pair_integrity_v1();
+create constraint trigger learning_compatibility_check after insert on private.student_activity_attempts deferrable initially deferred for each row execute function private.learning_pair_integrity_v1();
 create function private.assert_legacy_activity_attempt_v1(attempt_id text) returns void language plpgsql security definer set search_path='' as $f$
 declare attempt private.student_activity_attempts;
 begin

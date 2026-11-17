@@ -653,3 +653,18 @@ test('SQL rejects oversized schedules independently of client publication checks
   await assert.rejects(db.query('select private.learning_task_valid_v1($1)',[{...task,words:[...words,{id:'extra',word:'Extra',definition:'Extra definition'}]}]),/TASK_CAPACITY_EXCEEDED/);
  }
 });
+
+test('pair insertion rejects mismatched sources and mutable updates retain frozen compatibility identity',async()=>{
+ const pair=crypto.randomUUID();
+ await assert.rejects(db.transaction(async tx=>{
+  await tx.query("insert into private.learning_result_attempts select (jsonb_populate_record(null::private.learning_result_attempts,to_jsonb(a)||jsonb_build_object('id',$1::text,'compatibility_attempt_id',$1::text))).* from private.learning_result_attempts a where id=$2",[pair,attemptId]);
+  await tx.query("insert into private.student_activity_attempts select (jsonb_populate_record(null::private.student_activity_attempts,to_jsonb(a)||jsonb_build_object('id',$1::text,'learning_attempt_id',$1::text,'unit_key','mismatched-source'))).* from private.student_activity_attempts a where id=$2",[pair,attemptId]);
+ }),/LEARNING_PAIR_MISMATCH/);
+ assert.equal((await db.query('select count(*)::integer n from private.learning_result_attempts where id=$1',[pair])).rows[0].n,0);
+ const columns=['id','user_id','unit_key','activity_type','assignment_id','vocabulary_id','spark_id','record_protocol','learning_attempt_id'];
+ const original=(await db.query('select to_jsonb(a) value from private.student_activity_attempts a where id=$1',[attemptId])).rows[0].value;
+ for(const name of columns){
+  const value=original[name]===null?(name==='assignment_id'?crypto.randomUUID():'changed'):null;
+  await assert.rejects(db.query(`update private.student_activity_attempts set ${name}=(jsonb_populate_record(null::private.student_activity_attempts,jsonb_build_object($1::text,$2::jsonb))).${name} where id=$3`,[name,value===null?null:JSON.stringify(value),attemptId]),name==='assignment_id'?/IMMUTABLE_ATTEMPT_PROTOCOL|Assignment context does not match the unit key/:/IMMUTABLE_ATTEMPT_PROTOCOL/,name);
+ }
+});
