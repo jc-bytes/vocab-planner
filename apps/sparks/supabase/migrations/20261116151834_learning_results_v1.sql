@@ -2752,10 +2752,10 @@ begin
  source:=private.learning_source_v1(p->'source',(p->>'grade')::integer,false);
  if source->>'vocabularyId' is not null then perform private.assert_student_activity_access(p_expected_user_id,source->>'contextKey',source->>'vocabularyId',p->>'activity');end if;
  select * into setting from private.learning_results_settings s where s.school_id=(source->>'schoolId')::uuid and s.grade=(source->>'grade')::integer and s.content_set_id=source->>'contentSetId' and s.activity_type=p->>'activity' and s.enabled for share;
- if setting.published_task_id is null then raise exception 'TASK_NOT_PUBLISHED';end if;
+ if setting.published_task_id is null then return jsonb_build_object('status','unavailable','code','TASK_NOT_PUBLISHED');end if;
  if p->>'expectedTaskId' is not null and (p->>'expectedTaskId')::uuid<>setting.published_task_id then raise exception 'TASK_CHANGED';end if;
  select * into task from private.learning_result_tasks t where t.id=setting.published_task_id;
- if setting.source_digest is distinct from source->>'sourceDigest' then raise exception 'TASK_NOT_PUBLISHED';end if;
+ if setting.source_digest is distinct from source->>'sourceDigest' then return jsonb_build_object('status','unavailable','code','TASK_NOT_PUBLISHED');end if;
  select * into target_override from private.learning_result_target_overrides o where o.user_id=p_expected_user_id and o.context_key=source->>'contextKey' and o.activity_type=task.activity_type;
  if target_override.target is not null then target:=target_override.target;target_source:=jsonb_build_object('kind','individual','revision',target_override.revision,'target',target);end if;
  select * into support from private.learning_result_support s where s.user_id=p_expected_user_id and s.context_key=source->>'contextKey' and s.activity_type=task.activity_type;

@@ -17,6 +17,7 @@ export class LearningCoordinator {
     async download({source,grade,activity,expectedTaskId=null,signal}) {
         const owner=this.owner();this.assertOwner(owner);
         const response=await this.repository.operation('prepare',{contractVersion:CONTRACT_VERSION,source,grade,activity,expectedTaskId},owner,{signal});this.assertOwner(owner);
+        if(response.status==='unavailable' && response.code==='TASK_NOT_PUBLISHED')fail('TASK_NOT_PUBLISHED');
         const pkg={...response,id:response.preparationId,source,grade,activity,ready:true,downloadedAt:Date.now()};
         if(pkg.ownerUserId!==owner || !await packageReady(pkg))fail('INVALID_PACKAGE');
         if(!this.prepareAssets)fail('OFFLINE_ASSETS_REQUIRED');pkg.offlineReady=await this.prepareAssets(activity,{signal})===true;this.assertOwner(owner);

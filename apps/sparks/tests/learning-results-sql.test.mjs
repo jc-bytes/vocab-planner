@@ -348,6 +348,9 @@ test('teacher publication binds current source, grade authority, revisions and c
  await assert.rejects(call('learning_prepare_v1',user,prepare),/Complete the required activity flashcards first/);
  await db.query("insert into public.student_unit_progress(user_id,unit_key,assignment_id) values($1,$2,$3)",[user,'assignment:'+assignment,assignment]);
  await db.query("insert into public.student_activity_progress(user_id,unit_key,assignment_id,activity_type,score,is_complete,verified) values($1,$2,$3,'flashcards',100,true,true)",[user,'assignment:'+assignment,assignment]);
+ const preparationsBefore=(await db.query('select count(*)::int n from private.learning_result_preparations')).rows[0].n;
+ assert.deepEqual(await call('learning_prepare_v1',user,{...prepare,activity:'flashcards',expectedTaskId:null}),{status:'unavailable',code:'TASK_NOT_PUBLISHED'});
+ assert.equal((await db.query('select count(*)::int n from private.learning_result_preparations')).rows[0].n,preparationsBefore);
  const prepared=await call('learning_prepare_v1',user,prepare);
  assert.equal(prepared.passingTarget,80);
  (await import('../js/learningResults/task.js')).validateTask(prepared.task);

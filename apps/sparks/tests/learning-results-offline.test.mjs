@@ -108,3 +108,10 @@ test('delivery backs off network failures with the same immutable request and ho
   assert.equal((await store.list('learningOutbox',owner)).filter(row=>row.attemptId===a.id && row.status==='pending').length,0);
  }finally{await database.close();await deleteDB(database.dbName);}
 });
+
+test('unpublished scoring is a normal server response and never becomes a downloaded package',async()=>{
+ const {LearningCoordinator}=await import('../js/learningResults/coordinator.js');let saved=false,assetsLoaded=false;
+ const coordinator=new LearningCoordinator({owner:()=> 'student',repository:{operation:async()=>({status:'unavailable',code:'TASK_NOT_PUBLISHED'})},store:{savePackage:async()=>{saved=true;}},prepareAssets:async()=>{assetsLoaded=true;}});
+ await assert.rejects(coordinator.download({source:{kind:'assignment',id:crypto.randomUUID()},grade:7,activity:'flashcards'}),{code:'TASK_NOT_PUBLISHED'});
+ assert.equal(saved,false);assert.equal(assetsLoaded,false);
+});
