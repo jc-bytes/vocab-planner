@@ -3030,7 +3030,9 @@ grant execute on function public.prepare_student_learning_task_owned_v1(uuid,uui
 create function public.claim_student_learning_attempt_owned_v1(p_expected_user_id uuid,p_operation_id uuid,p_payload text) returns jsonb language sql security definer set search_path='' as $f$ select private.learning_claim_v1(p_expected_user_id,p_operation_id,p_payload); $f$;
 revoke all on function public.claim_student_learning_attempt_owned_v1(uuid,uuid,text) from public, anon;
 grant execute on function public.claim_student_learning_attempt_owned_v1(uuid,uuid,text) to authenticated;
-create function public.save_student_learning_checkpoint_owned_v1(p_expected_user_id uuid,p_operation_id uuid,p_payload text) returns jsonb language sql security definer set search_path='' as $f$ select private.learning_checkpoint_v1(p_expected_user_id,p_operation_id,p_payload); $f$;
+-- Bounded offline uploads can replay 4,000 opportunities under concurrent load.
+-- PostgREST hoists this function-only limit; other RPC timeouts remain unchanged.
+create function public.save_student_learning_checkpoint_owned_v1(p_expected_user_id uuid,p_operation_id uuid,p_payload text) returns jsonb language sql security definer set search_path='' set statement_timeout='30s' as $f$ select private.learning_checkpoint_v1(p_expected_user_id,p_operation_id,p_payload); $f$;
 revoke all on function public.save_student_learning_checkpoint_owned_v1(uuid,uuid,text) from public, anon;
 grant execute on function public.save_student_learning_checkpoint_owned_v1(uuid,uuid,text) to authenticated;
 create function public.submit_student_learning_result_owned_v1(p_expected_user_id uuid,p_operation_id uuid,p_payload text) returns jsonb language sql security definer set search_path='' as $f$ select private.learning_submit_v1(p_expected_user_id,p_operation_id,p_payload); $f$;
