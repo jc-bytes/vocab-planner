@@ -18,7 +18,8 @@ const args=(db,user='supabase_admin')=>['exec','-i',source.container,'sh','-c','
 const sql=(db,input,user)=>run(args(db,user),input).trim();
 const literal=value=>`'${String(typeof value==='object'?JSON.stringify(value):value).replaceAll("'","''")}'`;
 const query=input=>sql(database,input,'postgres');
-function parallelQuery(input){return new Promise((resolve,reject)=>{const child=spawn('docker',args(database),{stdio:['pipe','pipe','pipe']});let output='',error='';child.stdout.on('data',chunk=>output+=chunk);child.stderr.on('data',chunk=>error+=chunk);child.on('error',reject);child.on('exit',code=>code===0?resolve(output.trim()):reject(new Error(error)));child.stdin.end(input);});}
+// Wait for closed stdio: process exit can precede the last SQL response bytes.
+function parallelQuery(input){return new Promise((resolve,reject)=>{const child=spawn('docker',args(database),{stdio:['pipe','pipe','pipe']});let output='',error='';child.stdout.on('data',chunk=>output+=chunk);child.stderr.on('data',chunk=>error+=chunk);child.on('error',reject);child.on('close',code=>code===0?resolve(output.trim()):reject(new Error(error)));child.stdin.end(input);});}
 let created=false;const localDatabase=new ImageDB();localDatabase.dbName=`learning-native-${crypto.randomUUID()}`;
 try{
  sql('postgres',`create database ${database} owner postgres;`);created=true;
