@@ -27,7 +27,8 @@ export function recoveryAt(attempt,throughSequence) {
     }
     return recoverableState(attempt,state,throughSequence);
 }
-export async function buildCheckpoint({attempt,head,intent,operationId,maxEvents=LIMITS.events,requestLimit=LIMITS.request}) {
+// Small upload batches bound device hashing work and hosted transaction time.
+export async function buildCheckpoint({attempt,head,intent,operationId,maxEvents=256,requestLimit=LIMITS.request}) {
     if(intent.throughSequence<head.sequence) fail('EVIDENCE_OVERLAP');
     const maximum=Math.min(intent.throughSequence,head.sequence+maxEvents);
     const build=async end=>{
@@ -54,7 +55,7 @@ export function acceptedHead(response) {
     return {revision:response.revision,sequence:response.acceptedThroughSequence,hash:response.acceptedPrefixHash,stateHash:response.acceptedStateHash,evidenceBytes:response.acceptedEvidenceBytes};
 }
 export class LearningSync {
-    constructor({store,repository,activeOwner,newId=()=>crypto.randomUUID(),requestLimit=LIMITS.request,now=()=>Date.now()}) {this.now=now;this.store=store;this.repository=repository;this.activeOwner=activeOwner;this.newId=newId;this.running=null;this.requestLimit=requestLimit;}
+    constructor({store,repository,activeOwner,newId=()=>crypto.randomUUID(),requestLimit=65536,now=()=>Date.now()}) {this.now=now;this.store=store;this.repository=repository;this.activeOwner=activeOwner;this.newId=newId;this.running=null;this.requestLimit=requestLimit;}
     drain(owner) {
         if(this.running) {
             if(this.runningOwner===owner)return this.running;

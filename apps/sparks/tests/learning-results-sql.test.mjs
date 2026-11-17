@@ -408,7 +408,14 @@ test('append rejects invalid semantic transitions immediately and freezes origin
    await assert.rejects(repository.mutate('submit',rpcArguments(crypto.randomUUID(),premature,262144,user),user),/VALIDATED_PREFIX_REQUIRED/);
   }
   await db.query('update private.learning_result_attempts set accepted_validation=$2 where id=$1',[session.attempt.id,cached]);
-  await session.correct('cat:0','CAT');await session.submit();await sync.drain(user);
+  await session.correct('cat:0','CAT');await session.submit();
+  for(const corrupted of [null,{...cached,revision:cached.revision+1},{...cached,throughSequence:0},{...cached,throughHash:'0'.repeat(64)},{...cached,stateHash:'0'.repeat(64)},{...cached,replayState:null}]){
+   await db.query('update private.learning_result_attempts set accepted_validation=$2 where id=$1',[session.attempt.id,corrupted]);
+   await assert.rejects(sync.drain(user),/VALIDATED_PREFIX_REQUIRED/);
+   assert.equal((await db.query('select count(*)::int n from private.learning_result_evidence where attempt_id=$1',[session.attempt.id])).rows[0].n,pending.sequence,'rejected appends roll back their new evidence');
+  }
+  await db.query('update private.learning_result_attempts set accepted_validation=$2 where id=$1',[session.attempt.id,cached]);
+  await sync.drain(user);
   const refreshed=(await db.query('select accepted_validation value from private.learning_result_attempts where id=$1',[session.attempt.id])).rows[0].value;
   assert.ok(refreshed.revision>cached.revision);assert.equal(refreshed.evaluation.finished,true);
 
@@ -602,4 +609,38 @@ test('offline classroom reading retries deliver writing and results in causal or
   assert.equal((await store.get('learningAttempts',user,first.attempt.id)).confirmed,true);assert.equal((await store.get('learningAttempts',user,second.attempt.id)).confirmed,true);
   const response=(await db.query('select answers,evaluation,revision from public.class_assignment_responses where assignment_id=$1 and student_id=$2',[assignment,user])).rows[0];assert.equal(response.answers.written,'My edited explanation is preserved.');assert.equal(response.answers.mc,0);assert.equal(response.evaluation.points,1000);assert.equal(response.revision,4);
  }finally{await database.close();await deleteDB(database.dbName);}
+});
+
+
+test('incremental validation equals full replay across clue, out-of-order originals, correction and combo boundaries',async()=>{
+ const task={activity:'matching',appearances:2,sharedTargetMilliseconds:10000,words:[{id:'cat',word:'CAT'},{id:'bat',word:'BAT'}]};
+ const schedule=makeSchedule(task,7),events=[],add=(type,payload={})=>events.push({type,recordedMilliseconds:0,...payload});
+ const [a,b,c,d]=schedule;
+ add('assist',{opportunityIds:[d.id]});add('resume');add('original',{opportunityId:d.id,assisted:true,response:{selectedDefinitionId:d.wordId}});
+ add('resume');add('original',{opportunityId:a.id,assisted:false,response:{selectedDefinitionId:a.wordId==='cat'?'bat':'cat'}});
+ add('correction',{opportunityId:a.id,answer:task.words.find(w=>w.id===a.wordId).word});
+ for(const o of [c,b]){add('resume');add('original',{opportunityId:o.id,assisted:false,response:{selectedDefinitionId:o.wordId}});}add('submission');
+ for(const size of [1,2,3,4,7,events.length]){
+  let previous=null;
+  for(let offset=0;offset<events.length;offset+=size){
+   const chunk=events.slice(offset,offset+size),through=offset+chunk.length;
+   const incremental=(await db.query('select private.learning_evaluate_incremental_v1($1,$2,$3,80,null,false,$4) result',[task,schedule,chunk,previous])).rows[0].result;
+   previous=incremental.replayState;delete incremental.replayState;
+   const full=(await db.query('select private.learning_evaluate_v1($1,$2,$3,80,null,false) result',[task,schedule,events.slice(0,through)])).rows[0].result;
+   assert.deepEqual(incremental,full,`chunk size ${size}, prefix ${through}`);
+  }
+ }
+ const rights=(await db.query("select has_function_privilege('authenticated','private.learning_evaluate_incremental_v1(jsonb,jsonb,jsonb,integer,uuid,boolean,jsonb)','EXECUTE') allowed")).rows[0];
+ assert.equal(rights.allowed,false);
+});
+
+
+test('every immutable attempt column remains protected when validation state grows',async()=>{
+ const mutable=['accepted_revision','accepted_sequence','prefix_hash','evidence_bytes','state','state_hash','recorded_milliseconds','bridge_revision','completion_applied_at','originals_applied_at','accepted_validation'];
+ const columns=(await db.query("select attname name,format_type(atttypid,atttypmod) type from pg_attribute where attrelid='private.learning_result_attempts'::regclass and attnum>0 and not attisdropped")).rows;
+ const original=(await db.query('select to_jsonb(a) value from private.learning_result_attempts a where id=$1',[attemptId])).rows[0].value;
+ for(const column of columns.filter(c=>!mutable.includes(c.name))){
+  const name='"'+column.name.replaceAll('"','""')+'"',value=original[column.name]===null?(column.type==='uuid'?'00000000-0000-4000-8000-000000000099':'changed'):null;
+  await assert.rejects(db.query(`update private.learning_result_attempts set ${name}=(jsonb_populate_record(null::private.learning_result_attempts,jsonb_build_object($1::text,$2::jsonb))).${name} where id=$3`,[column.name,value===null?null:JSON.stringify(value),attemptId]),/IMMUTABLE_ATTEMPT_IDENTITY/,column.name);
+ }
 });

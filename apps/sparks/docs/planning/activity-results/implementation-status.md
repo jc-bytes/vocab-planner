@@ -91,3 +91,12 @@ The design and its drafting copy remain identical. Historical audit/review files
 The independent staging project used no production records. Its schema includes the release migrations and four existing production-only DDL additions retrieved from migration history. Six fictional accounts exercised actual Auth sign-in and public PostgREST RPCs. Eleven checks passed, recorded in `hosted-acceptance-2026-11-16.json`: school and grade isolation, teacher-only settings, shared-section boards, personal passing targets, saved offline outbox delivery, ten concurrent terminal replays, replacement sign-in/recovery, new board versions, failure/help reset, reading/writing retries and current-access removal. Offline browser cache behavior was checked separately by the built runner. A hosted browser disconnection test is not claimed.
 
 The release checkout starts from current `upstream/main` and preserves the deployed section-loading, vocabulary availability and recovery fixes. Three already-deployed replacement-credit migrations are included to make schema replay match production. The original working copy and unrelated edits remain preserved.
+
+
+## Hosted capacity investigation checkpoint
+
+All 65 source UI checks passed. The full release CI subsequently found a legacy invalid-attempt error-code change; the new guard now preserves the original P0001 code for invalid legacy attempts while retaining authenticated owner checks.
+
+Additional maximum-load hosted tests found upload timeouts and confirmations above the initial two-second target. The first shared-process fixture also mixed device work with request timing; it cannot establish hosted latency. Separate device processes are now used. The approved activity sizes and scoring rules have not been reduced.
+
+The implementation now uses server-owned incremental replay state bound to the exact accepted head, 64 KiB / 256-event soft upload batches, and direct immutable-identity comparisons. Eighty feature tests passed, including full/incremental parity, append rejection for stale private state and exhaustive immutable-column mutations. A native rehearsal before the final batching/identity refinements passed 10 concurrent maximum-size terminal submissions at p95 679 ms and the 5,000-entry board at p95 152 ms. These remain local measurements. Hosted capacity and the new full CI run must pass before production migration or publication.

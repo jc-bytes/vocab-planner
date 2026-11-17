@@ -136,6 +136,7 @@ begin
   -- Escape text in bulk. A large p_payload is itself a JSON string in the envelope;
   -- visiting every character in PL/pgSQL makes request hashing unnecessarily slow.
   result:=replace(replace(result,chr(92),chr(92)||chr(92)),chr(34),chr(92)||chr(34));
+  if result !~ '[[:cntrl:]]' then return chr(34)||result||chr(34);end if;
   for code in 1..31 loop
    if strpos(result,chr(code))>0 then result:=replace(result,chr(code),chr(92)||'u'||lpad(to_hex(code),4,'0'));end if;
   end loop;
@@ -1649,10 +1650,9 @@ create trigger learning_result_immutable before update on private.learning_resul
 
 create function private.learning_attempt_identity_immutable_v1() returns trigger language plpgsql set search_path='' as $f$
 begin
- if (to_jsonb(new)-array['accepted_revision','accepted_sequence','prefix_hash','evidence_bytes','state','state_hash','recorded_milliseconds','bridge_revision','completion_applied_at','originals_applied_at','accepted_validation'])
- is distinct from (to_jsonb(old)-array['accepted_revision','accepted_sequence','prefix_hash','evidence_bytes','state','state_hash','recorded_milliseconds','bridge_revision','completion_applied_at','originals_applied_at','accepted_validation']) then
-  raise exception 'IMMUTABLE_ATTEMPT_IDENTITY';
- end if;
+ -- Compare identity directly; mutable validation state can contain a large saved prefix.
+ if row(new.id,new.user_id,new.preparation_id,new.task_id,new.assignment_id,new.context_key,new.unit_key,new.vocabulary_id,new.spark_id,new.activity_type,new.compatibility_attempt_id,new.kind,new.target,new.schedule,new.seed,new.variant_id,new.start_context,new.predecessor_id,new.created_at)
+ is distinct from row(old.id,old.user_id,old.preparation_id,old.task_id,old.assignment_id,old.context_key,old.unit_key,old.vocabulary_id,old.spark_id,old.activity_type,old.compatibility_attempt_id,old.kind,old.target,old.schedule,old.seed,old.variant_id,old.start_context,old.predecessor_id,old.created_at) then raise exception 'IMMUTABLE_ATTEMPT_IDENTITY';end if;
  return new;
 end $f$;
 create trigger learning_attempt_identity_immutable before update on private.learning_result_attempts for each row execute function private.learning_attempt_identity_immutable_v1();
@@ -1694,7 +1694,7 @@ begin
  if auth.uid() is null then raise exception 'This activity attempt is invalid.' using errcode='42501';end if;
  if coalesce(attempt_id,'') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then raise exception 'This activity attempt is invalid.';end if;
  select * into attempt from private.student_activity_attempts where id=attempt_id::uuid and user_id=auth.uid();
- if attempt.id is null then raise exception 'This activity attempt is invalid.' using errcode='42501';end if;
+ if attempt.id is null then raise exception 'This activity attempt is invalid.';end if;
  if attempt.record_protocol<>'legacy' then raise exception 'LEARNING_RESULT_WRITE_REQUIRED';end if;
 end $f$;
 -- Update the current definitions, not a historical copy. Fail rather than silently miss an owning function.
@@ -1965,9 +1965,15 @@ begin
  state:=jsonb_set(jsonb_set(state,'{recordedMilliseconds}',to_jsonb(recorded_ms)),'{evidenceThroughSequence}',to_jsonb(sequence_no));
  if sequence_no is distinct from (p->>'throughSequence')::integer or prefix is distinct from p->>'throughHash' then raise exception 'PREFIX_MISMATCH';end if;
  if state is distinct from p->'recoverableState' then raise exception 'STATE_MISMATCH';end if;
- -- Validate semantic transitions before accepting this prefix, including incomplete attempts.
- validated_prefix:=private.learning_evaluate_v1((select t.task from private.learning_result_tasks t where t.id=attempt.task_id),attempt.schedule,
-  (select coalesce(jsonb_agg(e.event order by e.sequence),'[]'::jsonb) from private.learning_result_evidence e where e.attempt_id=attempt.id),attempt.target,attempt.variant_id,false);
+ -- Only private validation state bound to this exact accepted head can seed an append.
+ if attempt.accepted_revision>0 and (
+  (attempt.accepted_validation->>'revision')::bigint is distinct from attempt.accepted_revision
+  or (attempt.accepted_validation->>'throughSequence')::integer is distinct from attempt.accepted_sequence
+  or attempt.accepted_validation->>'throughHash' is distinct from attempt.prefix_hash
+  or attempt.accepted_validation->>'stateHash' is distinct from attempt.state_hash
+  or jsonb_typeof(attempt.accepted_validation->'replayState') is distinct from 'object') then raise exception 'VALIDATED_PREFIX_REQUIRED';end if;
+ validated_prefix:=private.learning_evaluate_incremental_v1((select t.task from private.learning_result_tasks t where t.id=attempt.task_id),attempt.schedule,
+  p->'events',attempt.target,attempt.variant_id,false,case when attempt.accepted_revision=0 then null else attempt.accepted_validation->'replayState' end);
  -- Freeze original points before untimed review, without completion, rewards or board admission.
  if validated_prefix ? 'points' then
   insert into private.learning_result_results(attempt_id,weighted_numerator,weighted_denominator,speed_numerator,speed_denominator,recorded_milliseconds,points,stars,longest_combo,passed,validation_status,eligibility_reason)
@@ -1978,7 +1984,7 @@ begin
  encoded:=private.learning_json_canonical_v1(state::json);if octet_length(encoded)>65536 then raise exception 'EVIDENCE_LIMIT';end if;
  update private.learning_result_attempts set accepted_revision=accepted_revision+1,accepted_sequence=sequence_no,prefix_hash=prefix,evidence_bytes=checkpoint.evidence_bytes,
   state=checkpoint.state,state_hash=private.learning_sha256_v1(convert_to(encoded,'UTF8')),recorded_milliseconds=recorded_ms,
-  accepted_validation=jsonb_build_object('revision',attempt.accepted_revision+1,'throughSequence',sequence_no,'throughHash',prefix,'stateHash',private.learning_sha256_v1(convert_to(encoded,'UTF8')),'evaluation',validated_prefix) where id=attempt.id returning * into attempt;
+  accepted_validation=jsonb_build_object('revision',attempt.accepted_revision+1,'throughSequence',sequence_no,'throughHash',prefix,'stateHash',private.learning_sha256_v1(convert_to(encoded,'UTF8')),'replayState',validated_prefix->'replayState','evaluation',validated_prefix-'replayState') where id=attempt.id returning * into attempt;
  rewards:=private.apply_learning_progress_rewards_v1(attempt.id,attempt.accepted_revision);
  receipt:=private.learning_head_v1(attempt)||jsonb_build_object('receiptId',p_operation_id,'localCheckpointRevision',p->'localCheckpointRevision','rewards',rewards);
  insert into private.learning_result_receipts(user_id,operation_id,kind,request_hash,accepted_revision,response) values(p_expected_user_id,p_operation_id,'checkpoint',request->>'requestHash',attempt.accepted_revision,receipt);
@@ -1986,17 +1992,28 @@ begin
 end $f$;
 
 -- Full replay checks assistance, first answers, corrections, phases and visual-only combos.
-create function private.learning_evaluate_v1(task jsonb,schedule jsonb,events jsonb,passing_target integer,assigned_variant uuid default null,require_submission boolean default true)
+create function private.learning_evaluate_incremental_v1(task jsonb,schedule jsonb,events jsonb,passing_target integer,assigned_variant uuid,require_submission boolean,previous jsonb)
 returns jsonb language plpgsql stable set search_path='' as $f$
 declare event jsonb;opportunity jsonb;item jsonb;word jsonb;outcome jsonb;credit jsonb;
  opportunities jsonb;opportunity_indices jsonb;opportunity_index integer;original_outcomes jsonb[]:=array[]::jsonb[];uncorrected_count integer:=0;correct_count integer:=0;word_map jsonb;original_count integer:=0;assistance jsonb:='{}'::jsonb;corrections jsonb:='{}'::jsonb;totals jsonb:='{}'::jsonb;responses jsonb;
  opportunity_id text;phase text:='paused';recorded_ms bigint:=0;current_ms bigint;event_type text;activity text:=task->>'activity';
  assisted boolean;full_run boolean;current_combo integer:=0;longest integer:=0;reading_locked boolean:=false;
- word_count integer:=0;n numeric:=0;d numeric:=1;wn numeric;wd numeric;total_n numeric;total_d numeric;g numeric;result jsonb;
+ replay_state jsonb;word_count integer:=0;n numeric:=0;d numeric:=1;wn numeric;wd numeric;total_n numeric;total_d numeric;g numeric;result jsonb;
 begin
  if jsonb_typeof(events) is distinct from 'array' or jsonb_array_length(events)>50000 then raise exception 'EVIDENCE_LIMIT';end if;
  select jsonb_object_agg(o->>'id',o),jsonb_object_agg(o->>'id',ordinal) into opportunities,opportunity_indices from jsonb_array_elements(schedule) with ordinality as scheduled(o,ordinal);
  select jsonb_object_agg(w->>'id',w) into word_map from jsonb_array_elements(task->'words') w;
+ original_outcomes:=array_fill(null::jsonb,array[jsonb_array_length(schedule)]);
+ if previous is not null then
+  if previous->>'version' is distinct from '1' then raise exception 'VALIDATED_PREFIX_REQUIRED';end if;
+  select array_agg(case when value='null'::jsonb then null::jsonb else value end order by ordinality)
+   into original_outcomes from jsonb_array_elements(previous->'originalOutcomes') with ordinality;
+  phase:=previous->>'phase';recorded_ms:=(previous->>'recordedMilliseconds')::bigint;
+  original_count:=(previous->>'originalCount')::integer;correct_count:=(previous->>'correctCount')::integer;
+  uncorrected_count:=(previous->>'uncorrectedCount')::integer;current_combo:=(previous->>'currentCombo')::integer;
+  longest:=(previous->>'longestCombo')::integer;reading_locked:=(previous->>'readingLocked')::boolean;
+  assistance:=previous->'assistance';corrections:=previous->'corrections';
+ end if;
  for event in select jsonb_array_elements(events) loop
   if reading_locked then raise exception 'ATTEMPT_FINISHED';end if;
   event_type:=event->>'type';current_ms:=(event->>'recordedMilliseconds')::bigint;
@@ -2059,11 +2076,14 @@ begin
   else raise exception 'INVALID_EVENT_TYPE';
   end case;
  end loop;
+ replay_state:=jsonb_build_object('version',1,'originalOutcomes',to_jsonb(original_outcomes),'phase',phase,
+ 'recordedMilliseconds',recorded_ms,'originalCount',original_count,'correctCount',correct_count,'uncorrectedCount',uncorrected_count,
+ 'currentCombo',current_combo,'longestCombo',longest,'readingLocked',reading_locked,'assistance',assistance,'corrections',corrections);
  if not reading_locked and require_submission then raise exception 'SUBMISSION_REQUIRED';end if;
  full_run:=original_count=jsonb_array_length(schedule);
  if not full_run then
   if require_submission then raise exception 'EVIDENCE_INCOMPLETE';end if;
-  return jsonb_build_object('status','prefix_valid','originalSetComplete',false,'progressEvidence',jsonb_build_object('originalCount',original_count,'correctCount',correct_count,'resolvedCount',original_count-uncorrected_count));
+  return jsonb_build_object('replayState',replay_state,'status','prefix_valid','originalSetComplete',false,'progressEvidence',jsonb_build_object('originalCount',original_count,'correctCount',correct_count,'resolvedCount',original_count-uncorrected_count));
  end if;
  for score_index in 1..jsonb_array_length(schedule) loop
   outcome:=original_outcomes[score_index];opportunity_id:=schedule->(score_index-1)->>'id';
@@ -2082,8 +2102,14 @@ begin
  d:=d*word_count;g:=private.learning_gcd_v1(n,d);n:=div(n,g);d:=div(d,g);
  -- All originals are present here. Review completion cannot change the locked speed component.
  result:=private.learning_score_v1(n,d,recorded_ms,(task->>'sharedTargetMilliseconds')::integer,passing_target,true);
- return result||jsonb_build_object('weighted',jsonb_build_object('numerator',n::text,'denominator',d::text),'recordedMilliseconds',recorded_ms,'longestCombo',longest,'finished',full_run,'progressEvidence',jsonb_build_object('originalCount',original_count,'correctCount',correct_count,'resolvedCount',original_count-uncorrected_count));
+ return result||jsonb_build_object('replayState',replay_state,'weighted',jsonb_build_object('numerator',n::text,'denominator',d::text),'recordedMilliseconds',recorded_ms,'longestCombo',longest,'finished',full_run,'progressEvidence',jsonb_build_object('originalCount',original_count,'correctCount',correct_count,'resolvedCount',original_count-uncorrected_count));
 end $f$;
+
+-- Full-transcript evaluator remains available for parity checks and independent audits.
+create function private.learning_evaluate_v1(task jsonb,schedule jsonb,events jsonb,passing_target integer,assigned_variant uuid default null,require_submission boolean default true)
+returns jsonb language sql stable set search_path='' as $f$
+ select private.learning_evaluate_incremental_v1(task,schedule,events,passing_target,assigned_variant,require_submission,null)-'replayState';
+$f$;
 
 -- One reward calculation shared by validated legacy writes and the learning bridge.
 create function private.apply_student_activity_reward_delta_v1(old_score numeric,new_score numeric,old_complete boolean,new_complete boolean,settings jsonb)
@@ -2356,8 +2382,8 @@ begin
  for question in select jsonb_array_elements(coalesce(task.task->'writingQuestions','[]')) loop
   if coalesce((question->>'required')::boolean,true) and (writing.id is null or length(trim(writing.responses->>(question->>'id'))) not between 12 and 3000 or writing.responses->>(question->>'id') is null) then raise exception 'WRITING_INCOMPLETE';end if;
  end loop;
- -- Every append replays and validates the full persisted evidence before saving
- -- this server-owned evaluation atomically with its head. Finalization accepts
+ -- Every append validates its new evidence against private state bound to the
+ -- preceding accepted head, then saves both atomically. Finalization accepts
  -- only that exact revision/sequence/hash/state; no browser score is reused.
  if (attempt.accepted_validation->>'revision')::bigint is distinct from attempt.accepted_revision
  or (attempt.accepted_validation->>'throughSequence')::integer is distinct from attempt.accepted_sequence
@@ -3027,7 +3053,7 @@ revoke all on function private.learning_history_v1(uuid,text), private.learning_
 create function public.prepare_student_learning_task_owned_v1(p_expected_user_id uuid,p_operation_id uuid,p_payload text) returns jsonb language sql security definer set search_path='' as $f$ select private.learning_prepare_v1(p_expected_user_id,p_operation_id,p_payload); $f$;
 revoke all on function public.prepare_student_learning_task_owned_v1(uuid,uuid,text) from public, anon;
 grant execute on function public.prepare_student_learning_task_owned_v1(uuid,uuid,text) to authenticated;
-create function public.claim_student_learning_attempt_owned_v1(p_expected_user_id uuid,p_operation_id uuid,p_payload text) returns jsonb language sql security definer set search_path='' as $f$ select private.learning_claim_v1(p_expected_user_id,p_operation_id,p_payload); $f$;
+create function public.claim_student_learning_attempt_owned_v1(p_expected_user_id uuid,p_operation_id uuid,p_payload text) returns jsonb language sql security definer set search_path='' set statement_timeout='30s' as $f$ select private.learning_claim_v1(p_expected_user_id,p_operation_id,p_payload); $f$;
 revoke all on function public.claim_student_learning_attempt_owned_v1(uuid,uuid,text) from public, anon;
 grant execute on function public.claim_student_learning_attempt_owned_v1(uuid,uuid,text) to authenticated;
 -- Bounded offline uploads can replay 4,000 opportunities under concurrent load.
