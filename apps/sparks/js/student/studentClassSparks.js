@@ -121,6 +121,13 @@ export async function showStudentClassSparks(routing, route = routing.sm.parseRo
             repository.readAssignment(selectedSpark.id, { signal }), repository.listResponses(selectedSpark.id, { signal })
         ]);
         if (!current()) return;
+        if(!sm.isTeacherUnitPreview && !sm.authDisabled && sm.currentUser && !selectedSpark.closed && assignment.content?.questions?.some(q=>q.type==='multiple_choice')){
+            const {mountReadingLearning}=await import('./studentLearningResults.js');if(!current())return;
+            const scoredRoot=element('article',undefined,'student-current-class-spark');
+            root.replaceChildren(sparkBreadcrumb({trimester:selectedSpark.trimester,month:selectedSpark.month,sparkId:selectedSpark.id},navigate),scoredRoot);
+            const runtime=await mountReadingLearning(sm,scoredRoot,{source:{kind:'assignment',id:assignment.id},grade:Number(sm.studentProfile?.grade),isCurrent:current,signal});
+            if(runtime){if(!current()){await runtime.destroy();return;}sm.activities.session.activityInstance=runtime;signal.addEventListener('abort',()=>void runtime.destroy(),{once:true});navigation?.addEventListener('abort',()=>void runtime.destroy(),{once:true});return;}
+        }
         const card = createClassSparkReader({ assignment, saved: responses[0], current, closed: selectedSpark.closed,
             saveCheck: (answers, revision) => repository.checkSpark(assignment.id, answers, revision, { ownerUserId: owner, signal }),
             saveResponse: (answer, revision) => repository.saveResponse(assignment.id, answer, revision, { ownerUserId: owner, signal })

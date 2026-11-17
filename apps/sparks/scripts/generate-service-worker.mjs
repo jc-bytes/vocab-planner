@@ -16,6 +16,7 @@ export async function generateStudentServiceWorker({ outputDirectory = 'dist-des
     precacheBytes += contents.byteLength;
     return { url, revision: createHash('sha256').update(contents).digest('hex').slice(0, 16) };
   }));
+  await writeFile(join(outputDirectory, 'learning-offline-assets.json'), JSON.stringify({version:1,files:[...precacheFiles].sort()}));
   const version = createHash('sha256').update(JSON.stringify(additionalManifestEntries)).digest('hex').slice(0, 16);
   const cachePrefix = `vocabulary-student-graph-${version}`;
   const lifecycleFile = `student-sw-lifecycle-${version}.js`;
