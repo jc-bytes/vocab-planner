@@ -94,5 +94,13 @@ try {
     assert.equal(await retryPage.evaluate(() => studentApp.currentUser?.uid), retryFixture.ids.user, 'Recovering vocabulary must keep the student signed in');
     assert.deepEqual(retryFixture.errors, []);
     await retryPage.close();
+    const scoredPage=await browser.newPage();const scored=await installStudentAssignedFlowFixture(scoredPage,{publishedLearning:true});
+    await scoredPage.goto(`${baseUrl}/student.html#/units?trimester=IIIT&month=october`);
+    await scoredPage.getByRole('button').filter({hasText:scored.detail.title}).first().click();await scoredPage.locator('#activity-menu-view:not(.hidden)').waitFor();await scoredPage.locator('[data-activity="matching"]').first().click();
+    await scoredPage.getByText('0 of 50 original answers saved. Passing target: 80%.',{exact:true}).waitFor();
+    const selected=await scoredPage.locator('.learning-match-column').first().getByRole('button').first().innerText();
+    await scoredPage.locator('.learning-match-column').first().getByRole('button',{name:selected,exact:true}).click();await scoredPage.locator('.learning-match-column').nth(1).getByRole('button',{name:`Meaning of ${selected.toLowerCase()}`,exact:true}).click();
+    await scoredPage.getByText('1 of 50 original answers saved. Passing target: 80%.',{exact:true}).waitFor();
+    assert.equal(scored.calls.some(call=>call.name==='start_student_activity_attempt_owned_v1'),false,'published scoring bypasses legacy attempt writes');assert.ok(scored.calls.some(call=>call.name==='prepare_student_learning_task_owned_v1'));assert.deepEqual(scored.errors,[]);await scoredPage.close();
     console.log('Actual student Units → published vocabulary → activity menu → Matching controller passed; transient activity vocabulary failures recover without sign-out; no activity completed.');
 } finally { await browser?.close(); server?.kill(); }
