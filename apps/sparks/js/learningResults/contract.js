@@ -1,6 +1,6 @@
 export const CONTRACT_VERSION = 'learning-results-v1';
 export const ACTIVITIES = Object.freeze(['flashcards', 'matching', 'scramble', 'wordle', 'hangman', 'fill-in-blank', 'crossword', 'word-search', 'quiz', 'synonym-antonym', 'speed-match', 'reading-check']);
-export const LIMITS = Object.freeze({ words: 200, appearances: 20, opportunities: 4000, events: 50000, request: 262144, evidence: 8388608, event: 16384, state: 65536, terminal: 16384 });
+export const LIMITS = Object.freeze({ words: 200, appearances: 20, opportunities: 250, events: 50000, request: 262144, evidence: 8388608, event: 16384, state: 65536, terminal: 16384 });
 const encoder = new TextEncoder();
 export function fail(code, field = '', message = code) { const error = new Error(message); error.code = code; error.field = field; throw error; }
 export function integer(value, min = 0, max = Number.MAX_SAFE_INTEGER, field = '') {

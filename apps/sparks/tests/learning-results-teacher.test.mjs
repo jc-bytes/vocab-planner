@@ -9,3 +9,12 @@ test('account changes discard late teacher settings and target responses',async(
 test('puzzle publication sends a complete locally validated candidate and never drops words',async()=>{const f=fixture();f.model.activity='crossword';await f.model.load();await f.model.publish({targetSeconds:120});const candidate=f.calls.at(-1)[1].layoutCandidates[0];assert.equal(candidate.placements.length,2);assert.deepEqual(new Set(candidate.placements.map(p=>p.wordId)),new Set(['cat','art']));});
 
 test('teacher values reject fractional shared seconds before sending any write',async()=>{const f=fixture();await f.model.load();await assert.rejects(f.model.publish({targetSeconds:2.5}),{code:'INVALID_INTEGER'});assert.equal(f.calls.filter(c=>c[0]==='settings').length,0);});
+
+test('oversized publication preserves saved settings and sends no write',async()=>{
+ const f=fixture();f.model.activity='matching';await f.model.load();
+ f.model.snapshot.scoredContent.words=Array.from({length:50},(_,i)=>({id:`term-${i}`,word:`Term ${i}`}));
+ await f.model.publish({targetSeconds:90,appearances:5});
+ const saved=structuredClone(f.model.snapshot.settings),writes=f.calls.length;
+ await assert.rejects(f.model.publish({targetSeconds:90,appearances:6}),{code:'TASK_CAPACITY_EXCEEDED'});
+ assert.equal(f.calls.length,writes);assert.deepEqual(f.model.snapshot.settings,saved);
+});

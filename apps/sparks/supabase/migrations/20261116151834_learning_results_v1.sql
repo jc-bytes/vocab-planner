@@ -2576,6 +2576,7 @@ begin
  if not coalesce(word->>'correctOptionId'=any(option_ids),false) then raise exception 'INVALID_TASK';end if;end if;end loop;
  if activity in ('matching','speed-match') then
  if cardinality(ids)<2 or coalesce(task->>'appearances','5') !~ '^[0-9]+$' or coalesce((task->>'appearances')::numeric,5) not between 1 and 20 then raise exception 'INVALID_TASK';end if;end if;
+ if activity in ('matching','speed-match') and cardinality(ids)*coalesce((task->>'appearances')::integer,5)>250 then raise exception 'TASK_CAPACITY_EXCEEDED';end if;
  if activity in ('crossword','word-search') then
  if jsonb_typeof(task->'variants') is distinct from 'array' or jsonb_array_length(task->'variants') not between 1 and 4 then raise exception 'LAYOUT_INVALID';end if;
  for variant in select value from jsonb_array_elements(task->'variants') loop

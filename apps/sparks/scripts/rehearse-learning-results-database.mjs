@@ -52,7 +52,7 @@ try{
  assert.equal(counters.finished,1);assert.equal(counters.mastered,1);assert.equal(counters.results,1);assert.equal(counters.xp,1);assert.ok(counters.coinKeys<=2);
  console.log(JSON.stringify({nativePostgres:true,concurrentRequests,terminalReplayConnections:10,points:saved.result.points,counters,hostedAcceptance:false}));
  // Run ten independent maximum-set attempts through the real public wrappers.
- const maxTask={id:crypto.randomUUID(),contractVersion:'learning-results-v1',activity:'matching',sharedTargetMilliseconds:10000,appearances:20,words:Array.from({length:200},(_,i)=>({id:`term-${i}`,word:`Term ${i}`,definition:`Definition ${i}`}))};
+ const maxTask={id:crypto.randomUUID(),contractVersion:'learning-results-v1',activity:'matching',sharedTargetMilliseconds:10000,appearances:5,words:Array.from({length:50},(_,i)=>({id:`term-${i}`,word:`Term ${i}`,definition:`Definition ${i}`}))};
  query(`insert into private.learning_result_tasks(id,school_id,grade,content_set_id,activity_type,canonical_digest,task,creator_id) values(${literal(maxTask.id)},${literal(school)},7,'native-capacity','matching',${literal(await sha256(bytes(maxTask)))},${literal(maxTask)},${literal(owner)});`);
  const finalizations=[],maximumAttempts=[];let largestRequest=0;
  const maximumStart=performance.now();
@@ -79,7 +79,7 @@ try{
   await new LearningSync({store:maxStore,repository:maxRepository,activeOwner:()=>student}).drain(student);const completed=await maxStore.get('learningAttempts',student,attempt.id);assert.equal(completed.confirmed,true);assert.equal(completed.result.points,1000);
  }));
  const functionProfile=JSON.parse(query("select coalesce(jsonb_agg(to_jsonb(f) order by self_time desc),'[]') from pg_stat_user_functions f where funcname like '%learning%'"));console.log(JSON.stringify({functionProfile}));
- finalizations.sort((a,b)=>a-b);console.log(JSON.stringify({nativeMaximumAttempts:maximumConcurrency,opportunitiesPerAttempt:4000,eventsPerAttempt:8001,largestRequestBytes:largestRequest,terminalMilliseconds:finalizations.map(Math.round),tenConcurrentTerminalP95Milliseconds:Math.round(finalizations.at(-1)),totalMilliseconds:Math.round(performance.now()-maximumStart),p95BudgetMilliseconds:2000,withinBudget:finalizations.at(-1)<2000}));
+ finalizations.sort((a,b)=>a-b);console.log(JSON.stringify({nativeMaximumAttempts:maximumConcurrency,opportunitiesPerAttempt:LIMITS.opportunities,eventsPerAttempt:LIMITS.opportunities*2+1,largestRequestBytes:largestRequest,terminalMilliseconds:finalizations.map(Math.round),tenConcurrentTerminalP95Milliseconds:Math.round(finalizations.at(-1)),totalMilliseconds:Math.round(performance.now()-maximumStart),p95BudgetMilliseconds:2000,withinBudget:finalizations.at(-1)<2000}));
 
  // Synthetic cloned rows measure the actual board query, including its ordering digest.
  const boardReader=query(`begin;create temporary table native_board_fixture as select n,gen_random_uuid() student,gen_random_uuid() preparation,gen_random_uuid() attempt,case when n<=3 then 1000-n when n<=1003 then 950 else 100 end points from generate_series(1,4999) n;

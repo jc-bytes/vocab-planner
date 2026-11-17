@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {deriveOutcome,ADAPTER_ACTIVITIES} from '../js/learningResults/adapters.js';import {fraction} from '../js/learningResults/scoring.js';import {validateLayout,makeSchedule,chooseVariant} from '../js/learningResults/task.js';
+import {deriveOutcome,ADAPTER_ACTIVITIES} from '../js/learningResults/adapters.js';import {fraction} from '../js/learningResults/scoring.js';import {validateTask,validateLayout,makeSchedule,chooseVariant} from '../js/learningResults/task.js';
 const word={id:'cat',word:'CAT',options:[{id:'yes'},{id:'no'}],correctOptionId:'yes'},opportunity={id:'cat:0',wordId:'cat'};
 const variants=[{variantId:'00000000-0000-4000-8000-000000000005',generatorVersion:'grid-v1',seed:'00000001',rows:3,columns:3,gridRows:['#B#','CAT','#T#'],placements:[{wordId:'cat',startRow:1,startColumn:0,direction:'across'},{wordId:'bat',startRow:0,startColumn:1,direction:'down'}]}];
 for(const activity of ADAPTER_ACTIVITIES)test(`${activity}: unaided and assisted original`,()=>{
@@ -14,4 +14,13 @@ test('bounded teacher generation produces complete deterministic validated puzzl
  const words=[{id:'cat',word:'CAT'},{id:'bat',word:'BAT'},{id:'tab',word:'TAB'}],variantId='00000000-0000-4000-8000-000000000005';
  for(const activity of ['crossword','word-search']){const layout=generateLayout({words,activity,seed:4,variantId});assert.equal(layout.placements.length,3);validateLayout(words,activity,layout);assert.deepEqual(layout,generateLayout({words,activity,seed:4,variantId}));}
  assert.throws(()=>generateLayout({words:[{id:'a',word:'AA'},{id:'b',word:'BB'}],activity:'crossword',seed:1,variantId}),{code:'LAYOUT_GENERATION_FAILED'});
+});
+
+test('task validation accepts 250 answers and rejects an oversized repetition schedule',()=>{
+ const words=Array.from({length:50},(_,i)=>({id:`term-${i}`,word:`Term ${i}`,definition:`Definition ${i}`}));
+ for(const activity of ['matching','speed-match']){
+  const task={id:crypto.randomUUID(),contractVersion:'learning-results-v1',activity,sharedTargetMilliseconds:10000,words,appearances:5};
+  validateTask(task);assert.equal(makeSchedule(task,7).length,250);
+  assert.throws(()=>validateTask({...task,words:[...words,{id:'extra',word:'Extra',definition:'Extra definition'}]}),{code:'INVALID_TASK'});
+ }
 });

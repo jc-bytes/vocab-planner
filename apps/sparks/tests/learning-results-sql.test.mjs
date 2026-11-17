@@ -644,3 +644,12 @@ test('every immutable attempt column remains protected when validation state gro
   await assert.rejects(db.query(`update private.learning_result_attempts set ${name}=(jsonb_populate_record(null::private.learning_result_attempts,jsonb_build_object($1::text,$2::jsonb))).${name} where id=$3`,[column.name,value===null?null:JSON.stringify(value),attemptId]),/IMMUTABLE_ATTEMPT_IDENTITY/,column.name);
  }
 });
+
+test('SQL rejects oversized schedules independently of client publication checks',async()=>{
+ const words=Array.from({length:50},(_,i)=>({id:`term-${i}`,word:`Term ${i}`,definition:`Definition ${i}`}));
+ for(const activity of ['matching','speed-match']){
+  const task={id:crypto.randomUUID(),contractVersion:'learning-results-v1',activity,sharedTargetMilliseconds:10000,words,appearances:5};
+  await db.query('select private.learning_task_valid_v1($1)',[task]);
+  await assert.rejects(db.query('select private.learning_task_valid_v1($1)',[{...task,words:[...words,{id:'extra',word:'Extra',definition:'Extra definition'}]}]),/TASK_CAPACITY_EXCEEDED/);
+ }
+});

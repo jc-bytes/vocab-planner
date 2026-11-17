@@ -1,5 +1,5 @@
 import {learningResultsRepository} from './services/learningResultsRepository.js';
-import {ACTIVITIES,fail,integer,canonical} from './learningResults/contract.js';
+import {ACTIVITIES,LIMITS,fail,integer,canonical} from './learningResults/contract.js';
 import {generateLayout} from './learningResults/task.js';
 const labels={'flashcards':'Flashcards','matching':'Matching','scramble':'Scramble','wordle':'Wordle','hangman':'Hangman','fill-in-blank':'Fill in Blank','crossword':'Crossword','word-search':'Word Search','quiz':'Quiz','synonym-antonym':'Synonym and Antonym','speed-match':'Speed Match','reading-check':'Reading check'};
 export class TeacherLearningSettings {
@@ -13,6 +13,8 @@ export class TeacherLearningSettings {
     async publish({targetSeconds,appearances=5,enabled=true},options={}) {
         if(!this.snapshot)fail('SOURCE_REQUIRED');integer(targetSeconds,1,86400);integer(appearances,1,20);
         const snapshot=this.snapshot,owner=this.owner();
+        const answerCount=snapshot.scoredContent.words.length*(['matching','speed-match'].includes(this.activity)?appearances:1);
+        if(answerCount>LIMITS.opportunities)fail('TASK_CAPACITY_EXCEEDED');
         const sameWords=snapshot.task && canonical(snapshot.task.words.map(w=>[w.id,w.word]))===canonical(snapshot.scoredContent.words.map(w=>[w.id,w.word]));
         const layouts=['crossword','word-search'].includes(this.activity)?sameWords?snapshot.task.variants:[generateLayout({words:snapshot.scoredContent.words,activity:this.activity,seed:this.newSeed()})]:[];
         const result=await this.repository.operation('settings',{contractVersion:'learning-results-v1',source:this.source,grade:this.grade,activity:this.activity,
@@ -28,16 +30,19 @@ export class TeacherLearningSettings {
 }
 const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
 export function mountLearningResultsSettings({root,source,grades,getOwner,isCurrent=()=>true,activities=ACTIVITIES.filter(id=>id!=='reading-check'),repository=learningResultsRepository}) {
-    let request=0,model=null,destroyed=false;
+    let request=0,model=null,destroyed=false,publishing=false;
     const section=node('section'),heading=node('h3','Game scores and rankings'),description=node('p','Accuracy provides up to 950 points. Answer speed provides up to 50 points. Students in the same grade use the same speed target for this content.'),form=node('form'),status=node('p');
     status.setAttribute('role','status');
     function select(label,values){const wrapper=node('label',label),control=node('select');for(const [value,text] of values){const option=node('option',text);option.value=String(value);control.append(option);}wrapper.append(control);form.append(wrapper);return control;}
     function numeric(label,min,max){const wrapper=node('label',label),control=node('input');control.type='number';control.min=String(min);control.max=String(max);control.step='1';control.required=true;wrapper.append(control);form.append(wrapper);return control;}
     const grade=select('Grade',grades.map(value=>[value,`Grade ${value}`])),activity=select('Activity',activities.map(value=>[value,labels[value] || value]));
     const seconds=numeric('Shared speed target in seconds',1,86400),repetitions=numeric('Scheduled appearances per word',1,20),enabledLabel=node('label','Enable scores for new attempts '),enabled=node('input');enabled.type='checkbox';enabledLabel.append(enabled);form.append(enabledLabel);
-    const affected=node('p'),save=node('button','Publish settings');save.type='submit';save.className='btn primary-btn';form.append(affected,save);const timing=node('p'),targets=node('section');section.append(heading,description,form,timing,targets,status);root.append(section);
+    const capacity=node('p');capacity.setAttribute('aria-live','polite');
+    const affected=node('p'),save=node('button','Publish settings');save.type='submit';save.className='btn primary-btn';form.append(capacity,affected,save);const timing=node('p'),targets=node('section');section.append(heading,description,form,timing,targets,status);root.append(section);
     const current=(id,owner)=>!destroyed && id===request && isCurrent() && owner===getOwner();
-    async function load(){const id=++request,owner=getOwner();save.disabled=true;targets.replaceChildren();timing.textContent='';status.textContent='Loading scoring settings…';
+    function updateCapacity(){if(!model?.snapshot)return;const count=model.snapshot.scoredContent.words.length*(['matching','speed-match'].includes(activity.value)?Number(repetitions.value):1);capacity.textContent=`${count} scheduled answers. Maximum ${LIMITS.opportunities} per scored attempt.`+(count>LIMITS.opportunities?' Use fewer words or appearances before publishing.':'');save.disabled=publishing || count>LIMITS.opportunities;}
+    repetitions.addEventListener('input',updateCapacity);
+    async function load(){const id=++request,owner=getOwner();publishing=false;save.disabled=true;targets.replaceChildren();timing.textContent='';status.textContent='Loading scoring settings…';capacity.textContent='';
         model=new TeacherLearningSettings({repository,owner:getOwner,source,grade:Number(grade.value),activity:activity.value});
         try {const snapshot=await model.load();if(!current(id,owner))return;
             seconds.value=snapshot.settings?.shared_target_milliseconds?String(snapshot.settings.shared_target_milliseconds/1000):'';
@@ -58,13 +63,13 @@ export function mountLearningResultsSettings({root,source,grades,getOwner,isCurr
                     finally{if(current(id,owner))button.disabled=false;}
                 });
             }
-            status.textContent='Choose a time students can reasonably complete the scored answers. You can adjust it after reviewing their results.';save.disabled=false;
+            status.textContent='Choose a time students can reasonably complete the scored answers. You can adjust it after reviewing their results.';updateCapacity();
         }catch(error){if(current(id,owner))status.textContent=error.message==='NO_SCORED_QUESTIONS'?'This reading check has no multiple-choice score.':error.message==='WORD_UNPLAYABLE'?'Every selected word needs usable answers before this activity can be scored.':'These scoring settings could not be loaded. Reopen the assignment to try again.';}
     }
-    form.addEventListener('submit',async event=>{event.preventDefault();if(save.disabled || !model)return;const id=request,owner=getOwner();save.disabled=true;status.textContent='Publishing settings…';
+    form.addEventListener('submit',async event=>{event.preventDefault();if(save.disabled || !model)return;const id=request,owner=getOwner();publishing=true;save.disabled=true;status.textContent='Publishing settings…';
         try {await model.publish({targetSeconds:Number(seconds.value),appearances:Number(repetitions.value || 5),enabled:enabled.checked});if(current(id,owner))status.textContent='Settings published. Existing attempts keep their saved settings.';}
-        catch(error){if(current(id,owner))status.textContent=/CONFLICT|SOURCE_CHANGED/.test(error.message)?'The content or settings changed. Select the activity again to load the latest version.':error.code==='LAYOUT_GENERATION_FAILED'?'A complete puzzle could not be made with these words. Edit the word list and publish a new assignment.':'Settings could not be published. Your previous settings are still saved.';}
-        finally{if(current(id,owner))save.disabled=false;}
+        catch(error){if(current(id,owner))status.textContent=/TASK_CAPACITY_EXCEEDED/.test(error.code || error.message)?'This activity exceeds 250 scheduled answers. Use fewer words or appearances before publishing.':/CONFLICT|SOURCE_CHANGED/.test(error.message)?'The content or settings changed. Select the activity again to load the latest version.':error.code==='LAYOUT_GENERATION_FAILED'?'A complete puzzle could not be made with these words. Edit the word list and publish a new assignment.':'Settings could not be published. Your previous settings are still saved.';}
+        finally{if(current(id,owner)){publishing=false;updateCapacity();}}
     });
     grade.addEventListener('change',load);activity.addEventListener('change',load);void load();
     return {destroy(){destroyed=true;request++;section.remove();}};

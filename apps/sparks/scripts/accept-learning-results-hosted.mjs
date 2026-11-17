@@ -59,6 +59,21 @@ passed('Teacher-only settings; school and grade access; two sections share one t
 await mutate('teacher','target',{source,grade:7,studentId:student,activity:'quiz',expectedRevision:0,target:95});
 assert.equal((await mutate('student','prepare',{source,grade:7,activity:'quiz',expectedTaskId:published.taskId})).passingTarget,95);assert.equal((await mutate('sectionPeer','prepare',{source:{kind:'assignment',id:assignmentB},grade:7,activity:'quiz',expectedTaskId:published.taskId})).passingTarget,80);
 passed('Individual passing targets do not change shared scoring settings');
+const capacityVocabulary=`hosted-capacity-boundary-${crypto.randomUUID()}`,capacityWords=Array.from({length:50},(_,i)=>({id:`term-${i}`,word:`Term ${i}`,definition:`Definition ${i}`}));
+sql(`insert into public.vocabularies(id,school_id,teacher_subject_id,grades,words) values(${quote(capacityVocabulary)},${quote(school)},${quote(subject)},array['7'],${quote(capacityWords)});`);
+for(const activity of ['matching','speed-match']){
+ const capacitySource={kind:'vocabulary',id:capacityVocabulary};
+ const before=await read('teacher',{mode:'authoring',source:capacitySource,grade:7,activity},true);
+ const publication={source:capacitySource,grade:7,activity,expectedRevision:0,sourceDigest:before.source.sourceDigest,sharedTargetMilliseconds:10000,appearances:5,enabled:true};
+ const accepted=await mutate('teacher','settings',publication);
+ const saved=await read('teacher',{mode:'authoring',source:capacitySource,grade:7,activity},true);
+ assert.equal(saved.task.words.length*saved.task.appearances,250);
+ await assert.rejects(mutate('teacher','settings',{...publication,expectedRevision:accepted.revision,appearances:6}),error=>/TASK_CAPACITY_EXCEEDED/.test(error.message));
+ const after=await read('teacher',{mode:'authoring',source:capacitySource,grade:7,activity},true);
+ assert.deepEqual(after.settings,saved.settings);assert.equal(after.task.id,saved.task.id);
+}
+passed('250-answer publications succeed; oversized Matching and Speed Match publications preserve saved settings');
+
 const database=new ImageDB();database.dbName=`hosted-acceptance-${crypto.randomUUID()}`;
 async function complete(who,pkg,correct=true){const owner=users[who].id,store=new LearningStore({database,activeOwner:()=>owner});const session=await LearningSession.create({task:pkg.task,preparationId:pkg.preparationId,ownerUserId:owner,passingTarget:pkg.passingTarget,seed:7,startContext:pkg.startContext,store,owner:()=>owner,now:()=>0});
  const repository={async mutate(kind,args){const {data,error}=await users[who].client.rpc(names[kind],args);if(error)throw error;return data;}};
