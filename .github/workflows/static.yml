@@ -71,7 +71,7 @@ jobs:
         run: |
           for file in /etc/apt/apt-mirrors.txt /etc/apt/apt-*-mirrors.txt /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
             [ -f "$file" ] || continue
-            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$file"
+            sudo sed -E -i 's|http://([[:alnum:]-]+\.)*archive\.ubuntu\.com/ubuntu|https://archive.ubuntu.com/ubuntu|g; s|http://security\.ubuntu\.com/ubuntu|https://security.ubuntu.com/ubuntu|g' "$file"
           done
       - name: Install Playwright browsers
         timeout-minutes: 10
