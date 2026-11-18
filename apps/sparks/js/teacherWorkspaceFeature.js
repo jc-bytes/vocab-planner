@@ -62,9 +62,9 @@ export function createTeacherWorkspaceFeature(manager) {
     }
     let selectorRequest, selectorLoadedAt = 0, selectorOwner, destroyed = false;
     return {
-        showHome() {
+        showHome({ forceRefresh = false } = {}) {
             if (!manager.ensureAuthenticated()) return;
-            return home.show();
+            return home.show({ refresh: forceRefresh });
         },
         async refreshClassSelector() {
             const owner = getUserId();
