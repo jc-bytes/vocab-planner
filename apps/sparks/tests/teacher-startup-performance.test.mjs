@@ -28,3 +28,15 @@ test('class home starts immediately after authentication', async () => {
     assert.equal(calls, 1);
     assert.equal(await pending, 'classes');
 });
+
+
+test('class home forwards an explicit refresh request to its workspace', async () => {
+    const { installTeacherOverviewMethods } = await import('../js/teacherOverview.js');
+    class Manager { ensureAuthenticated() { return true; } }
+    installTeacherOverviewMethods(Manager);
+    const manager = new Manager();
+    let received;
+    manager.showClassHome = options => { received = options; return Promise.resolve('refreshed'); };
+    assert.equal(await manager.loadTeacherOverview({ forceRefresh: true }), 'refreshed');
+    assert.deepEqual(received, { forceRefresh: true });
+});
