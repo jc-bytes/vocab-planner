@@ -92,7 +92,7 @@ test('hosted readiness executes only in publishing jobs before either Pages depl
 
 test('release audits include development dependencies used to build and verify published code', () => {
     for (const source of [validation, scripts['test:release']]) {
-        assert.match(source, /npm audit --audit-level=high/);
+        assert.match(source, /node scripts\/audit-release-dependencies\.mjs/);
         assert.doesNotMatch(source, /npm audit[^\n&]*--omit(?:=|\s+)dev/);
     }
 });

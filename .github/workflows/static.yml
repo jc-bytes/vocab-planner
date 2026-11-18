@@ -130,7 +130,7 @@ jobs:
             docker logs --tail 200 "${container}" 2>&1 || true
           done
       - name: Dependency audit including build and test tools
-        run: npm audit --audit-level=high
+        run: node scripts/audit-release-dependencies.mjs
       - name: Authenticated app smoke
         run: npm run test:ui:auth-smoke && npm run test:ui:startup-recovery
       - name: Firefox and WebKit focused smoke
