@@ -1,6 +1,6 @@
 # Christmas 2026 gallery
 
-The public route is `/view-models/`. Class pages use `/view-models/6a/`, `6b/`, or `6c/`. Share the matching `this-is-mine/` route and its class code in Classroom. Teacher ballots use `/view-models/teachers/`. All model cards have rotatable previews and still images. Offline or unavailable database records default to display only. All six 3MF attachments and 38 STL attachments are represented. Some models have lettering designed by their creators. Check publication permissions for the artwork itself before launch.
+The public route is `/view-models/`. Class pages use `/view-models/6a/`, `6b/`, or `6c/`. Share the matching `this-is-mine/` route and its class code in Classroom. Teacher ballots use `/view-models/teachers/`. All model cards have rotatable previews and still images. Offline or unavailable database records default to display only. The collection includes the 12 submissions from 6A, 27 from 6B and 17 from 6C. Some models have lettering designed by their creators. Check publication permissions for the artwork itself before launch.
 
 The Sparks migration creates the isolated event, class codes, and print decisions. Use the following queries in the private Supabase SQL editor. Keep class codes in their own Classroom section. Issue a separate teacher code to each invited teacher. A teacher code identifies one editable score per ornament. Audience votes use an anonymous browser token. Clearing browser storage allows a new audience ballot.
 
