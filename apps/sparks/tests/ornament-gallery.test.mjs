@@ -9,6 +9,9 @@ test('ornament event gates voting by exact approved file and protects private re
  try{
   await db.exec('create role anon;create role authenticated')
   await db.exec(await readFile(new URL('../supabase/migrations/20261124011500_ornament_gallery.sql',import.meta.url),'utf8'))
+  await db.exec(await readFile(new URL('../supabase/migrations/20261124160000_ornament_repairs.sql',import.meta.url),'utf8'))
+  // Keep exercising approval withdrawal when every real exhibit is eligible.
+  await db.exec("update ornament_gallery.model set approved=false where id='6C-001'")
   const key=(await db.query("select code from ornament_gallery.class_code where section='6B'")).rows[0].code
   const teacher=(await db.query("insert into ornament_gallery.teacher_code(event_id) values('christmas-2026') returning code")).rows[0].code
   await db.exec('set role anon')

@@ -1,0 +1,51 @@
+-- Apply only to the source versions reviewed for this repair. Preserve credits and claims.
+update ornament_gallery.model m set asset=v.new_asset, approved=true
+from (values
+('6B-004','92e4445fb187056214cc','f0c226d09d660af05143'),
+('6B-008','7103c7d6cc4f1c3fb048','9997df5f4a19de32550f'),
+('6B-009','88012adbc68fb66e7da8','862828483a063fa3d1b0'),
+('6B-010','040b63425ca823b05c00','5c87c2171415f48acbfd'),
+('6B-013','d6961273c22294a69d8f','d4edb03fe4ee2bd1415d'),
+('6B-014','f167e7a02580af6ba599','c97ba4e18345972c4135'),
+('6B-015','f047a11dda23dc3c0643','86ad1dcc60351be84722'),
+('6B-017','0005bcb6d331c928e61e','c001832f3742835ed014'),
+('6B-018','f1805bc8288cd2cd2a18','7f14a2c98475628cd4b1'),
+('6B-020','331ef305aadca030d885','0f044acb25a88a90126b'),
+('6B-021','bb9ebbecdf824b0e59a0','d99f1f81d9d676df1e9e'),
+('6B-022','db9a0bc03bd36907c96e','a47c8ad9d521eddb733b'),
+('6B-023','68fa120ce715e770f71c','924fd80111a62bdbbd8f'),
+('6B-024','89196972afd7ed3c733b','ed6b84257e4ae50f3fdd'),
+('6B-026','835c1e0c6d99d6ba0f5d','1c34fc18b68d50a8a86f'),
+('6C-001','60d9fbafa543640cf1ae','389515e4c192a368e422'),
+('6C-002','9a586daa8e03121c4b2d','cadaeec94c5f81361d14'),
+('6C-003','88788fcb19e2210d5df9','31e842a44a9f6c2b5208'),
+('6C-004','422497262b1624452656','1b8206ac3922b37a6355'),
+('6C-005','422497262b1624452656','1b8206ac3922b37a6355'),
+('6C-006','70b197c46d4662d4a11c','a8f02bea7aa1997273a3'),
+('6C-007','b48c7c44dcad61c27710','f6c8fdf6800b12fb2266'),
+('6C-008','c8f3e01db4971ebb9f67','93bce167c615554017c3'),
+('6C-009','a62331697e540331f9bb','5192a4abf20c5987ac41'),
+('6C-010','6f522eb6b59b5463782e','4d8776a97fb3b8f1863a'),
+('6C-011','8886da886cfce3a99a2c','57ff7b8f6b09c7b04208'),
+('6C-012','4f70a387703b561994ed','718fd96aad0f79f72c94'),
+('6C-013','db87897ccf1f524fa51d','484552f48d4f87ef2758'),
+('6C-014','6d63bd6df20fbe8dee3e','25cf67d4f9f10c1ea574'),
+('6C-015','0aa00cc7b1adc209fac8','ce716e0f5668edbf4c30'),
+('6C-016','835c1e0c6d99d6ba0f5d','1c34fc18b68d50a8a86f'),
+('6C-017','795f1ad4eff3ec9cd0e9','0591016e299f5091740a')
+) v(id,old_asset,new_asset)
+where m.event_id='christmas-2026' and m.id=v.id and m.asset=v.old_asset;
+
+insert into ornament_gallery.model(event_id,id,asset,approved) values
+('christmas-2026','6A-001','431d9d418d93619c8d4e',true),
+('christmas-2026','6A-002','234b6e62b081837106ed',true),
+('christmas-2026','6A-003','96b129b458ba1744efaa',true),
+('christmas-2026','6A-004','9d6f9fbf44da5bdc5545',true),
+('christmas-2026','6A-005','d79ff63e0bdafd4de9ae',true),
+('christmas-2026','6A-006','5801d4d401b387216563',true),
+('christmas-2026','6A-007','ad87c3c13f086c2e722b',true),
+('christmas-2026','6A-008','4b5486f637a67806a082',true),
+('christmas-2026','6A-009','4fde3191658c97a9f0de',true),
+('christmas-2026','6A-010','7ac0d70811a5a60d83d9',true),
+('christmas-2026','6A-011','391c84e62795af4face5',true),
+('christmas-2026','6A-012','2f10af30296b74543926',true);

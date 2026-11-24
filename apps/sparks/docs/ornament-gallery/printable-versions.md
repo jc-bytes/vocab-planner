@@ -1,0 +1,64 @@
+# Christmas 2026 printable files
+
+Bambu Lab A1, 0.4 mm nozzle, white PLA Basic, 0.20 mm Standard, flat on the bed, supports and brim off. Each listed version sliced as one connected piece. Verification used the generated extrusion paths. Physical prints have not been tested.
+
+Connected backing adds a narrow foundation and links behind the design. Supported relief carries elevated details down to the backing. Stepped and connected relief preserve the front design at several heights. The backed relief for 6C-008 includes a solid rear face and an open hanging eye. The source files remain in Classroom.
+
+| Ornament | Print version | Submission key | Gallery version | STL SHA-256 |
+| --- | --- | --- | --- | --- |
+| 6A-001 | Original | 431d9d418d93619c8d4e | 431d9d418d93619c8d4e | 431d9d418d93619c8d4e5a3836d3941527eb98b96027db1b5d9f080b979eb0db |
+| 6A-002 | Connected backing | f81aebdd6c36c9780409 | 234b6e62b081837106ed | 234b6e62b081837106edb64fbac02e36e9abcdaccb9df665791c6112043c6a52 |
+| 6A-003 | Connected backing | 2c092863c12957b37e6d | 96b129b458ba1744efaa | 96b129b458ba1744efaa039ef1b9cef2e152ca81e9cba166423e75a7c6abe7ca |
+| 6A-004 | Original | 9d6f9fbf44da5bdc5545 | 9d6f9fbf44da5bdc5545 | 9d6f9fbf44da5bdc5545c44365dfc9330fc2a27e7cf38cdeb5bb6e802de2500a |
+| 6A-005 | Stepped relief | 8bfe9795cceb19c93ce6 | d79ff63e0bdafd4de9ae | d79ff63e0bdafd4de9aeee11a06e54764856075fdca3a2202f3bdc57e3de9c6f |
+| 6A-006 | Connected backing | 647a3829c1f60da48f76 | 5801d4d401b387216563 | 5801d4d401b387216563204c05a8806e94b9e5e509d70fca04aa579bdbd80352 |
+| 6A-007 | Connected backing | 7bb98517c7733f905050 | ad87c3c13f086c2e722b | ad87c3c13f086c2e722b913854e5f6817f8ea73f36a16fa393595df1f994772a |
+| 6A-008 | Connected backing | 3020708214f516a83ea4 | 4b5486f637a67806a082 | 4b5486f637a67806a08218365bbe7c18a87550250315df8fe267b6f41974c65b |
+| 6A-009 | Supported relief | 15bd1f2ba62cc835f251 | 4fde3191658c97a9f0de | 4fde3191658c97a9f0debeab8818ed5c6af1509e67eaf1a3b9d3909c391a3e96 |
+| 6A-010 | Connected backing | af5d07f9ded7b8f287a2 | 7ac0d70811a5a60d83d9 | 7ac0d70811a5a60d83d90c160f25ad988a56e03226353ca3dc7ece1c8e88d1bd |
+| 6A-011 | Connected backing | f743b90adf3778f07a06 | 391c84e62795af4face5 | 391c84e62795af4face5a63010c58f3b448858142fdc946bee4e0760c3516685 |
+| 6A-012 | Connected backing | 3c1a39b8948f1240b497 | 2f10af30296b74543926 | 2f10af30296b74543926a3c75311f56df8b090d98d38d70c0367c1060decabe0 |
+| 6B-001 | Original | cbcc0d1af70638f839bc | cbcc0d1af70638f839bc | fff7e02151900e392875b702c9f4f1b280ed0a4bf3cbc0cc2521e97ab120a887 |
+| 6B-002 | Original | fef11353bacf259a29cb | fef11353bacf259a29cb | 8fcc9bb3776fbe484087e8bee89eec3ccc6a61462d7919f0c135ff4ab132e085 |
+| 6B-003 | Original | 8b67b62ae5cd8327a7aa | 8b67b62ae5cd8327a7aa | c5bcf92ed968771ee9828487b14e4067e35ff853ebce575441847a417a648e02 |
+| 6B-004 | Connected backing | 92e4445fb187056214cc | f0c226d09d660af05143 | f0c226d09d660af05143ca6b9f29bb5d8d8bfac8dcfc2a1cde6811d8e8f02839 |
+| 6B-005 | Original | fef11353bacf259a29cb | fef11353bacf259a29cb | 8fcc9bb3776fbe484087e8bee89eec3ccc6a61462d7919f0c135ff4ab132e085 |
+| 6B-006 | Original | ae3e47c779cd6ed697c4 | ae3e47c779cd6ed697c4 | 38b6376ae129e51169aa46b1b7f2e5db16740ea48c5dab782aab57a9c4a37be5 |
+| 6B-007 | Original | 13f611428ee33bd44fce | 13f611428ee33bd44fce | b8f5e5f8b390d8b10b30a76d635a9d9229233ffe6165a0be6c28895ec073f3c6 |
+| 6B-008 | Connected backing | 7103c7d6cc4f1c3fb048 | 9997df5f4a19de32550f | 9997df5f4a19de32550f585b7cd8d22e1407fffbae3182219fed83aa37a86bad |
+| 6B-009 | Connected backing | 88012adbc68fb66e7da8 | 862828483a063fa3d1b0 | 862828483a063fa3d1b08502ad2089d93f2a566ecdd27a1b7571e2ee9ecb07fa |
+| 6B-010 | Connected backing | 040b63425ca823b05c00 | 5c87c2171415f48acbfd | 5c87c2171415f48acbfdebbbadd26b781886495f3c6ba9ecd988edfdf4432238 |
+| 6B-011 | Original | 13f611428ee33bd44fce | 13f611428ee33bd44fce | b8f5e5f8b390d8b10b30a76d635a9d9229233ffe6165a0be6c28895ec073f3c6 |
+| 6B-012 | Original | abf828b7601bcaa0b202 | abf828b7601bcaa0b202 | e9b0cdb22421c43ab96b5af5eba5081d0c43ff35979f4a561328931c2752e591 |
+| 6B-013 | Connected backing | d6961273c22294a69d8f | d4edb03fe4ee2bd1415d | d4edb03fe4ee2bd1415d126e3de4bf9fbc554961aa468e60a73494cb0a2f5b17 |
+| 6B-014 | Connected backing | f167e7a02580af6ba599 | c97ba4e18345972c4135 | c97ba4e18345972c413523ee69c83c91e313c4f15839e4a80eee9d8f4d6ac4cf |
+| 6B-015 | Connected backing | f047a11dda23dc3c0643 | 86ad1dcc60351be84722 | 86ad1dcc60351be847223137e081aecca0c4d7445297e5d5fe9406e84d017178 |
+| 6B-016 | Original | 5d116904e1927f5874ee | 5d116904e1927f5874ee | fff7e02151900e392875b702c9f4f1b280ed0a4bf3cbc0cc2521e97ab120a887 |
+| 6B-017 | Connected backing | 0005bcb6d331c928e61e | c001832f3742835ed014 | c001832f3742835ed014fca594af443f12e10d4aebb9e9ea21a9c3b22dd5df07 |
+| 6B-018 | Connected backing | f1805bc8288cd2cd2a18 | 7f14a2c98475628cd4b1 | 7f14a2c98475628cd4b14dd69d2781f60e9897d61a16f50e2342bd57b96b1013 |
+| 6B-019 | Original | 9fbb9dfa1bd59a0df4f6 | 9fbb9dfa1bd59a0df4f6 | 3c37fbc555153123979136c29567814485aefc0b8585c7b69d036296777a7fb6 |
+| 6B-020 | Connected relief | 331ef305aadca030d885 | 0f044acb25a88a90126b | 0f044acb25a88a90126b91f74db8479c00e1cd674ee22dd8797c1c60039c5f84 |
+| 6B-021 | Connected relief | bb9ebbecdf824b0e59a0 | d99f1f81d9d676df1e9e | d99f1f81d9d676df1e9e0518fa983b77d28928ae99bd0a1256d14d815e1746c9 |
+| 6B-022 | Connected relief | db9a0bc03bd36907c96e | a47c8ad9d521eddb733b | a47c8ad9d521eddb733ba70945df69258d1a1fa3c220357a87cea772455cf649 |
+| 6B-023 | Supported relief | 68fa120ce715e770f71c | 924fd80111a62bdbbd8f | 924fd80111a62bdbbd8f45cfc2735ea8a181232b4e3be949c38d4b19beac6e42 |
+| 6B-024 | Connected backing | 89196972afd7ed3c733b | ed6b84257e4ae50f3fdd | ed6b84257e4ae50f3fdd04ced0cbd451577f458db34004ea3d4f21514f536f8b |
+| 6B-025 | Original | 41a96a87c9df15b42668 | 41a96a87c9df15b42668 | d4df2f2b55bd4a2d9b7be02c4fb67e6e7ada7773a0f39d7ab9b3d1b36e030d98 |
+| 6B-026 | Connected backing | 835c1e0c6d99d6ba0f5d | 1c34fc18b68d50a8a86f | 1c34fc18b68d50a8a86f9ef2558f6718287ecb7f224f94316b15ceceb8800d22 |
+| 6B-027 | Original | 11c9f23d792fd024292b | 11c9f23d792fd024292b | bc6aff34d74ebbc8bf7a43a0d2a81926d64e09bcaf9fe5cd1e73ffe68ffadfb4 |
+| 6C-001 | Connected relief | 60d9fbafa543640cf1ae | 389515e4c192a368e422 | 389515e4c192a368e422be75543c15694a192d6d790960a8adadd3f25ebebf54 |
+| 6C-002 | Connected relief | 9a586daa8e03121c4b2d | cadaeec94c5f81361d14 | cadaeec94c5f81361d14ec6b6b00f512752ff81ab7c8af13c9ee9575d91d879e |
+| 6C-003 | Supported relief | 88788fcb19e2210d5df9 | 31e842a44a9f6c2b5208 | 31e842a44a9f6c2b5208baf30adee264e0cdf9193ffe4d4f0c122185515875e6 |
+| 6C-004 | Connected relief | 422497262b1624452656 | 1b8206ac3922b37a6355 | 1b8206ac3922b37a635564b04870b36d93e08abe68c0b3fb4ee1bca06fcc89b0 |
+| 6C-005 | Connected relief | 422497262b1624452656 | 1b8206ac3922b37a6355 | 1b8206ac3922b37a635564b04870b36d93e08abe68c0b3fb4ee1bca06fcc89b0 |
+| 6C-006 | Supported relief | 70b197c46d4662d4a11c | a8f02bea7aa1997273a3 | a8f02bea7aa1997273a3b0ff80a61266afae3089ec24c8ef6616c79828a85a3e |
+| 6C-007 | Supported relief | b48c7c44dcad61c27710 | f6c8fdf6800b12fb2266 | f6c8fdf6800b12fb22661838dda19a4623012e1bc8be52d94a4d3f430c9e14df |
+| 6C-008 | Backed relief | c8f3e01db4971ebb9f67 | 93bce167c615554017c3 | 93bce167c615554017c3b9cf490b6d961bf915977ac27723252aa3013dddb91e |
+| 6C-009 | Supported relief | a62331697e540331f9bb | 5192a4abf20c5987ac41 | 5192a4abf20c5987ac417b66a2b577dc34b54f0e979021a89e22b982430d7c01 |
+| 6C-010 | Connected relief | 6f522eb6b59b5463782e | 4d8776a97fb3b8f1863a | 4d8776a97fb3b8f1863a1e6eb4ca3f77bbf6a6bc6c5cb6014198b3abaac3020f |
+| 6C-011 | Supported relief | 8886da886cfce3a99a2c | 57ff7b8f6b09c7b04208 | 57ff7b8f6b09c7b042084d4d8a21839dbc0cc14affe03ebaa3e9c8698bc1d9ef |
+| 6C-012 | Connected backing | 4f70a387703b561994ed | 718fd96aad0f79f72c94 | 718fd96aad0f79f72c942e981fef865540273cfae824b5d39079fd7c8347cae3 |
+| 6C-013 | Supported relief | db87897ccf1f524fa51d | 484552f48d4f87ef2758 | 484552f48d4f87ef2758fd2807fb0639a9f4c359667ad3e5e6297e96b72d67d7 |
+| 6C-014 | Supported relief | 6d63bd6df20fbe8dee3e | 25cf67d4f9f10c1ea574 | 25cf67d4f9f10c1ea5748f373d57591b77c91132fab4ac4672d1b583d6147091 |
+| 6C-015 | Connected relief | 0aa00cc7b1adc209fac8 | ce716e0f5668edbf4c30 | ce716e0f5668edbf4c3046f5f75720e9dfb82bd05f71abe17a0ceb7c1b856845 |
+| 6C-016 | Connected backing | 835c1e0c6d99d6ba0f5d | 1c34fc18b68d50a8a86f | 1c34fc18b68d50a8a86f9ef2558f6718287ecb7f224f94316b15ceceb8800d22 |
+| 6C-017 | Supported relief | 795f1ad4eff3ec9cd0e9 | 0591016e299f5091740a | 0591016e299f5091740a29ad54d28dab13a4b5755d9652db0d8286d1ea050d1b |

@@ -1,4 +1,6 @@
-# Christmas 2026 print review
+# Christmas 2026 original B and C submissions
+
+For the current gallery versions, including 6A and repaired files, see [Printable files](printable-versions.md).
 
 The gallery retains 44 attachments and has 40 distinct file hashes. IDs identify uploads. Byte-identical submissions share preview geometry and retain separate entries.
 
