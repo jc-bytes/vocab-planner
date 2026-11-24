@@ -125,7 +125,8 @@ function render(){
     const info=metadata.get(m.id)
     const card=el('article'),picture=el('button');picture.className='picture';picture.setAttribute('aria-label','View '+title(m));picture.onclick=()=>inspect(m)
     const img=el('img');img.loading='lazy';img.alt='';img.src=asset(m,'webp');picture.append(img)
-    const body=el('div');body.className='body';body.append(el('small','Class '+m.section),el('h2',title(m)),el('p',info?.credit||'Anonymous'))
+    const body=el('div');body.className='body';body.append(el('small','Class '+m.section),el('h2',title(m)))
+    if(info?.credit)body.append(el('p',info.credit))
     if(claimPage){const b=el('button','This is mine');b.onclick=()=>claim(m);body.append(b)}
     else if(info?.eligible===true && info.asset===m.asset)body.append(rating(m))
     else if(info)body.append(el('small','On display'))
