@@ -1,0 +1,14 @@
+fieldset { display: flex; gap: 1rem; border: 0; padding: 0; margin: 1rem 0; }
+legend { font-weight: bold; }
+fieldset label { display: inline-flex; align-items: center; gap: .4rem; min-height: 44px; margin: 0; cursor: pointer; }
+fieldset input { width: 1.15rem; min-height: 0; height: 1.15rem; margin: 0; accent-color: var(--pine); }
+.update { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.update button { border: 0; border-radius: 8px; padding: .45rem .85rem; }
+#standings { display: grid; gap: 1rem; margin-top: 1rem; grid-template-columns: repeat(auto-fit,minmax(min(100%,285px),1fr)); }
+#standings section { border: 1px solid #cbb9af; border-radius: 12px; background: #fff9f1; padding: 1rem; }
+#standings h2 { margin: 0 0 .75rem; }
+#standings ol { list-style: none; padding: 0; margin: 0; }
+#standings li { display: flex; align-items: center; gap: .65rem; padding: .6rem 0; border-top: 1px solid #ddcdc0; }
+#standings img { width: 50px; height: 58px; object-fit: contain; background: var(--pine); border-radius: 6px; }
+#standings h3 { font: 600 1.12rem Storybook, Georgia, serif; overflow-wrap: anywhere; }
+#standings h3, #standings li p { margin: 0; }
