@@ -1420,3 +1420,33 @@ test('timer reports through real persistence do not acknowledge a swallowed tran
     assert.equal(timer.lastReportedSeconds, 0);
     assert.equal(timer.nextReportAt, 60_000);
 });
+
+test('unit autosave skips confirmed content but keeps edits during a pending response', async t => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const cloud = unitSaveCloud();
+    cloud.progress.saveLocalProgress = () => {};
+    t.mock.method(imageDB, 'retireUnitSyncActions', async () => {});
+    let release;
+    const writes = [];
+    t.mock.method(supabaseService, 'syncStudentUnitWork', async payload => {
+        writes.push(payload);
+        if (writes.length === 2) await new Promise(resolve => { release = resolve; });
+        return { unit: { unitKey: payload.unitKey, ...structuredClone(payload.workPatch) } };
+    });
+    await cloud.saveProgressToCloud();
+    await cloud.saveProgressToCloud();
+    assert.equal(writes.length, 1);
+    const state = cloud.sm.progressData.units['unit-a'].states.matching;
+    state.answer = 'second';
+    const pending = cloud.saveProgressToCloud();
+    state.answer = 'third';
+    release();
+    await pending;
+    assert.equal(cloud.sm.progressData.units['unit-a'].states.matching.answer, 'third');
+    await cloud.saveProgressToCloud();
+    assert.deepEqual(writes.map(p => p.workPatch.states.matching.answer), ['original', 'second', 'third']);
+    await cloud.saveProgressToCloud();
+    assert.equal(writes.length, 3);
+});

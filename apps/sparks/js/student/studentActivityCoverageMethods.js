@@ -46,7 +46,7 @@ export class StudentActivityCoverage {
                 this.sm.progressData.wordCoverage = {};
             }
             this.sm.progressData.wordCoverage[vocabName] = this.wordCoverage;
-            this.sm.progress.saveLocalProgress();
+            this.sm.progress.saveLocalProgress(true);
         }
     }
 

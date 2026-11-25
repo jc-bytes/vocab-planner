@@ -200,6 +200,16 @@ test('private classes enforce ownership and verified enrollment through real aut
             const work = { p_event_id: crypto.randomUUID(), p_unit_key: key, p_unit_context: {},
                 p_work_patch: { states: { flashcards: { cardIndex: 1 } } } };
             assert.ifError((await both.client.rpc('sync_student_unit_work_v2', work)).error);
+            const nextWork = { ...work, p_event_id: crypto.randomUUID(),
+                p_work_patch: { states: { flashcards: { cardIndex: 2 } } } };
+            const updated = await both.client.rpc('sync_student_unit_work_v2', nextWork);
+            assert.ifError(updated.error);
+            const replay = await both.client.rpc('sync_student_unit_work_v2', work);
+            assert.ifError(replay.error);
+            assert.deepEqual(replay.data, updated.data, 'retry acknowledges the current saved work');
+            const conflict = await both.client.rpc('sync_student_unit_work_v2',
+                { ...nextWork, p_event_id: work.p_event_id });
+            assert.match(conflict.error?.message || '', /different request/);
             const { data: rows } = await both.client.from('student_activity_state').select('assignment_id').eq('unit_key', key);
             assert.equal(rows[0].assignment_id, assignment.id);
             await new Promise(resolve => setTimeout(resolve, (attempt.minimumSeconds + 1) * 1000));

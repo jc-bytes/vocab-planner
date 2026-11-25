@@ -118,7 +118,7 @@ export class StudentActivityWordHunt {
             : {};
         const merged = this.mergeWordHuntEntryMaps(progressEntries, localEntries, liveEntries);
 
-        if (unitProgress) {
+        if (unitProgress && JSON.stringify(progressEntries) !== JSON.stringify(merged)) {
             unitProgress.wordHunt = merged;
             this.sm.unitWordHunt = merged;
             this.sm.progress.saveLocalProgress();
@@ -152,7 +152,7 @@ export class StudentActivityWordHunt {
         try {
             if (this.sm.activityInstance && typeof this.sm.activityInstance.getScore === 'function' && this.sm.currentActivityType) {
                 this.sm.unitScores[this.sm.currentActivityType] = this.sm.activityInstance.getScore();
-                this.sm.progress.saveLocalProgress();
+                this.sm.progress.saveLocalProgress(true);
             }
 
             const report = captureStudentReport(this.sm, {

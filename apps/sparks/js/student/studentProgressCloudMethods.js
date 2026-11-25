@@ -29,6 +29,7 @@ export class StudentProgressCloud {
         this.storageSyncHandler = null;
         this.onlineSyncHandler = null;
         this.cloudGeneration = 0;
+        this.confirmedUnitSave = null;
         this.syncQueue = new StudentProgressSyncQueue(this);
     }
 
@@ -105,6 +106,7 @@ export class StudentProgressCloud {
     stopCoinSync() {
         this.syncQueue.cancelRetry();
         this.cloudGeneration += 1;
+        this.confirmedUnitSave = null;
         this.syncQueue.resetUnitSnapshots();
         if (this.coinRealtimeUnsubscribe) {
             this.coinRealtimeUnsubscribe();
@@ -322,7 +324,17 @@ export class StudentProgressCloud {
         if (!this.sm.currentUser) return;
         const ownerUserId = this.sm.currentUser.uid;
         const generation = this.cloudGeneration;
-        const unitPayload = this.buildUnitWorkSyncPayload();
+        const content = this.syncQueue.currentUnitWork();
+        const signature = JSON.stringify(content);
+        const confirmed = this.confirmedUnitSave;
+        if (confirmed && content && confirmed.ownerUserId === ownerUserId && confirmed.generation === generation
+            && confirmed.unit === this.sm.progressData.units[content.unitKey]
+            && confirmed.signature === signature && this.syncQueue.isLatestUnitSnapshot(confirmed)) {
+            this.sm.setAuthStatus(this.syncQueue.getAuthStatus());
+            return;
+        }
+        this.confirmedUnitSave = null;
+        const unitPayload = this.syncQueue.buildUnitWorkSyncPayload(content);
         try {
             let progress = null;
             if (unitPayload && typeof supabaseService.syncStudentUnitWork === 'function') {
@@ -338,7 +350,18 @@ export class StudentProgressCloud {
             if (!this.isCurrentOwner(ownerUserId) || generation !== this.cloudGeneration) return;
 
             if (progress && this.syncQueue.isLatestUnitSnapshot(unitPayload || {})) {
+                const current = this.syncQueue.currentUnitWork();
+                if (content && current?.unitKey === content.unitKey && JSON.stringify(current) !== signature) {
+                    // Another edit is still inside the save timer. Keep it for the next write.
+                    return;
+                }
                 this.applyUnitProgressResult(progress, unitPayload || {});
+                if (progress.unit && content && current?.unitKey === content.unitKey) {
+                    const saved = this.syncQueue.currentUnitWork();
+                    this.confirmedUnitSave = { ownerUserId, generation, unitKey: content.unitKey,
+                        snapshotOrder: unitPayload.snapshotOrder, unit: this.sm.progressData.units[content.unitKey],
+                        signature: JSON.stringify(saved) };
+                }
             }
 
             this.sm.setAuthStatus(this.syncQueue.getAuthStatus());

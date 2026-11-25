@@ -307,7 +307,7 @@ export class StudentListeners {
                 if (this.sm.activityInstance && typeof this.sm.activityInstance.getScore === 'function' && this.sm.currentActivityType) {
                     const result = this.sm.activityInstance.getScore();
                     this.sm.unitScores[this.sm.currentActivityType] = result;
-                    this.sm.progress.saveLocalProgress();
+                    this.sm.progress.saveLocalProgress(true);
                 }
 
                 const report = captureStudentReport(this.sm, {
@@ -363,7 +363,7 @@ export class StudentListeners {
                 const { applyStudentSchoolPlacement } = await import('./student/studentSchoolSession.js');
                 if (accountId !== this.sm.currentUser?.uid) return;
                 applyStudentSchoolPlacement(this.sm);
-                this.sm.progress.saveLocalProgress();
+                this.sm.progress.saveLocalProgress(true);
             } catch (error) {
                 console.error('Failed to update profile:', error);
                 notifications.error('Could not save your profile. Please try again.');
