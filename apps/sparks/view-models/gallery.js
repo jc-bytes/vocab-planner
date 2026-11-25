@@ -1,7 +1,7 @@
 import '@ui-sdk/web/rating'
 import { SUPABASE_CONFIG } from '../config/supabase-config.js'
 import catalog from './catalog.json'
-import './gallery.css'
+import './ornament-theme.css'
 
 const root = document.querySelector('#gallery')
 const parts = location.pathname.split('/').filter(Boolean)

@@ -1,5 +1,5 @@
 import { SUPABASE_CONFIG } from '../config/supabase-config.js'
-import '../view-models/gallery.css'
+import '../view-models/ornament-theme.css'
 import './results.css'
 
 const posters = import.meta.glob('../view-models/media/*.webp', { eager: true, query: '?url', import: 'default' })
