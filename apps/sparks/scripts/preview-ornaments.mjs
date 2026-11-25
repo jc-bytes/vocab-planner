@@ -28,12 +28,15 @@ const additions=await db.query("select 1 from ornament_gallery.model where event
 if(!additions.rows.length){
   await db.transaction(async tx=>tx.exec(await readFile(path.join(root,'supabase/migrations/20261125123000_ornament_additions.sql'),'utf8')))
 }
+if (!(await db.query("select to_regprocedure('public.ornament_results()') as fn")).rows[0].fn) {
+  await db.transaction(async tx=>tx.exec(await readFile(path.join(root,'supabase/migrations/20261125190000_ornament_results.sql'),'utf8')))
+}
 const classes=(await db.query("select section,code from ornament_gallery.class_code order by section")).rows
 const teachers=(await db.query("select code from ornament_gallery.teacher_code")).rows
 const access=['# Local ornament gallery access','',...classes.map(c=>c.section+' claim code: '+c.code),'',...teachers.map(t=>'Teacher ballot code: '+t.code)]
 await writeFile(path.join(dir,'local-access.md'),access.join('\n')+'\n',{mode:0o600})
 const calls={
-  catalog:[],my_ratings:['voter_id','teacher_key'],rate:['model_id','asset_key','voter_id','rating','teacher_key'],
+  results:[],catalog:[],my_ratings:['voter_id','teacher_key'],rate:['model_id','asset_key','voter_id','rating','teacher_key'],
   claim:['model_id','class_key','student_name','model_title','public_credit']
 }
 const server=await createServer({root,define:{

@@ -53,6 +53,7 @@ if(!claimPage && !teachers){
     nav.append(a)
   }
 } else nav.append(link('← Public gallery',section?section.toLowerCase()+'/':''))
+nav.append(link('Results','../view-results/'))
 root.append(nav)
 const intro=el('p',claimPage?'Find your ornament and send your claim to your teacher.':teachers?'Enter your teacher code to rate print-approved ornaments.':'Open an ornament to turn it around. Rate eligible designs from 1 to 10.')
 root.append(intro)

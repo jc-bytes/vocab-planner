@@ -39,3 +39,30 @@ test('ornament event gates voting by exact approved file and protects private re
   for(const table of ['vote','claim','model','teacher_code','class_code'])assert.equal((await db.query('select * from ornament_gallery.'+table)).rows.length,0)
  }finally{await db.close()}
 })
+
+test('class results rank current approved versions independently for each ballot', async () => {
+ const db = new PGlite()
+ try {
+  await db.exec('create role anon;create role authenticated')
+  for (const file of ['20261124011500_ornament_gallery.sql','20261125190000_ornament_results.sql']) {
+   await db.exec(await readFile(new URL('../supabase/migrations/' + file, import.meta.url), 'utf8'))
+  }
+  const results = async () => (await db.query('select public.ornament_results() as rows')).rows[0].rows
+  assert.deepEqual(await results(), [])
+  await db.exec(`insert into ornament_gallery.vote
+    select m.event_id,m.id,m.asset,gen_random_uuid(),v.teacher,v.score
+    from (values ('6B-001',false,9),('6B-001',false,9),('6B-002',false,9),
+                 ('6B-003',false,9),('6B-005',false,8),('6B-002',true,6),
+                 ('6B-004',false,10)) v(id,teacher,score)
+    join ornament_gallery.model m on m.id=v.id;
+    insert into ornament_gallery.vote
+    select event_id,id,'superseded',gen_random_uuid(),false,10 from ornament_gallery.model where id='6B-005';
+    update ornament_gallery.event set voting_open=false;
+    set role anon`)
+  const rows = await results()
+  assert.deepEqual(rows.map(r => [r.id,r.teacher,r.place,r.votes,r.average]), [
+   ['6B-001',false,1,2,9],['6B-002',false,2,1,9],['6B-003',false,3,1,9],['6B-002',true,1,1,6]
+  ])
+  assert.ok(rows.every(r => r.section === '6B' && !('voter' in r)))
+ } finally { await db.close() }
+})

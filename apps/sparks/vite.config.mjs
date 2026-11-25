@@ -58,6 +58,7 @@ export default defineConfig(({ command, mode }) => {
         input: {
           index: resolve(__dirname, 'index.html'),
           ...Object.fromEntries(['', '6a/', '6b/', '6c/', '6a/this-is-mine/', '6b/this-is-mine/', '6c/this-is-mine/', 'teachers/'].map(route => ['ornaments-' + route, resolve(__dirname, 'view-models', route, 'index.html')])),
+          ornamentResults: resolve(__dirname, 'view-results/index.html'),
           student: resolve(__dirname, 'student.html'),
           studentPreview: resolve(__dirname, 'student-preview.html'),
           teacher: resolve(__dirname, 'teacher.html')
