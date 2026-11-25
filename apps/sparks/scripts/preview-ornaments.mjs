@@ -24,6 +24,10 @@ const {rows: refreshed}=await db.query("select exists(select 1 from ornament_gal
 if(!refreshed[0].ready){
   await db.transaction(async tx=>tx.exec(await readFile(path.join(root,'supabase/migrations/20261124160000_ornament_repairs.sql'),'utf8')))
 }
+const additions=await db.query("select 1 from ornament_gallery.model where event_id='christmas-2026' and id='6A-013'")
+if(!additions.rows.length){
+  await db.transaction(async tx=>tx.exec(await readFile(path.join(root,'supabase/migrations/20261125123000_ornament_additions.sql'),'utf8')))
+}
 const classes=(await db.query("select section,code from ornament_gallery.class_code order by section")).rows
 const teachers=(await db.query("select code from ornament_gallery.teacher_code")).rows
 const access=['# Local ornament gallery access','',...classes.map(c=>c.section+' claim code: '+c.code),'',...teachers.map(t=>'Teacher ballot code: '+t.code)]

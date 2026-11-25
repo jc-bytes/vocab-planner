@@ -60,6 +60,26 @@
     "asset": "2f10af30296b74543926"
   },
   {
+    "id": "6A-013",
+    "section": "6A",
+    "asset": "285b2a43bef7d8d990c0"
+  },
+  {
+    "id": "6A-014",
+    "section": "6A",
+    "asset": "2a070a967f813c859ad3"
+  },
+  {
+    "id": "6A-015",
+    "section": "6A",
+    "asset": "3a7c025bcda632b0cbed"
+  },
+  {
+    "id": "6A-016",
+    "section": "6A",
+    "asset": "0094f5fe4d352d383e51"
+  },
+  {
     "id": "6B-001",
     "section": "6B",
     "asset": "cbcc0d1af70638f839bc"
@@ -195,6 +215,26 @@
     "asset": "11c9f23d792fd024292b"
   },
   {
+    "id": "6B-028",
+    "section": "6B",
+    "asset": "dd8232af8f945b802986"
+  },
+  {
+    "id": "6B-029",
+    "section": "6B",
+    "asset": "dda3c6ae55417eab6cf1"
+  },
+  {
+    "id": "6B-030",
+    "section": "6B",
+    "asset": "8466bceaeae356582710"
+  },
+  {
+    "id": "6B-031",
+    "section": "6B",
+    "asset": "1a9949d000e1766a11c8"
+  },
+  {
     "id": "6C-001",
     "section": "6C",
     "asset": "389515e4c192a368e422"
@@ -278,5 +318,25 @@
     "id": "6C-017",
     "section": "6C",
     "asset": "0591016e299f5091740a"
+  },
+  {
+    "id": "6C-018",
+    "section": "6C",
+    "asset": "504161989fbec1a8cce4"
+  },
+  {
+    "id": "6C-019",
+    "section": "6C",
+    "asset": "50a614fff27777295e2a"
+  },
+  {
+    "id": "6C-020",
+    "section": "6C",
+    "asset": "5bddca11fe611c9d795f"
+  },
+  {
+    "id": "6C-021",
+    "section": "6C",
+    "asset": "bdab91b6e11e0ee437f6"
   }
 ]
