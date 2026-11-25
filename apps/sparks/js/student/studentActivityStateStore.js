@@ -40,7 +40,8 @@ export class StudentActivityStateStore {
             removeStudentActivityValue(`${normalizedKey} `);
         }
 
-        if (this.sm.unitStates?.[activityType]) {
+        let changed = Object.hasOwn(this.sm.unitStates || {}, activityType);
+        if (changed) {
             delete this.sm.unitStates[activityType];
         }
 
@@ -51,6 +52,7 @@ export class StudentActivityStateStore {
             });
             const progressKey = this.activities.getUnitProgressKey(this.sm.currentVocab);
             if (this.sm.progressData.units[progressKey]?.wordHunt) {
+                changed = true;
                 delete this.sm.progressData.units[progressKey].wordHunt;
             }
             this.sm.unitWordHunt = {};
@@ -60,7 +62,7 @@ export class StudentActivityStateStore {
             this.sm.sessionProgress[activityType].lastScore = 0;
         }
 
-        this.sm.progress.saveLocalProgress();
+        this.sm.progress.saveLocalProgress(!changed);
     }
 
     sanitizeActivityState(stateData) {

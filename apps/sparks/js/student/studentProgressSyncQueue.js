@@ -139,7 +139,7 @@ export class StudentProgressSyncQueue {
         return latest === undefined || (Number(payload.snapshotOrder) || 0) >= latest;
     }
 
-    buildUnitWorkSyncPayload() {
+    currentUnitWork() {
         if (!this.sm.currentVocab || !this.sm.activities?.getUnitProgressKey) return null;
         const unitKey = this.sm.activities.getUnitProgressKey(this.sm.currentVocab);
         const unitProgress = this.sm.progressData.units?.[unitKey];
@@ -153,12 +153,7 @@ export class StudentProgressSyncQueue {
             ...workPatch
         } = unitProgress;
 
-        const snapshotOrder = this.snapshotClock = Math.max(Date.now(), this.snapshotClock + 1);
-        this.latestUnitSnapshots.set(unitKey, snapshotOrder);
-        // Match the RPC JSON transport, including legacy timestamp objects with methods.
-        return JSON.parse(JSON.stringify({
-            eventId: createUniqueId('unit-work:'),
-            snapshotOrder,
+        return {
             unitKey,
             unitContext: {
                 unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
@@ -169,7 +164,15 @@ export class StudentProgressSyncQueue {
                 grade: unitProgress.grade || this.sm.studentProfile?.grade || ''
             },
             workPatch
-        }));
+        };
+    }
+
+    buildUnitWorkSyncPayload(content = this.currentUnitWork()) {
+        if (!content) return null;
+        const snapshotOrder = this.snapshotClock = Math.max(Date.now(), this.snapshotClock + 1);
+        this.latestUnitSnapshots.set(content.unitKey, snapshotOrder);
+        // Detach the exact request before any asynchronous write or offline retry.
+        return JSON.parse(JSON.stringify({ eventId: createUniqueId('unit-work:'), snapshotOrder, ...content }));
     }
 
     executeUnitWork(payload, options = {}) {

@@ -366,3 +366,11 @@ for (const operation of ['uploadWordHuntImage', 'loadWordHuntImage']) {
         assert.equal(await op, operation === 'uploadWordHuntImage' ? 'confirmed original upload' : 'captured image');
     });
 }
+
+test('opening the same report twice saves only newly collected Word Hunt entries', () => {
+    const f = fixture();
+    f.sm.activityInstance = { getWordHuntEntries: () => ({ source: { text: 'revised answer' } }) };
+    assert.equal(f.evidence.getReportWordHuntEntries().source.text, 'revised answer');
+    assert.equal(f.evidence.getReportWordHuntEntries().source.text, 'revised answer');
+    assert.equal(f.sm.saves, 1);
+});
